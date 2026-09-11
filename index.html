@@ -324,13 +324,63 @@
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
+      osc.start();// --- SINTETIZADOR DE AUDIO 8-BITS (WEB AUDIO API) ---
+    let audioCtx = null;
+    let menuMusicInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Desbloquear audio automáticamente con el primer toque o clic en la página
+    document.addEventListener('pointerdown', () => {
+      initAudio();
+      if (!menuMusicInterval && document.getElementById('menuPrincipal').classList.contains('active')) {
+        startMenuMusic();
+      }
+    }, { once: true });
+
+    function playTone(freq, duration, type = 'square', delay = 0) {
+      initAudio();
+      setTimeout(() => {
+        if (!audioCtx || audioCtx.state !== 'running') return;
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      }, delay);
+    }
+
+    function playSlide(startFreq, endFreq, duration, type = 'square') {
+      initAudio();
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      let osc = audioCtx.createOscillator();
+      let gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     }
 
-    // Ruido blanco (para explosiones o choques)
     function playNoise(duration) {
       initAudio();
+      if (!audioCtx || audioCtx.state !== 'running') return;
       let bufferSize = audioCtx.sampleRate * duration;
       let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       let data = buffer.getChannelData(0);
@@ -352,10 +402,9 @@
       noise.start();
     }
 
-    // Canción 8-bit para el HUD / Menú Principal
     function startMenuMusic() {
       stopMenuMusic();
-      let notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63]; // C E G C5 G E
+      let notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
       let index = 0;
       menuMusicInterval = setInterval(() => {
         if (document.getElementById('menuPrincipal').classList.contains('active')) {
@@ -371,7 +420,6 @@
         menuMusicInterval = null;
       }
     }
-
     // --- SONIDOS ESPECÍFICOS SOLICITADOS ---
     // Culebrita
     function soundCulebraEat() {
