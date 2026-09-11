@@ -6,7 +6,19 @@
   <title>Arcade Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; touch-action: manipulation; }
+    * { 
+      box-sizing: border-box; 
+      touch-action: manipulation; 
+      -webkit-tap-highlight-color: transparent; /* Quita el destello azul al tocar */
+      user-select: none; /* Evita que el texto o los canvas se seleccionen por error */
+      -webkit-user-select: none;
+    }
+    
+    /* Permitir escribir en el cuadro de texto del login */
+    input {
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
     
     html, body {
       width: 100%; margin: 0; padding: 0;
