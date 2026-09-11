@@ -527,8 +527,24 @@
     function guardarPuntajeAutomatico(juego, puntaje) {
       if (!usuarioActual) return;
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
-      scores.push({ name: usuarioActual, score: puntaje, game: juego });
+      
+      // Buscar si el usuario ya tiene un récord registrado para este juego
+      let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
+
+      if (indexExistente !== -1) {
+        // Si ya existe, actualizamos solo si el nuevo puntaje es mayor al anterior
+        if (puntaje > scores[indexExistente].score) {
+          scores[indexExistente].score = puntaje;
+        }
+      } else {
+        // Si no existe, lo agregamos por primera vez
+        scores.push({ name: usuarioActual, score: puntaje, game: juego });
+      }
+
+      // Ordenar de mayor a menor puntaje
       scores.sort((a, b) => b.score - a.score);
+      
+      // Guardar en el almacenamiento local
       localStorage.setItem('arcadeScores', JSON.stringify(scores));
       cargarTablaRécordsGenerica(juego);
     }
