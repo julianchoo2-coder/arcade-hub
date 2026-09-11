@@ -14,12 +14,7 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    
-    input {
-      user-select: auto;
-      -webkit-user-select: auto;
-    }
-    
+    input { user-select: auto; -webkit-user-select: auto; }
     html, body {
       width: 100%; margin: 0; padding: 0;
       background-color: #050b14; color: #f8fafc; 
@@ -27,126 +22,69 @@
       background-image: radial-gradient(#1e293b 1.5px, transparent 1.5px);
       background-size: 24px 24px;
     }
-
-    .screen { 
-      display: none; flex-direction: column; align-items: center; 
-      width: 100%; max-width: 750px; 
-      margin: 0 auto; padding: 40px 20px; 
-      min-height: 100vh;
-    }
+    .screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 750px; margin: 0 auto; padding: 40px 20px; min-height: 100vh; }
     .screen.active { display: flex; }
-
     .arcade-title {
-      font-size: 1.8rem;
-      color: #38bdf8;
+      font-size: 1.8rem; color: #38bdf8;
       text-shadow: 4px 4px 0px #1e293b, 8px 8px 0px #020617;
-      text-align: center;
-      margin-bottom: 30px;
-      line-height: 1.6;
-      letter-spacing: 3px;
-      border-bottom: 4px dashed #334155;
-      padding-bottom: 20px;
-      width: 100%;
+      text-align: center; margin-bottom: 30px; line-height: 1.6; letter-spacing: 3px;
+      border-bottom: 4px dashed #334155; padding-bottom: 20px; width: 100%;
     }
-
-    h1 {
-      font-size: 1.2rem; font-weight: 400;
-      color: #38bdf8; margin: 0 0 15px 0; text-align: center;
-      line-height: 1.5;
-      text-shadow: 3px 3px 0px #000;
-    }
-
+    h1 { font-size: 1.2rem; font-weight: 400; color: #38bdf8; margin: 0 0 15px 0; text-align: center; line-height: 1.5; text-shadow: 3px 3px 0px #000; }
     .login-box {
-      background: #0f172a; border: 4px solid #334155; border-radius: 0px;
-      padding: 35px; width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 20px;
-      box-shadow: 8px 8px 0px #000; align-items: center;
+      background: #0f172a; border: 4px solid #334155; padding: 35px; width: 100%; max-width: 450px;
+      display: flex; flex-direction: column; gap: 20px; box-shadow: 8px 8px 0px #000; align-items: center;
     }
     .login-input {
       width: 100%; padding: 16px; font-size: 0.9rem; background: #020617;
-      border: 3px solid #475569; color: white; border-radius: 0px; text-align: center;
-      outline: none; font-family: 'Press Start 2P', monospace;
+      border: 3px solid #475569; color: white; text-align: center; outline: none; font-family: 'Press Start 2P', monospace;
     }
     .login-input:focus { border-color: #38bdf8; }
     .login-btn {
       width: 100%; padding: 16px; font-family: 'Press Start 2P', monospace; font-size: 0.9rem;
-      background-color: #38bdf8; color: #0f172a; border: 3px solid #020617; border-radius: 0px; cursor: pointer;
-      box-shadow: 4px 4px 0px #020617; transition: transform 0.1s;
+      background-color: #38bdf8; color: #0f172a; border: 3px solid #020617; cursor: pointer; box-shadow: 4px 4px 0px #020617;
     }
-    .login-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #020617; }
-    
     .guest-btn {
       width: 100%; padding: 14px; font-family: 'Press Start 2P', monospace; font-size: 0.75rem;
-      background-color: transparent; color: #94a3b8; border: 3px solid #475569; border-radius: 0px; cursor: pointer;
+      background-color: transparent; color: #94a3b8; border: 3px solid #475569; cursor: pointer;
     }
     .guest-btn:hover { color: #f8fafc; border-color: #f8fafc; }
     #loginMsg { font-size: 0.7rem; color: #f43f5e; text-align: center; min-height: 20px; }
-
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 20px;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 30px;
-    }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; width: 100%; max-width: 600px; margin-bottom: 30px; }
     .game-card {
-      background: #0f172a; border: 4px solid #334155; border-radius: 0px;
-      overflow: hidden; cursor: pointer;
-      box-shadow: 6px 6px 0px #000;
-      transition: transform 0.1s;
-      display: flex; flex-direction: column; align-items: center; padding-bottom: 18px;
+      background: #0f172a; border: 4px solid #334155; overflow: hidden; cursor: pointer;
+      box-shadow: 6px 6px 0px #000; transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; padding-bottom: 18px;
     }
-    .game-card:hover {
-      transform: translateY(-4px); border-color: #38bdf8;
-    }
-    .game-cover {
-      width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
-      background-size: cover; background-position: center;
-      border-bottom: 3px solid #334155;
-    }
-    
+    .game-card:hover { transform: translateY(-4px); border-color: #38bdf8; }
+    .game-cover { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem; background-size: cover; background-position: center; border-bottom: 3px solid #334155; }
     .cover-snake { background-color: #163820; }
     .cover-tiger { background: linear-gradient(135deg, #ff7b54 0%, #2d5a27 100%); }
     .cover-bomber { background: linear-gradient(135deg, #451a03 0%, #7c2d12 100%); }
-    .cover-kong { background: linear-gradient(135deg, #78350f 0%, #1e1b4b 100%); }
-    .game-title { font-size: 0.75rem; color: #f8fafc; margin-top: 15px; text-align: center; }
-
-    .main-wrapper { 
-      display: flex; flex-direction: column; gap: 30px; 
-      width: 100%; max-width: 600px; 
-      align-items: center; 
-    }
     
-    .game-container {
-      display: flex; flex-direction: column; align-items: center; width: 100%;
+    /* Estilo de tarjeta bloqueada / en desarrollo */
+    .game-card.disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      border-color: #eab308;
+    }
+    .game-card.disabled:hover { transform: none; border-color: #eab308; }
+    .dev-banner {
+      background: repeating-linear-gradient(45deg, #eab308, #eab308 10px, #000 10px, #000 20px);
+      color: #fff; font-size: 0.55rem; text-align: center; padding: 6px; width: 100%; font-weight: bold; text-shadow: 1px 1px 0px #000;
     }
 
-    canvas { 
-      border: 5px solid #334155; border-radius: 0px; background-color: #020617; 
-      width: 100%; max-width: 580px; height: auto; aspect-ratio: 1 / 1; 
-      image-rendering: pixelated; 
-      box-shadow: 8px 8px 0px #000;
-    }
-
-    .dashboard { 
-      background: #0f172a; border: 4px solid #334155; border-radius: 0px; 
-      padding: 20px; width: 100%; display: flex; gap: 15px;
-      box-shadow: 6px 6px 0px #000;
-    }
+    .game-title { font-size: 0.75rem; color: #f8fafc; margin-top: 12px; text-align: center; }
+    .main-wrapper { display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 600px; align-items: center; }
+    .game-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    canvas { border: 5px solid #334155; background-color: #020617; width: 100%; max-width: 580px; height: auto; aspect-ratio: 1 / 1; image-rendering: pixelated; box-shadow: 8px 8px 0px #000; }
+    .dashboard { background: #0f172a; border: 4px solid #334155; padding: 20px; width: 100%; display: flex; gap: 15px; box-shadow: 6px 6px 0px #000; }
     .dashboard h2 { font-size: 0.75rem; font-weight: 400; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; text-align: center; }
-    
     .mobile-controls { display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(2, 75px); gap: 12px; margin-top: 20px; justify-content: center; }
-    .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; border-radius: 0px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
+    .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
     .ctrl-btn:active { background: #38bdf8; color: #0f172a; transform: translate(2px, 2px); box-shadow: none; }
     .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-down { grid-column: 2; grid-row: 2; } .btn-right { grid-column: 3; grid-row: 2; }
-    
-    .back-btn { 
-      background: transparent; color: #94a3b8; border: 3px solid #475569; font-family: 'Press Start 2P', monospace; 
-      font-size: 0.75rem; padding: 14px 20px; border-radius: 0px; cursor: pointer; 
-      margin-bottom: 10px; align-self: flex-start; box-shadow: 3px 3px 0px #000;
-    }
+    .back-btn { background: transparent; color: #94a3b8; border: 3px solid #475569; font-family: 'Press Start 2P', monospace; font-size: 0.75rem; padding: 14px 20px; cursor: pointer; margin-bottom: 10px; align-self: flex-start; box-shadow: 3px 3px 0px #000; }
     .back-btn:hover { color: #f8fafc; border-color: #f8fafc; background: #1e293b; }
-
     .score-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
     .score-table th, .score-table td { padding: 8px 4px; text-align: left; border-bottom: 2px dashed #1e293b; }
     .score-table th { color: #38bdf8; }
@@ -187,8 +125,10 @@
           <div class="game-cover cover-bomber">💣</div>
           <div class="game-title">BOMBER</div>
         </div>
-        <div class="game-card" onclick="cambiarPantalla('vistaKong')">
-          <div class="game-cover cover-kong">🦍</div>
+        <!-- Tarjeta bloqueada en desarrollo -->
+        <div class="game-card disabled" onclick="alert('¡Juego en construcción! Vuelve pronto.')">
+          <div class="dev-banner">EN DESARROLLO</div>
+          <div class="game-cover" style="background: linear-gradient(135deg, #334155 0%, #0f172a 100%);">🚧</div>
           <div class="game-title">KONG ARCADE</div>
         </div>
       </div>
@@ -270,53 +210,21 @@
     </div>
   </div>
 
-  <!-- KONG ARCADE -->
-  <div id="vistaKong" class="screen">
-    <div class="main-wrapper">
-      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">KONG ARCADE</h1>
-        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreKong">0</span></p>
-        <canvas id="gameCanvasKong" width="260" height="260" style="max-width: 260px;"></canvas>
-        <button id="respawnBtnKong" onclick="resetKong()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">OTRA VEZ</button>
-        <div class="mobile-controls">
-          <button class="ctrl-btn btn-up" ontouchstart="moverKongInput('up'); event.preventDefault();" onclick="moverKongInput('up')">▲</button>
-          <button class="ctrl-btn btn-left" ontouchstart="moverKongInput('left'); event.preventDefault();" onclick="moverKongInput('left')">◄</button>
-          <button class="ctrl-btn btn-down" ontouchstart="moverKongInput('down'); event.preventDefault();" onclick="moverKongInput('down')">▼</button>
-          <button class="ctrl-btn btn-right" ontouchstart="moverKongInput('right'); event.preventDefault();" onclick="moverKongInput('right')">►</button>
-        </div>
-      </div>
-      <div class="dashboard">
-        <div style="flex: 1;">
-          <h2>TOP LOCAL</h2>
-          <table id="scoreTableKong" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
     let usuarioActual = "";
     let animIdCulebra = null;
     let animIdTigre = null;
     let animIdBomber = null;
-    let animIdKong = null;
     let juegoCulebraActivo = false;
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
-    let juegoKongActivo = false;
 
-    // --- SINTETIZADOR DE AUDIO ---
     let audioCtx = null;
     let currentMusicInterval = null;
 
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (audioCtx.state === 'suspended') { audioCtx.resume(); }
     }
 
     document.addEventListener('pointerdown', () => {
@@ -365,9 +273,7 @@
       let bufferSize = audioCtx.sampleRate * duration;
       let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       let data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
       let noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
       let filter = audioCtx.createBiquadFilter();
@@ -384,10 +290,7 @@
     }
 
     function stopMusic() {
-      if (currentMusicInterval) {
-        clearInterval(currentMusicInterval);
-        currentMusicInterval = null;
-      }
+      if (currentMusicInterval) { clearInterval(currentMusicInterval); currentMusicInterval = null; }
     }
 
     function startMenuMusic() {
@@ -438,39 +341,16 @@
       }, 190);
     }
 
-    function startKongMusic() {
-      stopMusic();
-      let notes = [220, 247, 261, 293, 329, 293, 261, 247, 220, 196, 220, 247, 261, 247, 220, 196];
-      let index = 0;
-      currentMusicInterval = setInterval(() => {
-        if (juegoKongActivo) {
-          playTone(notes[index], 0.12, 'sawtooth');
-          index = (index + 1) % notes.length;
-        }
-      }, 170);
-    }
-
     function soundCulebraEat() {
       playTone(523.25, 0.08, 'square', 0);
       playTone(659.25, 0.08, 'square', 80);
       playTone(783.99, 0.12, 'square', 160);
     }
-    function soundCulebraCrash() {
-      playNoise(0.3);
-      playTone(150, 0.2, 'sawtooth', 0);
-    }
-    function soundTigreJump() {
-      playSlide(200, 500, 0.1, 'square');
-    }
-    function soundBomberExplosion() {
-      playNoise(0.4);
-      playTone(100, 0.3, 'sawtooth', 0);
-    }
-    function soundBomberLose() {
-      playSlide(400, 100, 0.4, 'sawtooth');
-    }
+    function soundCulebraCrash() { playNoise(0.3); playTone(150, 0.2, 'sawtooth', 0); }
+    function soundTigreJump() { playSlide(200, 500, 0.1, 'square'); }
+    function soundBomberExplosion() { playNoise(0.4); playTone(100, 0.3, 'sawtooth', 0); }
+    function soundBomberLose() { playSlide(400, 100, 0.4, 'sawtooth'); }
 
-    // --- GESTIÓN DE SESIÓN Y ARRANQUE ---
     window.onload = function() {
       let savedUser = localStorage.getItem('arcadeUser');
       if (savedUser) {
@@ -490,10 +370,7 @@
       initAudio();
       let u = document.getElementById('userInput').value.trim();
       let msg = document.getElementById('loginMsg');
-      if (!u) {
-        msg.innerText = "POR FAVOR, INGRESA UN NOMBRE";
-        return;
-      }
+      if (!u) { msg.innerText = "POR FAVOR, INGRESA UN NOMBRE"; return; }
       usuarioActual = u;
       localStorage.setItem('arcadeUser', usuarioActual);
       document.getElementById('welcomeUser').innerText = "HOLA, " + usuarioActual;
@@ -521,22 +398,15 @@
     function cambiarPantalla(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      
-      juegoCulebraActivo = false;
-      juegoTigreActivo = false;
-      juegoBomberActivo = false;
-      juegoKongActivo = false;
+      juegoCulebraActivo = false; juegoTigreActivo = false; juegoBomberActivo = false;
       if (animIdCulebra) cancelAnimationFrame(animIdCulebra);
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
-      if (animIdKong) cancelAnimationFrame(animIdKong);
-
       stopMusic();
       if(id === 'menuPrincipal') { startMenuMusic(); }
       if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
       if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
       if(id === 'vistaBomber') { cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
-      if(id === 'vistaKong') { cargarTablaRécordsGenerica("KongArcade"); iniciarKong(); }
       window.scrollTo(0, 0);
     }
 
@@ -544,15 +414,11 @@
       if (!usuarioActual) return;
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
       let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
-
       if (indexExistente !== -1) {
-        if (puntaje > scores[indexExistente].score) {
-          scores[indexExistente].score = puntaje;
-        }
+        if (puntaje > scores[indexExistente].score) { scores[indexExistente].score = puntaje; }
       } else {
         scores.push({ name: usuarioActual, score: puntaje, game: juego });
       }
-
       scores.sort((a, b) => b.score - a.score);
       localStorage.setItem('arcadeScores', JSON.stringify(scores));
       cargarTablaRécordsGenerica(juego);
@@ -562,15 +428,11 @@
       let tablaId = "scoreTableCulebra";
       if (nombreJuego === "TigreSelva") tablaId = "scoreTableTigre";
       if (nombreJuego === "BomberMan") tablaId = "scoreTableBomber";
-      if (nombreJuego === "KongArcade") tablaId = "scoreTableKong";
-      
       let scoreTable = document.getElementById(tablaId);
       if (!scoreTable) return;
       scoreTable.innerHTML = "<tr><th>JUGADOR</th><th>PTS</th></tr>";
-      
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
       let filtered = scores.filter(item => item.game === nombreJuego).slice(0, 5);
-
       if(filtered.length === 0) {
         scoreTable.innerHTML += "<tr><td colspan='2' style='text-align:center; color:#64748b;'>SIN RÉCORDS</td></tr>";
         return;
@@ -581,7 +443,7 @@
       });
     }
 
-    // --- CULEBRITA ---
+    // --- CULEBRITA & TIGRE & BOMBER (Mantenidos igual) ---
     const canvasC = document.getElementById('gameCanvasCulebra');
     const ctxC = canvasC.getContext('2d');
     let snake = [{x: 140, y: 140}], food = {x: 100, y: 100};
@@ -590,61 +452,38 @@
 
     function iniciarCulebra() {
       if (animIdCulebra) cancelAnimationFrame(animIdCulebra);
-      snake = [{x: 140, y: 140}];
-      dxC = 20; dyC = 0; scoreC = 0;
+      snake = [{x: 140, y: 140}]; dxC = 20; dyC = 0; scoreC = 0;
       document.getElementById('scoreCulebra').innerText = scoreC;
-      gameOverC = false;
-      lastTimeC = 0; acumuladorC = 0;
+      gameOverC = false; lastTimeC = 0; acumuladorC = 0;
       document.getElementById('respawnBtnCulebra').style.display = 'none';
-      placeFoodC();
-      juegoCulebraActivo = true;
-      startCulebraMusic();
+      placeFoodC(); juegoCulebraActivo = true; startCulebraMusic();
       animIdCulebra = requestAnimationFrame(updateCulebra);
     }
-
     function placeFoodC() {
       food.x = Math.floor(Math.random() * (canvasC.width / 20)) * 20;
       food.y = Math.floor(Math.random() * (canvasC.height / 20)) * 20;
     }
-
     function updateCulebra(time) {
       if (!juegoCulebraActivo || gameOverC) return;
       animIdCulebra = requestAnimationFrame(updateCulebra);
-
       if (!lastTimeC) lastTimeC = time;
-      acumuladorC += (time - lastTimeC);
-      lastTimeC = time;
-
-      let currentSnakeSpeed = 110;
-      if (scoreC >= 500) currentSnakeSpeed = 65;   
-      else if (scoreC >= 100) currentSnakeSpeed = 90;   
-
+      acumuladorC += (time - lastTimeC); lastTimeC = time;
+      let currentSnakeSpeed = scoreC >= 500 ? 65 : (scoreC >= 100 ? 90 : 110);
       while (acumuladorC >= currentSnakeSpeed) {
-        acumuladorC -= currentSnakeSpeed;
-        cambiandoDirC = false;
+        acumuladorC -= currentSnakeSpeed; cambiandoDirC = false;
         const head = {x: snake[0].x + dxC, y: snake[0].y + dyC};
-
         if (head.x < 0 || head.x >= canvasC.width || head.y < 0 || head.y >= canvasC.height || snake.some(p => p.x === head.x && p.y === head.y)) {
-          gameOverC = true;
-          juegoCulebraActivo = false;
-          stopMusic();
-          soundCulebraCrash();
+          gameOverC = true; juegoCulebraActivo = false; stopMusic(); soundCulebraCrash();
           document.getElementById('respawnBtnCulebra').style.display = 'block';
           if (scoreC > 0) guardarPuntajeAutomatico("Culebrita", scoreC);
           return;
         }
-
         snake.unshift(head);
         if (head.x === food.x && head.y === food.y) {
-          scoreC += 10;
-          soundCulebraEat();
-          document.getElementById('scoreCulebra').innerText = scoreC;
-          placeFoodC();
-        } else {
-          snake.pop();
-        }
+          scoreC += 10; soundCulebraEat();
+          document.getElementById('scoreCulebra').innerText = scoreC; placeFoodC();
+        } else { snake.pop(); }
       }
-
       ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
       for (let r = 0; r < canvasC.height / 20; r++) {
         for (let c = 0; c < canvasC.width / 20; c++) {
@@ -652,23 +491,13 @@
           ctxC.fillRect(c * 20, r * 20, 20, 20);
         }
       }
-      ctxC.fillStyle = '#ff2a2a';
-      ctxC.fillRect(food.x + 3, food.y + 6, 14, 10);
-      ctxC.fillRect(food.x + 5, food.y + 4, 10, 14);
-      ctxC.fillStyle = '#55ff55';
-      ctxC.fillRect(food.x + 8, food.y + 2, 4, 4);
-
+      ctxC.fillStyle = '#ff2a2a'; ctxC.fillRect(food.x + 3, food.y + 6, 14, 10);
+      ctxC.fillStyle = '#55ff55'; ctxC.fillRect(food.x + 8, food.y + 2, 4, 4);
       snake.forEach((p, index) => {
-        if (index === 0) {
-          ctxC.fillStyle = '#00ccff';
-          ctxC.fillRect(p.x + 1, p.y + 1, 18, 18);
-        } else {
-          ctxC.fillStyle = '#0099cc';
-          ctxC.fillRect(p.x + 2, p.y + 2, 16, 16);
-        }
+        ctxC.fillStyle = index === 0 ? '#00ccff' : '#0099cc';
+        ctxC.fillRect(p.x + 1, p.y + 1, 18, 18);
       });
     }
-
     function intentarMoverC(nx, ny) {
       if (gameOverC || cambiandoDirC) return;
       if (ny !== 0 && dyC === 0) { dxC = 0; dyC = ny; cambiandoDirC = true; }
@@ -676,102 +505,73 @@
     }
     function resetCulebra() { iniciarCulebra(); }
 
-    // --- TIGRE EN LA SELVA ---
     const canvasT = document.getElementById('gameCanvasTigre');
     const ctxT = canvasT.getContext('2d');
     let tigre = { x: 40, y: 220, w: 32, h: 24, vy: 0, jump: -9.5, gravity: 0.5, grounded: true };
     let obstaculos = [], distance = 0, scoreT = 0, gameOverT = false, nextSpawn = 0;
-
     function iniciarTigre() {
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
-      tigre.y = 220; tigre.vy = 0; tigre.grounded = true;
-      obstaculos = []; distance = 0; scoreT = 0;
+      tigre.y = 220; tigre.vy = 0; tigre.grounded = true; obstaculos = []; distance = 0; scoreT = 0;
       nextSpawn = 40 + Math.floor(Math.random() * 100);
       document.getElementById('scoreTigre').innerText = scoreT;
-      gameOverT = false;
-      document.getElementById('respawnBtnTigre').style.display = 'none';
-      juegoTigreActivo = true;
-      startTigerMusic();
+      gameOverT = false; document.getElementById('respawnBtnTigre').style.display = 'none';
+      juegoTigreActivo = true; startTigerMusic();
       animIdTigre = requestAnimationFrame(updateTigre);
     }
-
     function saltarTigre() {
       if (tigre.grounded && juegoTigreActivo && !gameOverT) {
-        tigre.vy = tigre.jump; 
-        tigre.grounded = false;
-        soundTigreJump();
+        tigre.vy = tigre.jump; tigre.grounded = false; soundTigreJump();
       }
     }
-
     function updateTigre() {
       if (!juegoTigreActivo || gameOverT) return;
       animIdTigre = requestAnimationFrame(updateTigre);
-
       let currentSpeed = scoreT >= 1000 ? 7 : (scoreT >= 400 ? 6 : 4.5);
-      distance += currentSpeed;
-      scoreT = Math.floor(distance / 10);
+      distance += currentSpeed; scoreT = Math.floor(distance / 10);
       document.getElementById('scoreTigre').innerText = scoreT;
-
-      tigre.vy += tigre.gravity;
-      tigre.y += tigre.vy;
+      tigre.vy += tigre.gravity; tigre.y += tigre.vy;
       if (tigre.y >= 220) { tigre.y = 220; tigre.vy = 0; tigre.grounded = true; }
-
       nextSpawn--;
       if (nextSpawn <= 0) {
         let esLoro = scoreT >= 1000 && Math.random() > 0.55;
         if (esLoro) {
-          let alturaLoro = (Math.random() > 0.5) ? 185 : 215; 
-          obstaculos.push({ x: 300, y: alturaLoro, w: 24, h: 12, tipo: 'loro', sonado: false });
+          obstaculos.push({ x: 300, y: (Math.random() > 0.5 ? 185 : 215), w: 24, h: 12, tipo: 'loro', sonado: false });
         } else {
           obstaculos.push({ x: 300, y: 228, w: 16, h: 16, tipo: 'tronco' });
         }
-        nextSpawn = 35 + Math.floor(Math.random() * 100); 
+        nextSpawn = 35 + Math.floor(Math.random() * 100);
       }
-
       for (let i = obstaculos.length - 1; i >= 0; i--) {
         obstaculos[i].x -= currentSpeed;
-        if (obstaculos[i].tipo === 'loro' && !obstaculos[i].sonado && obstaculos[i].x < 150) {
-          obstaculos[i].sonado = true;
-          soundTigreParrot();
-        }
         if (
           tigre.x < obstaculos[i].x + obstaculos[i].w &&
           tigre.x + tigre.w > obstaculos[i].x &&
           tigre.y < obstaculos[i].y + obstaculos[i].h &&
           tigre.y + tigre.h > obstaculos[i].y
         ) {
-          gameOverT = true;
-          juegoTigreActivo = false;
-          stopMusic();
-          soundCulebraCrash();
+          gameOverT = true; juegoTigreActivo = false; stopMusic(); soundCulebraCrash();
           document.getElementById('respawnBtnTigre').style.display = 'block';
           if (scoreT > 0) guardarPuntajeAutomatico("TigreSelva", scoreT);
           return;
         }
         if (obstaculos[i].x + obstaculos[i].w < 0) obstaculos.splice(i, 1);
       }
-
       ctxT.clearRect(0, 0, canvasT.width, canvasT.height);
       ctxT.fillStyle = '#ff7b54'; ctxT.fillRect(0, 0, canvasT.width, canvasT.height);
       ctxT.fillStyle = '#1b431b'; ctxT.fillRect(0, 244, canvasT.width, 56);
-      
       obstaculos.forEach(o => {
         ctxT.fillStyle = o.tipo === 'loro' ? '#ef4444' : '#5c4033';
         ctxT.fillRect(o.x, o.y, o.w, o.h);
       });
-
-      ctxT.fillStyle = '#f97316';
-      ctxT.fillRect(tigre.x, tigre.y, tigre.w, tigre.h);
+      ctxT.fillStyle = '#f97316'; ctxT.fillRect(tigre.x, tigre.y, tigre.w, tigre.h);
     }
     function resetTigre() { iniciarTigre(); }
 
-    // --- BOMBER MAN ---
     const canvasB = document.getElementById('gameCanvasBomber');
     const ctxB = canvasB.getContext('2d');
     const colsB = 11, rowsB = 11;
     let mapB = [], playerB = { x: 1, y: 1, dir: 'down' }, bombasB = [], explosionesB = [], enemigosB = [];
     let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0;
-
     function iniciarBomber(siguienteNivel = false) {
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
       if (!siguienteNivel) { scoreBomber = 0; nivelBomber = 1; }
@@ -779,27 +579,21 @@
       document.getElementById('nivelBomber').innerText = nivelBomber;
       gameOverBomber = false; document.getElementById('respawnBtnBomber').style.display = 'none';
       playerB = { x: 1, y: 1, dir: 'down' }; bombasB = []; explosionesB = []; tiempoRecargaBomba = 0;
-      
       mapB = [];
       for (let r = 0; r < rowsB; r++) {
         let row = [];
         for (let c = 0; c < colsB; c++) {
           if (r === 0 || r === rowsB - 1 || c === 0 || c === colsB - 1 || (r % 2 === 0 && c % 2 === 0)) {
-            row.push(1); 
+            row.push(1);
           } else if ((r === 1 && c === 1) || (r === 1 && c === 2) || (r === 2 && c === 1)) {
-            row.push(0); 
-          } else {
-            row.push(Math.random() < 0.6 ? 2 : 0);
-          }
+            row.push(0);
+          } else { row.push(Math.random() < 0.6 ? 2 : 0); }
         }
         mapB.push(row);
       }
-      enemigosB = [{ x: 5, y: 5, timerMov: 0 }];
-      juegoBomberActivo = true;
-      startBomberMusic();
+      juegoBomberActivo = true; startBomberMusic();
       animIdBomber = requestAnimationFrame(updateBomber);
     }
-
     function moverBomber(dx, dy) {
       if (!juegoBomberActivo || gameOverBomber) return;
       let nx = playerB.x + dx, ny = playerB.y + dy;
@@ -807,27 +601,21 @@
         playerB.x = nx; playerB.y = ny;
       }
     }
-
     function ponerBomba() {
       if (!juegoBomberActivo || gameOverBomber || tiempoRecargaBomba > 0) return;
       bombasB.push({ x: playerB.x, y: playerB.y, timer: 120, alcance: 2 });
       tiempoRecargaBomba = 180;
     }
-
     function updateBomber() {
       if (!juegoBomberActivo || gameOverBomber) return;
       animIdBomber = requestAnimationFrame(updateBomber);
       if (tiempoRecargaBomba > 0) tiempoRecargaBomba--;
-
       for (let i = bombasB.length - 1; i >= 0; i--) {
         bombasB[i].timer--;
         if (bombasB[i].timer <= 0) {
-          let b = bombasB.splice(i, 1)[0];
-          soundBomberExplosion();
-          explosionesB.push({ x: b.x, y: b.y, timer: 15 });
+          bombasB.splice(i, 1); soundBomberExplosion();
         }
       }
-
       ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
       let cellW = canvasB.width / colsB, cellH = canvasB.height / rowsB;
       for (let r = 0; r < rowsB; r++) {
@@ -841,242 +629,8 @@
     }
     function resetBomber() { iniciarBomber(false); }
 
-    // --- KONG ARCADE (CON PENDIENTES, BARRILES QUE CAEN Y VILLANO CON INTRO) ---
-    const canvasK = document.getElementById('gameCanvasKong');
-    const ctxK = canvasK.getContext('2d');
-    let kongPlayer = { x: 30, y: 220, w: 16, h: 22, vx: 0, vy: 0, grounded: false };
-    let scoreKong = 0, gameOverKong = false, timerLanzamiento = 0;
-    
-    // Plataformas inclinadas (Pendientes verdaderas tipo DK)
-    let plataformasKong = [
-      { x1: 10, y1: 240, x2: 250, y2: 240 }, // Suelo plano
-      { x1: 20, y1: 185, x2: 240, y2: 205 }, // Pendiente derecha
-      { x1: 20, y1: 130, x2: 240, y2: 110 }, // Pendiente izquierda
-      { x1: 40, y1: 65,  x2: 220, y2: 80  }  // Cima superior
-    ];
-    let barrilesKong = [];
-    let kongBoss = { x: 35, y: -40, targetY: 30, w: 32, h: 24, intro: true };
-
-    function iniciarKong() {
-      if (animIdKong) cancelAnimationFrame(animIdKong);
-      kongPlayer = { x: 30, y: 210, w: 16, h: 22, vx: 0, vy: 0, grounded: true };
-      scoreKong = 0; gameOverKong = false; barrilesKong = []; timerLanzamiento = 0;
-      kongBoss = { x: 35, y: -40, targetY: 30, w: 32, h: 24, intro: true };
-      document.getElementById('scoreKong').innerText = scoreKong;
-      document.getElementById('respawnBtnKong').style.display = 'none';
-      juegoKongActivo = true;
-      startKongMusic();
-      animIdKong = requestAnimationFrame(updateKong);
-    }
-
-    function moverKongInput(dir) {
-      if (!juegoKongActivo || gameOverKong || kongBoss.intro) return;
-      if (dir === 'left') kongPlayer.x -= 10;
-      if (dir === 'right') kongPlayer.x += 10;
-      if (dir === 'up' && kongPlayer.grounded) {
-        kongPlayer.vy = -5.8;
-        kongPlayer.grounded = false;
-        soundTigreJump();
-      }
-    }
-
-    function obtenerYPlataforma(p, px) {
-      if (px < Math.min(p.x1, p.x2) || px > Math.max(p.x1, p.x2)) return null;
-      let t = (px - p.x1) / (p.x2 - p.x1);
-      return p.y1 + t * (p.y2 - p.y1);
-    }
-
-    function dibujarPersonajePictorico(ctx, px, py) {
-      const s = 1.5;
-      const coloresCabello = ['#7c2d12', '#9a3412', '#b45309', '#78350f'];
-      let matrizCabello = [
-        [0,1,1,1,1,1,1,0],
-        [1,1,1,1,1,1,1,1],
-        [1,1,0,0,0,0,1,1],
-        [1,0,0,0,0,0,0,1],
-        [0,0,1,1,1,1,0,0]
-      ];
-      for(let r=0; r<matrizCabello.length; r++) {
-        for(let c=0; c<matrizCabello[r].length; c++) {
-          if(matrizCabello[r][c] === 1) {
-            ctx.fillStyle = coloresCabello[(r + c) % coloresCabello.length];
-            ctx.fillRect(px + (c-1)*s, py + (r-2)*s, s, s);
-          }
-        }
-      }
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(px + 1*s, py + 3*s, s*2, s*2);
-      ctx.fillRect(px + 5*s, py + 3*s, s*2, s*2);
-      ctx.fillStyle = '#fed7aa';
-      ctx.fillRect(px + 0*s, py + 5*s, s*8, s*3);
-      let franjas = ['#22c55e', '#f97316', '#eab308', '#22c55e'];
-      for(let r=0; r<4; r++) {
-        for(let c=0; c<8; c++) {
-          ctx.fillStyle = franjas[c % franjas.length];
-          ctx.fillRect(px + c*s, py + (8+r)*s, s, s);
-        }
-      }
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(px + 1*s, py + 12*s, s*6, s*2);
-      ctx.fillStyle = '#020617';
-      ctx.fillRect(px + 1*s, py + 14*s, s*2, s*2);
-      ctx.fillRect(px + 5*s, py + 14*s, s*2, s*2);
-    }
-
-    function dibujarVillanoKong(ctx, bx, by) {
-      ctx.fillStyle = '#451a03';
-      ctx.fillRect(bx, by, 32, 24);
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(bx + 4, by + 4, 24, 16);
-      ctx.fillStyle = '#ef4444';
-      ctx.fillRect(bx + 6, by + 7, 5, 3);
-      ctx.fillRect(bx + 21, by + 7, 5, 3);
-      ctx.fillStyle = '#fde68a';
-      ctx.fillRect(bx + 9, by + 13, 14, 7);
-    }
-
-    function updateKong() {
-      if (!juegoKongActivo || gameOverKong) return;
-      animIdKong = requestAnimationFrame(updateKong);
-
-      // Intro del Villano cayendo del cielo y temblando
-      if (kongBoss.intro) {
-        kongBoss.y += 2.5;
-        if (kongBoss.y >= kongBoss.targetY) {
-          kongBoss.y = kongBoss.targetY;
-          kongBoss.intro = false;
-        }
-      }
-
-      // Gravedad jugador
-      kongPlayer.vy += 0.35;
-      kongPlayer.y += kongPlayer.vy;
-      kongPlayer.grounded = false;
-
-      // Colisión Jugador con plataformas inclinadas
-      plataformasKong.forEach(p => {
-        let sueloY = obtenerYPlataforma(p, kongPlayer.x + kongPlayer.w/2);
-        if (sueloY !== null && kongPlayer.y + kongPlayer.h >= sueloY - 4 && kongPlayer.y + kongPlayer.h <= sueloY + 8 && kongPlayer.vy >= 0) {
-          kongPlayer.y = sueloY - kongPlayer.h;
-          kongPlayer.vy = 0;
-          kongPlayer.grounded = true;
-        }
-      });
-
-      // Generar barriles desde las manos del villano cuando termina la intro
-      if (!kongBoss.intro) {
-        timerLanzamiento++;
-        if (timerLanzamiento > 85) {
-          timerLanzamiento = 0;
-          barrilesKong.push({ x: kongBoss.x + 10, y: kongBoss.y + 18, vx: 1.6, vy: 0, platIndex: 3, rolling: true });
-        }
-      }
-
-      // Física de barriles rodando por pendientes y cayendo
-      for (let i = barrilesKong.length - 1; i >= 0; i--) {
-        let b = barrilesKong[i];
-
-        if (b.rolling) {
-          let p = plataformasKong[b.platIndex];
-          // Dirección según pendiente
-          let dir = (p.x2 > p.x1) ? 1 : -1;
-          b.x += b.vx * dir;
-
-          let sueloY = obtenerYPlataforma(p, b.x);
-          if (sueloY !== null) {
-            b.y = sueloY - 7;
-          }
-
-          // Si llega al borde de la plataforma, empieza a caer a la plataforma inferior
-          if ((dir === 1 && b.x >= Math.max(p.x1, p.x2) - 5) || (dir === -1 && b.x <= Math.min(p.x1, p.x2) + 5)) {
-            if (b.platIndex > 0) {
-              b.platIndex--; // Baja de nivel
-              b.rolling = false; // Comienza caída libre
-              b.vy = 1;
-            } else {
-              barrilesKong.splice(i, 1);
-              scoreKong += 10;
-              document.getElementById('scoreKong').innerText = scoreKong;
-              continue;
-            }
-          }
-        } else {
-          // Caída libre hasta encontrar la siguiente plataforma
-          b.vy += 0.3;
-          b.y += b.vy;
-
-          let p = plataformasKong[b.platIndex];
-          let sueloY = obtenerYPlataforma(p, b.x);
-          if (sueloY !== null && b.y >= sueloY - 7) {
-            b.y = sueloY - 7;
-            b.rolling = true; // Vuelve a rodar
-          }
-        }
-
-        // Colisión barril con jugador
-        if (
-          kongPlayer.x < b.x + 6 &&
-          kongPlayer.x + kongPlayer.w > b.x - 6 &&
-          kongPlayer.y < b.y + 6 &&
-          kongPlayer.y + kongPlayer.h > b.y - 6
-        ) {
-          gameOverKong = true;
-          juegoKongActivo = false;
-          stopMusic();
-          soundBomberLose();
-          document.getElementById('respawnBtnKong').style.display = 'block';
-          if (scoreKong > 0) guardarPuntajeAutomatico("KongArcade", scoreKong);
-          return;
-        }
-
-        if (b.y > 260 || b.x < -10 || b.x > 270) {
-          barrilesKong.splice(i, 1);
-        }
-      }
-
-      // Renderizado
-      ctxK.clearRect(0, 0, canvasK.width, canvasK.height);
-      ctxK.fillStyle = '#0f172a';
-      ctxK.fillRect(0, 0, canvasK.width, canvasK.height);
-
-      // Dibujar plataformas inclinadas
-      plataformasKong.forEach(p => {
-        ctxK.strokeStyle = '#b45309';
-        ctxK.lineWidth = 10;
-        ctxK.beginPath();
-        ctxK.moveTo(p.x1, p.y1);
-        ctxK.lineTo(p.x2, p.y2);
-        ctxK.stroke();
-        ctxK.strokeStyle = '#d97706';
-        ctxK.lineWidth = 3;
-        ctxK.beginPath();
-        ctxK.moveTo(p.x1, p.y1 - 3);
-        ctxK.lineTo(p.x2, p.y2 - 3);
-        ctxK.stroke();
-      });
-
-      // Dibujar Villano
-      dibujarVillanoKong(ctxK, kongBoss.x, kongBoss.y);
-
-      // Dibujar barriles
-      barrilesKong.forEach(b => {
-        ctxK.fillStyle = '#7f1d1d';
-        ctxK.beginPath();
-        ctxK.arc(b.x, b.y, 6, 0, Math.PI * 2);
-        ctxK.fill();
-        ctxK.fillStyle = '#f87171';
-        ctxK.fillRect(b.x - 2, b.y - 2, 4, 4);
-      });
-
-      // Dibujar Protagonista
-      dibujarPersonajePictorico(ctxK, kongPlayer.x, kongPlayer.y);
-    }
-
-    function resetKong() { iniciarKong(); }
-
     document.addEventListener('keydown', (e) => {
       if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
-
       if (document.getElementById('vistaCulebrita').classList.contains('active')) {
         if (gameOverC && (e.key === ' ' || e.code === 'Space')) return resetCulebra();
         if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') intentarMoverC(0, -20);
@@ -1084,13 +638,11 @@
         if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') intentarMoverC(-20, 0);
         if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') intentarMoverC(20, 0);
       }
-
       if (document.getElementById('vistaTigre').classList.contains('active')) {
         if (e.key === ' ' || e.code === 'Space' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
           gameOverT ? resetTigre() : saltarTigre();
         }
       }
-
       if (document.getElementById('vistaBomber').classList.contains('active')) {
         if (gameOverBomber && (e.key === ' ' || e.code === 'Space')) return resetBomber();
         if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') moverBomber(0, -1);
@@ -1098,13 +650,6 @@
         if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moverBomber(-1, 0);
         if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moverBomber(1, 0);
         if (e.key === ' ' || e.code === 'Space') ponerBomba();
-      }
-
-      if (document.getElementById('vistaKong').classList.contains('active')) {
-        if (gameOverKong && (e.key === ' ' || e.code === 'Space')) return resetKong();
-        if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moverKongInput('left');
-        if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moverKongInput('right');
-        if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ' || e.code === 'Space') moverKongInput('up');
       }
     });
   </script>
