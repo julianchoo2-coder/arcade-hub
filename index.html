@@ -281,7 +281,7 @@
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
 
-    // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS ---
+    // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS EXPANDIDOS ---
     let audioCtx = null;
     let currentMusicInterval = null;
 
@@ -294,7 +294,6 @@
       }
     }
 
-    // Desbloquear audio automáticamente con el primer toque o clic
     document.addEventListener('pointerdown', () => {
       initAudio();
       if (!currentMusicInterval && document.getElementById('menuPrincipal').classList.contains('active')) {
@@ -310,7 +309,7 @@
         let gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -327,7 +326,7 @@
       osc.type = type;
       osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
-      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -351,7 +350,7 @@
       filter.frequency.setValueAtTime(800, audioCtx.currentTime);
       filter.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + duration);
       let gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       noise.connect(filter);
       filter.connect(gain);
@@ -366,59 +365,71 @@
       }
     }
 
-    // 1. Soundtrack del Menú Principal (Alegre y relajado)
+    // 1. Menú Principal: Melodía de 16 notas (jingle completo que resuelve de forma suave)
     function startMenuMusic() {
       stopMusic();
-      let notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+      let notes = [
+        330, 392, 523, 659, 523, 392, 330, 261,
+        293, 349, 440, 523, 440, 349, 392, 330
+      ];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (document.getElementById('menuPrincipal').classList.contains('active')) {
-          playTone(notes[index], 0.15, 'square');
-          index = (index + 1) % notes.length;
-        }
-      }, 250);
-    }
-
-    // 2. Soundtrack de Culebrita (Ritmo serpenteante y misterioso)
-    function startCulebraMusic() {
-      stopMusic();
-      let notes = [150, 180, 220, 180, 140, 160, 200, 160];
-      let index = 0;
-      currentMusicInterval = setInterval(() => {
-        if (juegoCulebraActivo) {
-          playTone(notes[index], 0.12, 'triangle');
+          playTone(notes[index], 0.18, 'square');
           index = (index + 1) % notes.length;
         }
       }, 200);
     }
 
-    // 3. Soundtrack del Tigre (Ritmo veloz y aventurero tipo runner)
+    // 2. Culebrita: Arpegio fluido y misterioso de 16 notas
+    function startCulebraMusic() {
+      stopMusic();
+      let notes = [
+        164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81,
+        146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47
+      ];
+      let index = 0;
+      currentMusicInterval = setInterval(() => {
+        if (juegoCulebraActivo) {
+          playTone(notes[index], 0.14, 'triangle');
+          index = (index + 1) % notes.length;
+        }
+      }, 180);
+    }
+
+    // 3. Tigre: Secuencia de acción rápida y aventurera (16 notas)
     function startTigerMusic() {
       stopMusic();
-      let notes = [300, 350, 400, 450, 400, 350];
+      let notes = [
+        261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23,
+        440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66
+      ];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoTigreActivo) {
-          playTone(notes[index], 0.08, 'sawtooth');
+          playTone(notes[index], 0.1, 'sawtooth');
           index = (index + 1) % notes.length;
         }
-      }, 150);
+      }, 140);
     }
 
-    // 4. Soundtrack de Bomber Man (Ritmo tenso y estratégico de acción)
+    // 4. Bomber Man: Tema táctico de tensión y marcha (16 notas)
     function startBomberMusic() {
       stopMusic();
-      let notes = [110, 110, 130, 110, 98, 110, 146, 130];
+      let notes = [
+        110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00,
+        123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50
+      ];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoBomberActivo) {
-          playTone(notes[index], 0.1, 'square');
+          playTone(notes[index], 0.12, 'square');
           index = (index + 1) % notes.length;
         }
-      }, 220);
+      }, 190);
     }
 
-    // Efectos de sonido específicos
+    // Efectos de sonido
     function soundCulebraEat() {
       playTone(523.25, 0.08, 'square', 0);
       playTone(659.25, 0.08, 'square', 80);
