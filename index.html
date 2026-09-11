@@ -9,12 +9,11 @@
     * { 
       box-sizing: border-box; 
       touch-action: manipulation; 
-      -webkit-tap-highlight-color: transparent; /* Quita el destello azul al tocar */
-      user-select: none; /* Evita que el texto o los canvas se seleccionen por error */
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
       -webkit-user-select: none;
     }
     
-    /* Permitir escribir en el cuadro de texto del login */
     input {
       user-select: auto;
       -webkit-user-select: auto;
@@ -36,7 +35,6 @@
     }
     .screen.active { display: flex; }
 
-    /* TÍTULO ESTILO MARQUESINA RETRO */
     .arcade-title {
       font-size: 1.8rem;
       color: #38bdf8;
@@ -106,9 +104,7 @@
       border-bottom: 3px solid #334155;
     }
     
-    /* Si quieres poner tu imagen Base64 para la culebrita, pégala en URL('...') aquí abajo */
     .cover-snake { background-color: #163820; }
-    
     .cover-tiger { background: linear-gradient(135deg, #ff7b54 0%, #2d5a27 100%); }
     .cover-bomber { background: linear-gradient(135deg, #451a03 0%, #7c2d12 100%); }
     .game-title { font-size: 0.85rem; color: #f8fafc; margin-top: 15px; text-align: center; }
@@ -123,7 +119,6 @@
       display: flex; flex-direction: column; align-items: center; width: 100%;
     }
 
-    /* CANVAS GRANDE Y CÓMODO */
     canvas { 
       border: 5px solid #334155; border-radius: 0px; background-color: #020617; 
       width: 100%; max-width: 580px; height: auto; aspect-ratio: 1 / 1; 
@@ -138,7 +133,6 @@
     }
     .dashboard h2 { font-size: 0.9rem; font-weight: 400; color: #94a3b8; margin: 0 0 15px 0; text-transform: uppercase; }
     
-    /* CONTROLES TÁCTILES MÁS GRANDES */
     .mobile-controls { display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(2, 75px); gap: 12px; margin-top: 20px; justify-content: center; }
     .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; border-radius: 0px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
     .ctrl-btn:active { background: #38bdf8; color: #0f172a; transform: translate(2px, 2px); box-shadow: none; }
@@ -311,7 +305,6 @@
         return;
       }
 
-      // Guardado Local (GitHub Pages friendly)
       usuarioActual = u;
       localStorage.setItem('arcadeUser', usuarioActual);
       document.getElementById('welcomeUser').innerText = "HOLA, " + usuarioActual;
@@ -346,35 +339,18 @@
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
 
-      if(id === 'vistaCulebrita') {
-        cargarTablaRécordsGenerica("Culebrita");
-        iniciarCulebra();
-      }
-      if(id === 'vistaTigre') {
-        cargarTablaRécordsGenerica("TigreSelva");
-        iniciarTigre();
-      }
-      if(id === 'vistaBomber') {
-        cargarTablaRécordsGenerica("BomberMan");
-        iniciarBomber();
-      }
+      if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
+      if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
+      if(id === 'vistaBomber') { cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
       window.scrollTo(0, 0);
     }
 
     function guardarPuntajeAutomatico(juego, puntaje) {
       if (!usuarioActual) return;
-      
-      // Obtener récords locales guardados o array vacío si no hay
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
       scores.push({ name: usuarioActual, score: puntaje, game: juego });
-      
-      // Ordenar de mayor a menor
       scores.sort((a, b) => b.score - a.score);
-      
-      // Guardar de vuelta en localStorage
       localStorage.setItem('arcadeScores', JSON.stringify(scores));
-      
-      // Actualizar la tabla visualmente
       cargarTablaRécordsGenerica(juego);
     }
 
@@ -387,12 +363,8 @@
       if (!scoreTable) return;
       scoreTable.innerHTML = "<tr><th>JUGADOR</th><th>PTS</th></tr>";
       
-      // Leer de localStorage
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
-      let filtered = scores.filter(item => item.game === nombreJuego);
-      
-      // Mostrar solo el Top 5
-      filtered = filtered.slice(0, 5);
+      let filtered = scores.filter(item => item.game === nombreJuego).slice(0, 5);
 
       if(filtered.length === 0) {
         scoreTable.innerHTML += "<tr><td colspan='2' style='text-align:center; color:#64748b;'>SIN RÉCORDS</td></tr>";
@@ -506,7 +478,6 @@
       if (ny !== 0 && dyC === 0) { dxC = 0; dyC = ny; cambiandoDirC = true; }
       else if (nx !== 0 && dxC === 0) { dxC = nx; dyC = 0; cambiandoDirC = true; }
     }
-
     function resetCulebra() { iniciarCulebra(); }
 
     // --- TIGRE EN LA SELVA ---
@@ -518,8 +489,7 @@
     function iniciarTigre() {
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
       tigre.y = 220; tigre.vy = 0; tigre.grounded = true;
-      obstaculos = [];
-      distance = 0; scoreT = 0;
+      obstaculos = []; distance = 0; scoreT = 0;
       nextSpawn = 40 + Math.floor(Math.random() * 100);
       document.getElementById('scoreTigre').innerText = scoreT;
       gameOverT = false;
@@ -530,8 +500,7 @@
 
     function saltarTigre() {
       if (tigre.grounded && juegoTigreActivo && !gameOverT) {
-        tigre.vy = tigre.jump;
-        tigre.grounded = false;
+        tigre.vy = tigre.jump; tigre.grounded = false;
       }
     }
 
@@ -546,11 +515,7 @@
 
       tigre.vy += tigre.gravity;
       tigre.y += tigre.vy;
-      if (tigre.y >= 220) {
-        tigre.y = 220;
-        tigre.vy = 0;
-        tigre.grounded = true;
-      }
+      if (tigre.y >= 220) { tigre.y = 220; tigre.vy = 0; tigre.grounded = true; }
 
       nextSpawn--;
       if (nextSpawn <= 0) {
@@ -578,142 +543,84 @@
           if (scoreT > 0) guardarPuntajeAutomatico("TigreSelva", scoreT);
           return;
         }
-        if (obstaculos[i].x + obstaculos[i].w < 0) {
-          obstaculos.splice(i, 1);
-        }
+        if (obstaculos[i].x + obstaculos[i].w < 0) obstaculos.splice(i, 1);
       }
 
       ctxT.clearRect(0, 0, canvasT.width, canvasT.height);
-      
-      ctxT.fillStyle = '#ff7b54'; 
-      ctxT.fillRect(0, 0, canvasT.width, canvasT.height);
-      ctxT.fillStyle = '#ffb26b';
-      ctxT.fillRect(200, 40, 40, 40);
+      ctxT.fillStyle = '#ff7b54'; ctxT.fillRect(0, 0, canvasT.width, canvasT.height);
+      ctxT.fillStyle = '#ffb26b'; ctxT.fillRect(200, 40, 40, 40);
 
       ctxT.fillStyle = '#939b62';
       let bgLayer3 = (distance * 0.15) % 300;
       for(let i=-1; i<3; i++) {
          let bx = i*150 - bgLayer3;
-         ctxT.fillRect(bx, 100, 100, 200); 
-         ctxT.fillRect(bx+20, 80, 60, 200);
-         ctxT.fillRect(bx+40, 60, 20, 200);
+         ctxT.fillRect(bx, 100, 100, 200); ctxT.fillRect(bx+20, 80, 60, 200); ctxT.fillRect(bx+40, 60, 20, 200);
       }
 
       let bgLayer2 = (distance * 0.4) % 200;
       for(let i=-1; i<4; i++) {
          let bx = i*200 - bgLayer2;
-         ctxT.fillStyle = '#5c4033'; 
-         ctxT.fillRect(bx+40, 100, 20, 150);
-         ctxT.fillStyle = '#1e3f1a'; 
-         ctxT.fillRect(bx+10, 60, 80, 40);
-         ctxT.fillRect(bx+20, 40, 60, 20);
-         ctxT.fillRect(bx+30, 20, 40, 20);
+         ctxT.fillStyle = '#5c4033'; ctxT.fillRect(bx+40, 100, 20, 150);
+         ctxT.fillStyle = '#1e3f1a'; ctxT.fillRect(bx+10, 60, 80, 40);
+         ctxT.fillRect(bx+20, 40, 60, 20); ctxT.fillRect(bx+30, 20, 40, 20);
       }
 
-      ctxT.fillStyle = '#1b431b';
-      ctxT.fillRect(0, 244, canvasT.width, 56);
-      ctxT.fillStyle = '#0a1c0a';
-      ctxT.fillRect(0, 244, canvasT.width, 4);
+      ctxT.fillStyle = '#1b431b'; ctxT.fillRect(0, 244, canvasT.width, 56);
+      ctxT.fillStyle = '#0a1c0a'; ctxT.fillRect(0, 244, canvasT.width, 4);
 
       obstaculos.forEach(o => {
         if (o.tipo === 'loro') {
           let wingOffset = (distance % 20 < 10) ? -3 : 2;
-          ctxT.fillStyle = '#d1d5db';
-          ctxT.fillRect(o.x, o.y + 2, 4, 4);
-          ctxT.fillStyle = '#ef4444'; 
-          ctxT.fillRect(o.x + 4, o.y, 6, 6); 
-          ctxT.fillRect(o.x + 8, o.y + 2, 10, 8); 
-          ctxT.fillStyle = '#111';
-          ctxT.fillRect(o.x + 6, o.y + 2, 2, 2);
-          ctxT.fillStyle = '#3b82f6';
-          ctxT.fillRect(o.x + 18, o.y + 4, 6, 4);
+          ctxT.fillStyle = '#d1d5db'; ctxT.fillRect(o.x, o.y + 2, 4, 4);
+          ctxT.fillStyle = '#ef4444'; ctxT.fillRect(o.x + 4, o.y, 6, 6); ctxT.fillRect(o.x + 8, o.y + 2, 10, 8); 
+          ctxT.fillStyle = '#111'; ctxT.fillRect(o.x + 6, o.y + 2, 2, 2);
+          ctxT.fillStyle = '#3b82f6'; ctxT.fillRect(o.x + 18, o.y + 4, 6, 4);
           let wingY = o.y + 2 + wingOffset;
-          ctxT.fillStyle = '#eab308'; 
-          ctxT.fillRect(o.x + 10, wingY, 6, 3);
-          ctxT.fillStyle = '#3b82f6'; 
-          ctxT.fillRect(o.x + 10, wingY + 3, 6, 3);
+          ctxT.fillStyle = '#eab308'; ctxT.fillRect(o.x + 10, wingY, 6, 3);
+          ctxT.fillStyle = '#3b82f6'; ctxT.fillRect(o.x + 10, wingY + 3, 6, 3);
         } else {
-          ctxT.fillStyle = '#5c4033'; 
-          ctxT.fillRect(o.x, o.y, o.w, o.h);
-          ctxT.fillStyle = '#3e2723';
-          ctxT.fillRect(o.x, o.y+4, o.w, 4); 
-          ctxT.fillRect(o.x+4, o.y, 4, o.h);
+          ctxT.fillStyle = '#5c4033'; ctxT.fillRect(o.x, o.y, o.w, o.h);
+          ctxT.fillStyle = '#3e2723'; ctxT.fillRect(o.x, o.y+4, o.w, 4); ctxT.fillRect(o.x+4, o.y, 4, o.h);
         }
       });
 
       let tailOffset = (distance % 30 < 15 && tigre.grounded) ? 0 : 4;
-      ctxT.fillStyle = '#f97316';
-      ctxT.fillRect(tigre.x - 6, tigre.y + 8 - tailOffset, 10, 2);
-
-      ctxT.fillStyle = '#f97316';
-      ctxT.fillRect(tigre.x + 4, tigre.y + 8, 20, 12);
-      ctxT.fillRect(tigre.x + 20, tigre.y + 4, 12, 10);
-      
-      ctxT.fillStyle = '#fff';
-      ctxT.fillRect(tigre.x + 28, tigre.y + 10, 4, 4);
-      
-      ctxT.fillStyle = '#c2410c';
-      ctxT.fillRect(tigre.x + 22, tigre.y + 2, 4, 4);
-      
-      ctxT.fillStyle = '#111';
-      ctxT.fillRect(tigre.x + 26, tigre.y + 6, 2, 2);
-      
-      ctxT.fillStyle = '#111';
-      ctxT.fillRect(tigre.x + 8, tigre.y + 8, 2, 12);
-      ctxT.fillRect(tigre.x + 14, tigre.y + 8, 2, 12);
-      ctxT.fillRect(tigre.x + 20, tigre.y + 8, 2, 12);
+      ctxT.fillStyle = '#f97316'; ctxT.fillRect(tigre.x - 6, tigre.y + 8 - tailOffset, 10, 2);
+      ctxT.fillStyle = '#f97316'; ctxT.fillRect(tigre.x + 4, tigre.y + 8, 20, 12); ctxT.fillRect(tigre.x + 20, tigre.y + 4, 12, 10);
+      ctxT.fillStyle = '#fff'; ctxT.fillRect(tigre.x + 28, tigre.y + 10, 4, 4);
+      ctxT.fillStyle = '#c2410c'; ctxT.fillRect(tigre.x + 22, tigre.y + 2, 4, 4);
+      ctxT.fillStyle = '#111'; ctxT.fillRect(tigre.x + 26, tigre.y + 6, 2, 2);
+      ctxT.fillStyle = '#111'; ctxT.fillRect(tigre.x + 8, tigre.y + 8, 2, 12); ctxT.fillRect(tigre.x + 14, tigre.y + 8, 2, 12); ctxT.fillRect(tigre.x + 20, tigre.y + 8, 2, 12);
       
       let legFront = 0, legBack = 0;
       if (tigre.grounded) {
-        legFront = (distance % 20 < 10) ? 4 : -2;
-        legBack = (distance % 20 < 10) ? -2 : 4;
+        legFront = (distance % 20 < 10) ? 4 : -2; legBack = (distance % 20 < 10) ? -2 : 4;
       } else {
-        legFront = 4; 
-        legBack = -4; 
+        legFront = 4; legBack = -4; 
       }
-      
       ctxT.fillStyle = '#c2410c';
-      ctxT.fillRect(tigre.x + 6 + legBack, tigre.y + 20, 4, 4);
-      ctxT.fillRect(tigre.x + 18 + legFront, tigre.y + 20, 4, 4);
+      ctxT.fillRect(tigre.x + 6 + legBack, tigre.y + 20, 4, 4); ctxT.fillRect(tigre.x + 18 + legFront, tigre.y + 20, 4, 4);
     }
-
     function resetTigre() { iniciarTigre(); }
 
-    // --- BOMBER MAN ---
+    // --- BOMBER MAN (PIXEL ART REDISEÑADO) ---
     const canvasB = document.getElementById('gameCanvasBomber');
     const ctxB = canvasB.getContext('2d');
-    const colsB = 11;
-    const rowsB = 11;
-    
-    let mapB = [];
-    let playerB = { x: 1, y: 1 };
-    let bombasB = [];
-    let explosionesB = [];
-    let enemigosB = [];
+    const colsB = 11, rowsB = 11;
+    let mapB = [], playerB = { x: 1, y: 1 }, bombasB = [], explosionesB = [], enemigosB = [];
     let puertaB = { x: -1, y: -1, encontrada: false };
-    let scoreBomber = 0;
-    let nivelBomber = 1;
-    let gameOverBomber = false;
-    let tiempoRecargaBomba = 0;
+    let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0;
 
     function iniciarBomber(siguienteNivel = false) {
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
-      if (!siguienteNivel) {
-        scoreBomber = 0;
-        nivelBomber = 1;
-      }
+      if (!siguienteNivel) { scoreBomber = 0; nivelBomber = 1; }
       document.getElementById('scoreBomber').innerText = scoreBomber;
       document.getElementById('nivelBomber').innerText = nivelBomber;
-      gameOverBomber = false;
-      document.getElementById('respawnBtnBomber').style.display = 'none';
-      playerB = { x: 1, y: 1 };
-      bombasB = [];
-      explosionesB = [];
-      tiempoRecargaBomba = 0;
+      gameOverBomber = false; document.getElementById('respawnBtnBomber').style.display = 'none';
+      playerB = { x: 1, y: 1 }; bombasB = []; explosionesB = []; tiempoRecargaBomba = 0;
       puertaB = { x: -1, y: -1, encontrada: false };
       
-      mapB = [];
-      let bloquesDestructiblesOcultanPuerta = [];
+      mapB = []; let bloquesDestructiblesOcultanPuerta = [];
       for (let r = 0; r < rowsB; r++) {
         let row = [];
         for (let c = 0; c < colsB; c++) {
@@ -736,13 +643,10 @@
       }
 
       let cantidadEnemigos = 2 + (nivelBomber - 1);
-      enemigosB = [];
-      let casillasLibres = [];
+      enemigosB = []; let casillasLibres = [];
       for (let r = 1; r < rowsB - 1; r++) {
         for (let c = 1; c < colsB - 1; c++) {
-          if (mapB[r][c] === 0 && !(r <= 2 && c <= 2)) {
-            casillasLibres.push({r, c});
-          }
+          if (mapB[r][c] === 0 && !(r <= 2 && c <= 2)) casillasLibres.push({r, c});
         }
       }
       
@@ -752,34 +656,25 @@
         enemigosB.push({ x: pos.c, y: pos.r, timerMov: 0 });
       }
 
-      juegoBomberActivo = true;
-      animIdBomber = requestAnimationFrame(updateBomber);
+      juegoBomberActivo = true; animIdBomber = requestAnimationFrame(updateBomber);
     }
 
     function moverBomber(dx, dy) {
       if (!juegoBomberActivo || gameOverBomber) return;
-      let nuevoX = playerB.x + dx;
-      let nuevoY = playerB.y + dy;
-
+      let nuevoX = playerB.x + dx, nuevoY = playerB.y + dy;
       let hayBomba = bombasB.some(b => b.x === nuevoX && b.y === nuevoY);
       if (nuevoX >= 0 && nuevoX < colsB && nuevoY >= 0 && nuevoY < rowsB) {
         if (mapB[nuevoY][nuevoX] === 0 && !hayBomba) {
-          playerB.x = nuevoX;
-          playerB.y = nuevoY;
-
+          playerB.x = nuevoX; playerB.y = nuevoY;
           if (puertaB.encontrada && playerB.x === puertaB.x && playerB.y === puertaB.y && enemigosB.length === 0) {
-            nivelBomber++;
-            scoreBomber += 300;
-            iniciarBomber(true);
+            nivelBomber++; scoreBomber += 300; iniciarBomber(true);
           }
         }
       }
     }
 
     function ponerBomba() {
-      if (!juegoBomberActivo || gameOverBomber) return;
-      if (tiempoRecargaBomba > 0) return;
-
+      if (!juegoBomberActivo || gameOverBomber || tiempoRecargaBomba > 0) return;
       let existe = bombasB.some(b => b.x === playerB.x && b.y === playerB.y);
       if (!existe) {
         bombasB.push({ x: playerB.x, y: playerB.y, timer: 120, alcance: 2 });
@@ -791,23 +686,18 @@
       if (!juegoBomberActivo || gameOverBomber) return;
       animIdBomber = requestAnimationFrame(updateBomber);
 
-      if (tiempoRecargaBomba > 0) {
-        tiempoRecargaBomba--;
-      }
+      if (tiempoRecargaBomba > 0) tiempoRecargaBomba--;
 
       for (let i = bombasB.length - 1; i >= 0; i--) {
         bombasB[i].timer--;
         if (bombasB[i].timer <= 0) {
-          let b = bombasB.splice(i, 1)[0];
-          explotarBomba(b.x, b.y, b.alcance);
+          let b = bombasB.splice(i, 1)[0]; explotarBomba(b.x, b.y, b.alcance);
         }
       }
 
       for (let i = explosionesB.length - 1; i >= 0; i--) {
         explosionesB[i].timer--;
-        if (explosionesB[i].timer <= 0) {
-          explosionesB.splice(i, 1);
-        }
+        if (explosionesB[i].timer <= 0) explosionesB.splice(i, 1);
       }
 
       let velocidadEnemigo = Math.max(15, 30 - (nivelBomber * 2));
@@ -817,97 +707,129 @@
           en.timerMov = 0;
           let dirs = [{x:0, y:1}, {x:0, y:-1}, {x:1, y:0}, {x:-1, y:0}];
           let d = dirs[Math.floor(Math.random() * dirs.length)];
-          let nx = en.x + d.x;
-          let ny = en.y + d.y;
+          let nx = en.x + d.x, ny = en.y + d.y;
           if (nx >= 0 && nx < colsB && ny >= 0 && ny < rowsB && mapB[ny][nx] === 0) {
-            en.x = nx;
-            en.y = ny;
+            en.x = nx; en.y = ny;
           }
         }
       });
 
       let murio = false;
-      explosionesB.forEach(ex => {
-        if (ex.x === playerB.x && ex.y === playerB.y) murio = true;
-      });
-      enemigosB.forEach(en => {
-        if (en.x === playerB.x && en.y === playerB.y) murio = true;
-      });
+      explosionesB.forEach(ex => { if (ex.x === playerB.x && ex.y === playerB.y) murio = true; });
+      enemigosB.forEach(en => { if (en.x === playerB.x && en.y === playerB.y) murio = true; });
 
       if (murio) {
-        gameOverBomber = true;
-        document.getElementById('respawnBtnBomber').style.display = 'block';
+        gameOverBomber = true; document.getElementById('respawnBtnBomber').style.display = 'block';
         if (scoreBomber > 0) guardarPuntajeAutomatico("BomberMan", scoreBomber);
         return;
       }
 
       ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
-      
-      let cellW = canvasB.width / colsB;
-      let cellH = canvasB.height / rowsB;
+      let cellW = canvasB.width / colsB, cellH = canvasB.height / rowsB;
 
+      // FONDO Y MUROS
       for (let r = 0; r < rowsB; r++) {
         for (let c = 0; c < colsB; c++) {
-          let px = c * cellW;
-          let py = r * cellH;
+          let px = c * cellW, py = r * cellH;
 
+          // PUERTA SALIDA
           if (puertaB.encontrada && puertaB.x === c && puertaB.y === r) {
-            ctxB.fillStyle = '#1e293b';
-            ctxB.fillRect(px, py, cellW, cellH);
-            ctxB.fillStyle = '#eab308';
-            ctxB.fillRect(px + 6, py + 4, cellW - 12, cellH - 4);
-            ctxB.fillStyle = '#713f12';
-            ctxB.fillRect(px + 9, py + 8, cellW - 18, cellH - 8);
+            ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py, cellW, cellH); 
+            ctxB.fillStyle = '#22c55e'; ctxB.fillRect(px + 4, py + 2, cellW - 8, cellH - 4); 
+            ctxB.fillStyle = '#14532d'; ctxB.fillRect(px + 6, py + 4, cellW - 12, cellH - 6); 
+            ctxB.fillStyle = '#eab308'; ctxB.fillRect(px + 10, py + 10, cellW - 20, cellH - 18); 
           }
-
-          if (mapB[r][c] === 1) {
-            ctxB.fillStyle = '#334155';
-            ctxB.fillRect(px, py, cellW, cellH);
-          } else if (mapB[r][c] === 2) {
-            ctxB.fillStyle = '#9a3412';
-            ctxB.fillRect(px, py, cellW, cellH);
-            ctxB.fillStyle = '#c2410c';
-            ctxB.fillRect(px + 2, py + 2, cellW - 4, cellH - 4);
-          } else if (!puertaB.encontrada || puertaB.x !== c || puertaB.y !== r) {
-            ctxB.fillStyle = '#1e293b';
-            ctxB.fillRect(px, py, cellW, cellH);
+          // MURO SÓLIDO PIXEL ART
+          else if (mapB[r][c] === 1) {
+            ctxB.fillStyle = '#475569'; ctxB.fillRect(px, py, cellW, cellH);
+            ctxB.fillStyle = '#94a3b8'; ctxB.fillRect(px, py, cellW, 4); 
+            ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py + cellH - 4, cellW, 4); 
+            ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8); 
+            ctxB.fillStyle = '#334155'; ctxB.fillRect(px + 8, py + 8, cellW - 16, cellH - 16);
+          } 
+          // BLOQUE DESTRUCTIBLE PIXEL ART
+          else if (mapB[r][c] === 2) {
+            ctxB.fillStyle = '#9a3412'; ctxB.fillRect(px, py, cellW, cellH); 
+            ctxB.fillStyle = '#fdba74'; ctxB.fillRect(px, py, cellW, 2); 
+            ctxB.fillStyle = '#ea580c'; ctxB.fillRect(px + 2, py + 2, cellW - 4, cellH - 4);
+            ctxB.fillStyle = '#431407'; 
+            ctxB.fillRect(px, py + cellH/2, cellW, 2);
+            ctxB.fillRect(px + cellW/3, py, 2, cellH/2);
+            ctxB.fillRect(px + (cellW/3)*2, py + cellH/2, 2, cellH/2);
+          } 
+          // SUELO
+          else if (!puertaB.encontrada || puertaB.x !== c || puertaB.y !== r) {
+            ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py, cellW, cellH);
           }
         }
       }
 
+      // BOMBAS
       bombasB.forEach(b => {
-        let px = b.x * cellW;
-        let py = b.y * cellH;
-        ctxB.fillStyle = '#ef4444';
-        ctxB.beginPath();
-        ctxB.arc(px + cellW/2, py + cellH/2, cellW/3, 0, Math.PI * 2);
-        ctxB.fill();
-        ctxB.fillStyle = '#facc15';
-        ctxB.fillRect(px + cellW/2 - 2, py + 4, 4, 6);
+        let px = b.x * cellW, py = b.y * cellH;
+        let cx = px + cellW/2, cy = py + cellH/2;
+        ctxB.fillStyle = '#111';
+        ctxB.beginPath(); ctxB.arc(cx, cy + 2, cellW/2.5, 0, Math.PI*2); ctxB.fill();
+        ctxB.fillStyle = '#555'; // Brillo
+        ctxB.beginPath(); ctxB.arc(cx - 4, cy - 2, cellW/8, 0, Math.PI*2); ctxB.fill();
+        ctxB.fillStyle = '#78350f'; // Mecha
+        ctxB.fillRect(cx - 2, py + 2, 4, 6);
+        ctxB.fillStyle = (b.timer % 10 < 5) ? '#ef4444' : '#facc15'; // Chispa
+        ctxB.fillRect(cx - 3, py, 6, 4);
       });
 
+      // EXPLOSIONES
       explosionesB.forEach(ex => {
-        let px = ex.x * cellW;
-        let py = ex.y * cellH;
-        ctxB.fillStyle = '#f97316';
-        ctxB.fillRect(px, py, cellW, cellH);
-        ctxB.fillStyle = '#facc15';
-        ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8);
+        let px = ex.x * cellW, py = ex.y * cellH;
+        ctxB.fillStyle = '#ef4444'; ctxB.fillRect(px, py, cellW, cellH);
+        ctxB.fillStyle = '#f97316'; ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8);
+        ctxB.fillStyle = '#facc15'; ctxB.fillRect(px + 8, py + 8, cellW - 16, cellH - 16);
+        ctxB.fillStyle = '#ffffff'; ctxB.fillRect(px + 12, py + 12, cellW - 24, cellH - 24);
       });
 
+      // ENEMIGOS FANTASMA
       enemigosB.forEach(en => {
-        let px = en.x * cellW;
-        let py = en.y * cellH;
-        ctxB.fillStyle = '#a855f7';
-        ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8);
+        let px = en.x * cellW, py = en.y * cellH;
+        let floatY = Math.sin(en.timerMov * 0.3) * 3;
+        let ey = py + floatY;
+        
+        ctxB.fillStyle = '#ec4899'; 
+        ctxB.beginPath(); ctxB.arc(px + cellW/2, ey + cellH/2, cellW/2.2, Math.PI, 0); ctxB.fill();
+        ctxB.fillRect(px + 2, ey + cellH/2, cellW - 4, cellH/2.5);
+        ctxB.fillRect(px + 2, ey + cellH/2 + cellH/3, cellW/5, cellH/5); // Tentáculo 1
+        ctxB.fillRect(px + cellW/2 - cellW/10, ey + cellH/2 + cellH/3, cellW/5, cellH/5); // Tentáculo 2
+        ctxB.fillRect(px + cellW - 2 - cellW/5, ey + cellH/2 + cellH/3, cellW/5, cellH/5); // Tentáculo 3
+        
+        ctxB.fillStyle = '#ffffff'; // Ojos
+        ctxB.fillRect(px + 6, ey + 8, 6, 8); ctxB.fillRect(px + cellW - 12, ey + 8, 6, 8);
+        ctxB.fillStyle = '#2563eb'; // Pupilas
+        ctxB.fillRect(px + 6, ey + 10, 4, 4); ctxB.fillRect(px + cellW - 10, ey + 10, 4, 4);
       });
 
-      let pX = playerB.x * cellW;
-      let pY = playerB.y * cellH;
-      ctxB.fillStyle = '#38bdf8';
-      ctxB.fillRect(pX + 4, pY + 4, cellW - 8, cellH - 8);
-      ctxB.fillStyle = '#ffffff';
-      ctxB.fillRect(pX + 8, pY + 6, cellW - 16, 6);
+      // JUGADOR (BOMBERMAN CLÁSICO)
+      let px = playerB.x * cellW, py = playerB.y * cellH;
+      // Cabeza
+      ctxB.fillStyle = '#ffffff'; ctxB.fillRect(px + 4, py + 2, cellW - 8, cellH/2 + 2);
+      // Visor oscuro
+      ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 8, cellW - 8, cellH/3);
+      // Ojos azules
+      ctxB.fillStyle = '#38bdf8'; 
+      ctxB.fillRect(px + 8, py + 10, 3, 5); ctxB.fillRect(px + cellW - 11, py + 10, 3, 5);
+      // Antena superior
+      ctxB.fillStyle = '#f472b6'; ctxB.fillRect(px + cellW/2 - 2, py - 4, 4, 6);
+      ctxB.fillStyle = '#ef4444'; ctxB.fillRect(px + cellW/2 - 3, py - 6, 6, 3);
+      // Cuerpo azul
+      ctxB.fillStyle = '#3b82f6'; ctxB.fillRect(px + 6, py + cellH/2 + 4, cellW - 12, cellH/2 - 4);
+      // Cinturón negro y hebilla dorada
+      ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px + 6, py + cellH - 7, cellW - 12, 3);
+      ctxB.fillStyle = '#facc15'; ctxB.fillRect(px + cellW/2 - 3, py + cellH - 8, 6, 5);
+      // Manos rosadas
+      ctxB.fillStyle = '#f472b6'; 
+      ctxB.fillRect(px + 1, py + cellH/2 + 4, 5, 5); 
+      ctxB.fillRect(px + cellW - 6, py + cellH/2 + 4, 5, 5);
+      // Pies rosados redondeados
+      ctxB.beginPath(); ctxB.arc(px + 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
+      ctxB.beginPath(); ctxB.arc(px + cellW - 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
     }
 
     function explotarBomba(bx, by, alcance) {
@@ -916,21 +838,14 @@
       
       dirs.forEach(d => {
         for (let i = 1; i <= alcance; i++) {
-          let nx = bx + (d.x * i);
-          let ny = by + (d.y * i);
-
+          let nx = bx + (d.x * i), ny = by + (d.y * i);
           if (nx < 0 || nx >= colsB || ny < 0 || ny >= rowsB) break;
           if (mapB[ny][nx] === 1) break; 
           
           if (mapB[ny][nx] === 2) {
-            mapB[ny][nx] = 0; 
-            scoreBomber += 25; 
+            mapB[ny][nx] = 0; scoreBomber += 25; 
             document.getElementById('scoreBomber').innerText = scoreBomber;
-            
-            if (puertaB.x === nx && puertaB.y === ny) {
-              puertaB.encontrada = true;
-            }
-
+            if (puertaB.x === nx && puertaB.y === ny) puertaB.encontrada = true;
             explosionesB.push({ x: nx, y: ny, timer: 15 });
             break; 
           }
@@ -939,8 +854,7 @@
 
           for (let e = enemigosB.length - 1; e >= 0; e--) {
             if (enemigosB[e].x === nx && enemigosB[e].y === ny) {
-              enemigosB.splice(e, 1);
-              scoreBomber += 100; 
+              enemigosB.splice(e, 1); scoreBomber += 100; 
               document.getElementById('scoreBomber').innerText = scoreBomber;
             }
           }
@@ -949,8 +863,7 @@
 
       for (let e = enemigosB.length - 1; e >= 0; e--) {
         if (enemigosB[e].x === bx && enemigosB[e].y === by) {
-          enemigosB.splice(e, 1);
-          scoreBomber += 100;
+          enemigosB.splice(e, 1); scoreBomber += 100;
           document.getElementById('scoreBomber').innerText = scoreBomber;
         }
       }
@@ -959,15 +872,10 @@
     function resetBomber() { iniciarBomber(false); }
 
     document.addEventListener('keydown', (e) => {
-      if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-      }
+      if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
 
       if (document.getElementById('vistaCulebrita').classList.contains('active')) {
-        if (gameOverC && (e.key === ' ' || e.code === 'Space')) {
-          resetCulebra();
-          return;
-        }
+        if (gameOverC && (e.key === ' ' || e.code === 'Space')) return resetCulebra();
         if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') intentarMoverC(0, -20);
         if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') intentarMoverC(0, 20);
         if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') intentarMoverC(-20, 0);
@@ -976,19 +884,12 @@
 
       if (document.getElementById('vistaTigre').classList.contains('active')) {
         if (e.key === ' ' || e.code === 'Space' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
-          if (gameOverT) {
-            resetTigre();
-          } else {
-            saltarTigre();
-          }
+          gameOverT ? resetTigre() : saltarTigre();
         }
       }
 
       if (document.getElementById('vistaBomber').classList.contains('active')) {
-        if (gameOverBomber && (e.key === ' ' || e.code === 'Space')) {
-          resetBomber();
-          return;
-        }
+        if (gameOverBomber && (e.key === ' ' || e.code === 'Space')) return resetBomber();
         if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') moverBomber(0, -1);
         if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') moverBomber(0, 1);
         if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moverBomber(-1, 0);
