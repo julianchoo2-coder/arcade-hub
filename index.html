@@ -460,11 +460,7 @@
       playTone(150, 0.2, 'sawtooth', 0);
     }
     function soundTigreJump() {
-      playSlide(200, 600, 0.12, 'square');
-    }
-    function soundTigreParrot() {
-      playSlide(900, 1300, 0.08, 'sine');
-      setTimeout(() => playSlide(1300, 900, 0.08, 'sine'), 90);
+      playSlide(200, 500, 0.1, 'square');
     }
     function soundBomberExplosion() {
       playNoise(0.4);
@@ -845,23 +841,24 @@
     }
     function resetBomber() { iniciarBomber(false); }
 
-    // --- KONG ARCADE (CON ARTE PICTÓRICO / TEXTURIZADO) ---
+    // --- KONG ARCADE (CON SALTO AJUSTADO Y VILLANO LANZA-BARRILES) ---
     const canvasK = document.getElementById('gameCanvasKong');
     const ctxK = canvasK.getContext('2d');
     let kongPlayer = { x: 40, y: 220, w: 20, h: 26, vx: 0, vy: 0, grounded: false };
-    let scoreKong = 0, gameOverKong = false;
+    let scoreKong = 0, gameOverKong = false, timerLanzamiento = 0;
     let plataformasKong = [
       { x: 0, y: 250, w: 300, h: 15 },
-      { x: 30, y: 190, w: 240, h: 12 },
-      { x: 20, y: 130, w: 240, h: 12 },
-      { x: 40, y: 70, w: 220, h: 12 }
+      { x: 20, y: 190, w: 260, h: 12, slope: -1 },
+      { x: 20, y: 130, w: 260, h: 12, slope: 1 },
+      { x: 40, y: 70, w: 220, h: 12, slope: 0 }
     ];
     let barrilesKong = [];
+    let kongBoss = { x: 40, y: 38, w: 36, h: 28 };
 
     function iniciarKong() {
       if (animIdKong) cancelAnimationFrame(animIdKong);
       kongPlayer = { x: 40, y: 210, w: 20, h: 26, vx: 0, vy: 0, grounded: true };
-      scoreKong = 0; gameOverKong = false; barrilesKong = [];
+      scoreKong = 0; gameOverKong = false; barrilesKong = []; timerLanzamiento = 0;
       document.getElementById('scoreKong').innerText = scoreKong;
       document.getElementById('respawnBtnKong').style.display = 'none';
       juegoKongActivo = true;
@@ -871,31 +868,24 @@
 
     function moverKongInput(dir) {
       if (!juegoKongActivo || gameOverKong) return;
-      if (dir === 'left') kongPlayer.x -= 15;
-      if (dir === 'right') kongPlayer.x += 15;
+      if (dir === 'left') kongPlayer.x -= 12;
+      if (dir === 'right') kongPlayer.x += 12;
       if (dir === 'up' && kongPlayer.grounded) {
-        kongPlayer.vy = -8;
+        kongPlayer.vy = -6.2; // Salto más bajo, medido y preciso
         kongPlayer.grounded = false;
         soundTigreJump();
       }
     }
 
-    // Función que dibuja tu personaje con micro-píxeles y textura pictórica
     function dibujarPersonajePictorico(ctx, px, py) {
-      // Usamos una rejilla de micro-bloques (escala de 2px) para dar aspecto artesanal/pictórico
       const s = 2;
-      
-      // Cabello castaño texturizado (variaciones de tonos marrones como pinceladas)
       const coloresCabello = ['#7c2d12', '#9a3412', '#b45309', '#78350f'];
-      let idxC = 0;
-      
-      // Forma característica del cabello del boceto
       let matrizCabello = [
         [0,1,1,1,1,1,1,0],
         [1,1,1,1,1,1,1,1],
         [1,1,0,0,0,0,1,1],
         [1,0,0,0,0,0,0,1],
-        [0,0,1,1,1,1,0,0] // mechón superior
+        [0,0,1,1,1,1,0,0]
       ];
       
       for(let r=0; r<matrizCabello.length; r++) {
@@ -907,18 +897,13 @@
         }
       }
 
-      // Ojos negros profundos
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(px + 1*s, py + 3*s, s*2, s*2);
       ctx.fillRect(px + 5*s, py + 3*s, s*2, s*2);
 
-      // Tono de piel cálido con textura de pincel
       ctx.fillStyle = '#fed7aa';
       ctx.fillRect(px + 0*s, py + 5*s, s*8, s*3);
-      ctx.fillStyle = '#ffedd5'; // toque de luz
-      ctx.fillRect(px + 2*s, py + 5*s, s*2, s*1);
 
-      // Camiseta colorida (Verde, Naranja, Amarillo según tu boceto)
       let franjas = ['#22c55e', '#f97316', '#eab308', '#22c55e'];
       for(let r=0; r<4; r++) {
         for(let c=0; c<8; c++) {
@@ -927,22 +912,34 @@
         }
       }
 
-      // Pantalón / Cinturón oscuro
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(px + 1*s, py + 12*s, s*6, s*2);
 
-      // Zapatos negros
       ctx.fillStyle = '#020617';
       ctx.fillRect(px + 1*s, py + 14*s, s*2, s*2);
       ctx.fillRect(px + 5*s, py + 14*s, s*2, s*2);
+    }
+
+    function dibujarVillanoKong(ctx, bx, by) {
+      // Simio gigante estilo arcade en la cima
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(bx, by, 36, 28);
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(bx + 4, by + 4, 28, 20);
+      // Ojos furiosos
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(bx + 8, by + 8, 6, 4);
+      ctx.fillRect(bx + 22, by + 8, 6, 4);
+      // Hocico
+      ctx.fillStyle = '#fde68a';
+      ctx.fillRect(bx + 10, by + 16, 16, 8);
     }
 
     function updateKong() {
       if (!juegoKongActivo || gameOverKong) return;
       animIdKong = requestAnimationFrame(updateKong);
 
-      // Gravedad y físicas sencillas
-      kongPlayer.vy += 0.4;
+      kongPlayer.vy += 0.38; // Gravedad equilibrada
       kongPlayer.y += kongPlayer.vy;
       kongPlayer.grounded = false;
 
@@ -961,9 +958,11 @@
         }
       });
 
-      // Generar barriles rodantes ocasionales
-      if (Math.random() < 0.02) {
-        barrilesKong.push({ x: 20, y: 55, vx: 2, r: 8 });
+      // El villano lanza barriles periódicamente
+      timerLanzamiento++;
+      if (timerLanzamiento > 90) {
+        timerLanzamiento = 0;
+        barrilesKong.push({ x: kongBoss.x + 36, y: kongBoss.y + 14, vx: 2.2, r: 8 });
       }
 
       // Actualizar barriles
@@ -972,7 +971,7 @@
         b.x += b.vx;
         if (b.x > 300 || b.x < 0) {
           barrilesKong.splice(i, 1);
-          scoreKong += 10;
+          scoreKong += 15;
           document.getElementById('scoreKong').innerText = scoreKong;
         }
 
@@ -993,20 +992,21 @@
         }
       }
 
-      // Renderizado del juego
       ctxK.clearRect(0, 0, canvasK.width, canvasK.height);
 
-      // Fondo estilo arcade nocturno con textura
       ctxK.fillStyle = '#0f172a';
       ctxK.fillRect(0, 0, canvasK.width, canvasK.height);
 
-      // Dibujar plataformas escalonadas con textura de pintura
+      // Dibujar plataformas
       plataformasKong.forEach(p => {
         ctxK.fillStyle = '#b45309';
         ctxK.fillRect(p.x, p.y, p.w, p.h);
-        ctxK.fillStyle = '#d97706'; // detalle superior
+        ctxK.fillStyle = '#d97706';
         ctxK.fillRect(p.x, p.y, p.w, 3);
       });
+
+      // Dibujar villano arriba
+      dibujarVillanoKong(ctxK, kongBoss.x, kongBoss.y);
 
       // Dibujar barriles
       barrilesKong.forEach(b => {
@@ -1018,13 +1018,12 @@
         ctxK.fillRect(b.x - 2, b.y - 2, 4, 4);
       });
 
-      // Dibujar a tu personaje con estilo pictórico
+      // Dibujar personaje principal
       dibujarPersonajePictorico(ctxK, kongPlayer.x, kongPlayer.y);
     }
 
     function resetKong() { iniciarKong(); }
 
-    // Controles de teclado generales
     document.addEventListener('keydown', (e) => {
       if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
 
