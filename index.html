@@ -277,7 +277,7 @@
       <div class="game-container">
         <h1 style="font-size: 1.1rem; margin-bottom: 10px;">KONG ARCADE</h1>
         <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreKong">0</span></p>
-        <canvas id="gameCanvasKong" width="300" height="300"></canvas>
+        <canvas id="gameCanvasKong" width="260" height="260" style="max-width: 260px;"></canvas>
         <button id="respawnBtnKong" onclick="resetKong()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">OTRA VEZ</button>
         <div class="mobile-controls">
           <button class="ctrl-btn btn-up" ontouchstart="moverKongInput('up'); event.preventDefault();" onclick="moverKongInput('up')">▲</button>
@@ -841,24 +841,27 @@
     }
     function resetBomber() { iniciarBomber(false); }
 
-    // --- KONG ARCADE (CON SALTO AJUSTADO Y VILLANO LANZA-BARRILES) ---
+    // --- KONG ARCADE (CON PENDIENTES, BARRILES QUE CAEN Y VILLANO CON INTRO) ---
     const canvasK = document.getElementById('gameCanvasKong');
     const ctxK = canvasK.getContext('2d');
-    let kongPlayer = { x: 40, y: 220, w: 20, h: 26, vx: 0, vy: 0, grounded: false };
+    let kongPlayer = { x: 30, y: 220, w: 16, h: 22, vx: 0, vy: 0, grounded: false };
     let scoreKong = 0, gameOverKong = false, timerLanzamiento = 0;
+    
+    // Plataformas inclinadas (Pendientes verdaderas tipo DK)
     let plataformasKong = [
-      { x: 0, y: 250, w: 300, h: 15 },
-      { x: 20, y: 190, w: 260, h: 12, slope: -1 },
-      { x: 20, y: 130, w: 260, h: 12, slope: 1 },
-      { x: 40, y: 70, w: 220, h: 12, slope: 0 }
+      { x1: 10, y1: 240, x2: 250, y2: 240 }, // Suelo plano
+      { x1: 20, y1: 185, x2: 240, y2: 205 }, // Pendiente derecha
+      { x1: 20, y1: 130, x2: 240, y2: 110 }, // Pendiente izquierda
+      { x1: 40, y1: 65,  x2: 220, y2: 80  }  // Cima superior
     ];
     let barrilesKong = [];
-    let kongBoss = { x: 40, y: 38, w: 36, h: 28 };
+    let kongBoss = { x: 35, y: -40, targetY: 30, w: 32, h: 24, intro: true };
 
     function iniciarKong() {
       if (animIdKong) cancelAnimationFrame(animIdKong);
-      kongPlayer = { x: 40, y: 210, w: 20, h: 26, vx: 0, vy: 0, grounded: true };
+      kongPlayer = { x: 30, y: 210, w: 16, h: 22, vx: 0, vy: 0, grounded: true };
       scoreKong = 0; gameOverKong = false; barrilesKong = []; timerLanzamiento = 0;
+      kongBoss = { x: 35, y: -40, targetY: 30, w: 32, h: 24, intro: true };
       document.getElementById('scoreKong').innerText = scoreKong;
       document.getElementById('respawnBtnKong').style.display = 'none';
       juegoKongActivo = true;
@@ -867,18 +870,24 @@
     }
 
     function moverKongInput(dir) {
-      if (!juegoKongActivo || gameOverKong) return;
-      if (dir === 'left') kongPlayer.x -= 12;
-      if (dir === 'right') kongPlayer.x += 12;
+      if (!juegoKongActivo || gameOverKong || kongBoss.intro) return;
+      if (dir === 'left') kongPlayer.x -= 10;
+      if (dir === 'right') kongPlayer.x += 10;
       if (dir === 'up' && kongPlayer.grounded) {
-        kongPlayer.vy = -6.2; // Salto más bajo, medido y preciso
+        kongPlayer.vy = -5.8;
         kongPlayer.grounded = false;
         soundTigreJump();
       }
     }
 
+    function obtenerYPlataforma(p, px) {
+      if (px < Math.min(p.x1, p.x2) || px > Math.max(p.x1, p.x2)) return null;
+      let t = (px - p.x1) / (p.x2 - p.x1);
+      return p.y1 + t * (p.y2 - p.y1);
+    }
+
     function dibujarPersonajePictorico(ctx, px, py) {
-      const s = 2;
+      const s = 1.5;
       const coloresCabello = ['#7c2d12', '#9a3412', '#b45309', '#78350f'];
       let matrizCabello = [
         [0,1,1,1,1,1,1,0],
@@ -887,7 +896,6 @@
         [1,0,0,0,0,0,0,1],
         [0,0,1,1,1,1,0,0]
       ];
-      
       for(let r=0; r<matrizCabello.length; r++) {
         for(let c=0; c<matrizCabello[r].length; c++) {
           if(matrizCabello[r][c] === 1) {
@@ -896,14 +904,11 @@
           }
         }
       }
-
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(px + 1*s, py + 3*s, s*2, s*2);
       ctx.fillRect(px + 5*s, py + 3*s, s*2, s*2);
-
       ctx.fillStyle = '#fed7aa';
       ctx.fillRect(px + 0*s, py + 5*s, s*8, s*3);
-
       let franjas = ['#22c55e', '#f97316', '#eab308', '#22c55e'];
       for(let r=0; r<4; r++) {
         for(let c=0; c<8; c++) {
@@ -911,76 +916,109 @@
           ctx.fillRect(px + c*s, py + (8+r)*s, s, s);
         }
       }
-
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(px + 1*s, py + 12*s, s*6, s*2);
-
       ctx.fillStyle = '#020617';
       ctx.fillRect(px + 1*s, py + 14*s, s*2, s*2);
       ctx.fillRect(px + 5*s, py + 14*s, s*2, s*2);
     }
 
     function dibujarVillanoKong(ctx, bx, by) {
-      // Simio gigante estilo arcade en la cima
       ctx.fillStyle = '#451a03';
-      ctx.fillRect(bx, by, 36, 28);
+      ctx.fillRect(bx, by, 32, 24);
       ctx.fillStyle = '#78350f';
-      ctx.fillRect(bx + 4, by + 4, 28, 20);
-      // Ojos furiosos
+      ctx.fillRect(bx + 4, by + 4, 24, 16);
       ctx.fillStyle = '#ef4444';
-      ctx.fillRect(bx + 8, by + 8, 6, 4);
-      ctx.fillRect(bx + 22, by + 8, 6, 4);
-      // Hocico
+      ctx.fillRect(bx + 6, by + 7, 5, 3);
+      ctx.fillRect(bx + 21, by + 7, 5, 3);
       ctx.fillStyle = '#fde68a';
-      ctx.fillRect(bx + 10, by + 16, 16, 8);
+      ctx.fillRect(bx + 9, by + 13, 14, 7);
     }
 
     function updateKong() {
       if (!juegoKongActivo || gameOverKong) return;
       animIdKong = requestAnimationFrame(updateKong);
 
-      kongPlayer.vy += 0.38; // Gravedad equilibrada
+      // Intro del Villano cayendo del cielo y temblando
+      if (kongBoss.intro) {
+        kongBoss.y += 2.5;
+        if (kongBoss.y >= kongBoss.targetY) {
+          kongBoss.y = kongBoss.targetY;
+          kongBoss.intro = false;
+        }
+      }
+
+      // Gravedad jugador
+      kongPlayer.vy += 0.35;
       kongPlayer.y += kongPlayer.vy;
       kongPlayer.grounded = false;
 
-      // Colisión con plataformas
+      // Colisión Jugador con plataformas inclinadas
       plataformasKong.forEach(p => {
-        if (
-          kongPlayer.x + kongPlayer.w > p.x &&
-          kongPlayer.x < p.x + p.w &&
-          kongPlayer.y + kongPlayer.h >= p.y &&
-          kongPlayer.y + kongPlayer.h <= p.y + 12 &&
-          kongPlayer.vy >= 0
-        ) {
-          kongPlayer.y = p.y - kongPlayer.h;
+        let sueloY = obtenerYPlataforma(p, kongPlayer.x + kongPlayer.w/2);
+        if (sueloY !== null && kongPlayer.y + kongPlayer.h >= sueloY - 4 && kongPlayer.y + kongPlayer.h <= sueloY + 8 && kongPlayer.vy >= 0) {
+          kongPlayer.y = sueloY - kongPlayer.h;
           kongPlayer.vy = 0;
           kongPlayer.grounded = true;
         }
       });
 
-      // El villano lanza barriles periódicamente
-      timerLanzamiento++;
-      if (timerLanzamiento > 90) {
-        timerLanzamiento = 0;
-        barrilesKong.push({ x: kongBoss.x + 36, y: kongBoss.y + 14, vx: 2.2, r: 8 });
+      // Generar barriles desde las manos del villano cuando termina la intro
+      if (!kongBoss.intro) {
+        timerLanzamiento++;
+        if (timerLanzamiento > 85) {
+          timerLanzamiento = 0;
+          barrilesKong.push({ x: kongBoss.x + 10, y: kongBoss.y + 18, vx: 1.6, vy: 0, platIndex: 3, rolling: true });
+        }
       }
 
-      // Actualizar barriles
+      // Física de barriles rodando por pendientes y cayendo
       for (let i = barrilesKong.length - 1; i >= 0; i--) {
         let b = barrilesKong[i];
-        b.x += b.vx;
-        if (b.x > 300 || b.x < 0) {
-          barrilesKong.splice(i, 1);
-          scoreKong += 15;
-          document.getElementById('scoreKong').innerText = scoreKong;
+
+        if (b.rolling) {
+          let p = plataformasKong[b.platIndex];
+          // Dirección según pendiente
+          let dir = (p.x2 > p.x1) ? 1 : -1;
+          b.x += b.vx * dir;
+
+          let sueloY = obtenerYPlataforma(p, b.x);
+          if (sueloY !== null) {
+            b.y = sueloY - 7;
+          }
+
+          // Si llega al borde de la plataforma, empieza a caer a la plataforma inferior
+          if ((dir === 1 && b.x >= Math.max(p.x1, p.x2) - 5) || (dir === -1 && b.x <= Math.min(p.x1, p.x2) + 5)) {
+            if (b.platIndex > 0) {
+              b.platIndex--; // Baja de nivel
+              b.rolling = false; // Comienza caída libre
+              b.vy = 1;
+            } else {
+              barrilesKong.splice(i, 1);
+              scoreKong += 10;
+              document.getElementById('scoreKong').innerText = scoreKong;
+              continue;
+            }
+          }
+        } else {
+          // Caída libre hasta encontrar la siguiente plataforma
+          b.vy += 0.3;
+          b.y += b.vy;
+
+          let p = plataformasKong[b.platIndex];
+          let sueloY = obtenerYPlataforma(p, b.x);
+          if (sueloY !== null && b.y >= sueloY - 7) {
+            b.y = sueloY - 7;
+            b.rolling = true; // Vuelve a rodar
+          }
         }
 
-        // Colisión con el jugador
+        // Colisión barril con jugador
         if (
-          kongPlayer.x < b.x + b.r &&
-          kongPlayer.x + kongPlayer.w > b.x - b.r &&
-          kongPlayer.y < b.y + b.r &&
-          kongPlayer.y + kongPlayer.h > b.y - b.r
+          kongPlayer.x < b.x + 6 &&
+          kongPlayer.x + kongPlayer.w > b.x - 6 &&
+          kongPlayer.y < b.y + 6 &&
+          kongPlayer.y + kongPlayer.h > b.y - 6
         ) {
           gameOverKong = true;
           juegoKongActivo = false;
@@ -990,35 +1028,47 @@
           if (scoreKong > 0) guardarPuntajeAutomatico("KongArcade", scoreKong);
           return;
         }
+
+        if (b.y > 260 || b.x < -10 || b.x > 270) {
+          barrilesKong.splice(i, 1);
+        }
       }
 
+      // Renderizado
       ctxK.clearRect(0, 0, canvasK.width, canvasK.height);
-
       ctxK.fillStyle = '#0f172a';
       ctxK.fillRect(0, 0, canvasK.width, canvasK.height);
 
-      // Dibujar plataformas
+      // Dibujar plataformas inclinadas
       plataformasKong.forEach(p => {
-        ctxK.fillStyle = '#b45309';
-        ctxK.fillRect(p.x, p.y, p.w, p.h);
-        ctxK.fillStyle = '#d97706';
-        ctxK.fillRect(p.x, p.y, p.w, 3);
+        ctxK.strokeStyle = '#b45309';
+        ctxK.lineWidth = 10;
+        ctxK.beginPath();
+        ctxK.moveTo(p.x1, p.y1);
+        ctxK.lineTo(p.x2, p.y2);
+        ctxK.stroke();
+        ctxK.strokeStyle = '#d97706';
+        ctxK.lineWidth = 3;
+        ctxK.beginPath();
+        ctxK.moveTo(p.x1, p.y1 - 3);
+        ctxK.lineTo(p.x2, p.y2 - 3);
+        ctxK.stroke();
       });
 
-      // Dibujar villano arriba
+      // Dibujar Villano
       dibujarVillanoKong(ctxK, kongBoss.x, kongBoss.y);
 
       // Dibujar barriles
       barrilesKong.forEach(b => {
         ctxK.fillStyle = '#7f1d1d';
         ctxK.beginPath();
-        ctxK.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctxK.arc(b.x, b.y, 6, 0, Math.PI * 2);
         ctxK.fill();
         ctxK.fillStyle = '#f87171';
         ctxK.fillRect(b.x - 2, b.y - 2, 4, 4);
       });
 
-      // Dibujar personaje principal
+      // Dibujar Protagonista
       dibujarPersonajePictorico(ctxK, kongPlayer.x, kongPlayer.y);
     }
 
