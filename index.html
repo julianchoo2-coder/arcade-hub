@@ -30,77 +30,77 @@
 
     .screen { 
       display: none; flex-direction: column; align-items: center; 
-      width: 100%; max-width: 750px; 
-      margin: 0 auto; padding: 40px 20px; 
+      width: 100%; max-width: 600px; 
+      margin: 0 auto; padding: 30px 15px; 
       min-height: 100vh;
     }
     .screen.active { display: flex; }
 
     .arcade-title {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       color: #38bdf8;
       text-shadow: 4px 4px 0px #1e293b, 8px 8px 0px #020617;
       text-align: center;
-      margin-bottom: 30px;
-      line-height: 1.6;
-      letter-spacing: 3px;
+      margin-bottom: 25px;
+      line-height: 1.5;
+      letter-spacing: 2px;
       border-bottom: 4px dashed #334155;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       width: 100%;
     }
 
     h1 {
-      font-size: 1.2rem; font-weight: 400;
-      color: #38bdf8; margin: 0 0 15px 0; text-align: center;
-      line-height: 1.5;
+      font-size: 1.1rem; font-weight: 400;
+      color: #38bdf8; margin: 0 0 10px 0; text-align: center;
       text-shadow: 3px 3px 0px #000;
     }
 
     .login-box {
-      background: #0f172a; border: 4px solid #334155; border-radius: 0px;
-      padding: 35px; width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 20px;
+      background: #0f172a; border: 4px solid #334155;
+      padding: 30px; width: 100%; max-width: 400px; 
+      display: flex; flex-direction: column; gap: 18px;
       box-shadow: 8px 8px 0px #000; align-items: center;
     }
     .login-input {
-      width: 100%; padding: 16px; font-size: 0.9rem; background: #020617;
-      border: 3px solid #475569; color: white; border-radius: 0px; text-align: center;
+      width: 100%; padding: 14px; font-size: 0.85rem; background: #020617;
+      border: 3px solid #475569; color: white; text-align: center;
       outline: none; font-family: 'Press Start 2P', monospace;
     }
     .login-input:focus { border-color: #38bdf8; }
     .login-btn {
-      width: 100%; padding: 16px; font-family: 'Press Start 2P', monospace; font-size: 0.9rem;
-      background-color: #38bdf8; color: #0f172a; border: 3px solid #020617; border-radius: 0px; cursor: pointer;
+      width: 100%; padding: 14px; font-family: 'Press Start 2P', monospace; font-size: 0.85rem;
+      background-color: #38bdf8; color: #0f172a; border: 3px solid #020617; cursor: pointer;
       box-shadow: 4px 4px 0px #020617; transition: transform 0.1s;
     }
     .login-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #020617; }
     
     .guest-btn {
-      width: 100%; padding: 14px; font-family: 'Press Start 2P', monospace; font-size: 0.75rem;
-      background-color: transparent; color: #94a3b8; border: 3px solid #475569; border-radius: 0px; cursor: pointer;
+      width: 100%; padding: 12px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem;
+      background-color: transparent; color: #94a3b8; border: 3px solid #475569; cursor: pointer;
     }
     .guest-btn:hover { color: #f8fafc; border-color: #f8fafc; }
-    #loginMsg { font-size: 0.7rem; color: #f43f5e; text-align: center; min-height: 20px; }
+    #loginMsg { font-size: 0.65rem; color: #f43f5e; text-align: center; min-height: 18px; }
 
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
       width: 100%;
-      max-width: 600px;
-      margin-bottom: 30px;
+      max-width: 450px;
+      margin-bottom: 25px;
     }
     .game-card {
-      background: #0f172a; border: 4px solid #334155; border-radius: 0px;
+      background: #0f172a; border: 4px solid #334155;
       overflow: hidden; cursor: pointer;
       box-shadow: 6px 6px 0px #000;
       transition: transform 0.1s;
-      display: flex; flex-direction: column; align-items: center; padding-bottom: 18px;
+      display: flex; flex-direction: column; align-items: center; padding-bottom: 15px;
     }
     .game-card:hover {
-      transform: translateY(-4px); border-color: #38bdf8;
+      transform: translateY(-3px); border-color: #38bdf8;
     }
     .game-cover {
-      width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
+      width: 100%; height: 110px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
       background-size: cover; background-position: center;
       border-bottom: 3px solid #334155;
     }
@@ -109,7 +109,6 @@
     .cover-tiger { background: linear-gradient(135deg, #ff7b54 0%, #2d5a27 100%); }
     .cover-bomber { background: linear-gradient(135deg, #451a03 0%, #7c2d12 100%); }
     
-    /* Estilo de tarjeta bloqueada / en desarrollo con cinta de policía */
     .game-card.disabled {
       opacity: 0.75;
       cursor: not-allowed;
@@ -117,50 +116,51 @@
     }
     .game-card.disabled:hover { transform: none; border-color: #eab308; }
     .dev-banner {
-      background: repeating-linear-gradient(45deg, #eab308, #eab308 12px, #000 12px, #000 24px);
-      color: #fff; font-size: 0.55rem; text-align: center; padding: 7px; width: 100%; font-weight: bold; text-shadow: 1px 1px 0px #000;
+      background: repeating-linear-gradient(45deg, #eab308, #eab308 10px, #000 10px, #000 20px);
+      color: #fff; font-size: 0.5rem; text-align: center; padding: 6px; width: 100%; font-weight: bold; text-shadow: 1px 1px 0px #000;
     }
 
-    .game-title { font-size: 0.75rem; color: #f8fafc; margin-top: 15px; text-align: center; }
+    .game-title { font-size: 0.7rem; color: #f8fafc; margin-top: 12px; text-align: center; }
 
     .main-wrapper { 
-      display: flex; flex-direction: column; gap: 30px; 
-      width: 100%; max-width: 600px; 
+      display: flex; flex-direction: column; gap: 20px; 
+      width: 100%; max-width: 450px; 
       align-items: center; 
     }
     
     .game-container {
       display: flex; flex-direction: column; align-items: center; width: 100%;
+      background: #0f172a; border: 4px solid #334155; padding: 20px; box-shadow: 6px 6px 0px #000;
     }
 
     canvas { 
-      border: 5px solid #334155; border-radius: 0px; background-color: #020617; 
-      width: 100%; max-width: 580px; height: auto; aspect-ratio: 1 / 1; 
+      border: 4px solid #334155; background-color: #020617; 
+      width: 260px; height: 260px; 
       image-rendering: pixelated; 
-      box-shadow: 8px 8px 0px #000;
+      box-shadow: 4px 4px 0px #000;
     }
 
     .dashboard { 
-      background: #0f172a; border: 4px solid #334155; border-radius: 0px; 
-      padding: 20px; width: 100%; display: flex; gap: 15px;
+      background: #0f172a; border: 4px solid #334155; 
+      padding: 15px; width: 100%; display: flex; gap: 15px;
       box-shadow: 6px 6px 0px #000;
     }
-    .dashboard h2 { font-size: 0.75rem; font-weight: 400; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; text-align: center; }
+    .dashboard h2 { font-size: 0.7rem; font-weight: 400; color: #94a3b8; margin: 0 0 8px 0; text-transform: uppercase; text-align: center; }
     
-    .mobile-controls { display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(2, 75px); gap: 12px; margin-top: 20px; justify-content: center; }
-    .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; border-radius: 0px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
+    .mobile-controls { display: grid; grid-template-columns: repeat(3, 75px); grid-template-rows: repeat(2, 65px); gap: 10px; margin-top: 15px; justify-content: center; }
+    .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 3px 3px 0px #020617; }
     .ctrl-btn:active { background: #38bdf8; color: #0f172a; transform: translate(2px, 2px); box-shadow: none; }
     .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-down { grid-column: 2; grid-row: 2; } .btn-right { grid-column: 3; grid-row: 2; }
     
     .back-btn { 
       background: transparent; color: #94a3b8; border: 3px solid #475569; font-family: 'Press Start 2P', monospace; 
-      font-size: 0.75rem; padding: 14px 20px; border-radius: 0px; cursor: pointer; 
-      margin-bottom: 10px; align-self: flex-start; box-shadow: 3px 3px 0px #000;
+      font-size: 0.7rem; padding: 12px 18px; cursor: pointer; 
+      margin-bottom: 5px; align-self: flex-start; box-shadow: 3px 3px 0px #000;
     }
     .back-btn:hover { color: #f8fafc; border-color: #f8fafc; background: #1e293b; }
 
-    .score-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
-    .score-table th, .score-table td { padding: 8px 4px; text-align: left; border-bottom: 2px dashed #1e293b; }
+    .score-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; }
+    .score-table th, .score-table td { padding: 6px 4px; text-align: left; border-bottom: 2px dashed #1e293b; }
     .score-table th { color: #38bdf8; }
   </style>
 </head>
@@ -168,9 +168,9 @@
 
   <!-- LOGIN LOCAL -->
   <div id="vistaLogin" class="screen">
-    <div style="margin-bottom: 25px; text-align: center; width: 100%;">
+    <div style="margin-bottom: 20px; text-align: center; width: 100%;">
       <div class="arcade-title">ARCADE HUB</div>
-      <p style="color: #94a3b8; margin: 0; font-size: 0.7rem; line-height: 1.8;">INGRESA UN NOMBRE PARA GUARDAR RÉCORDS</p>
+      <p style="color: #94a3b8; margin: 0; font-size: 0.65rem; line-height: 1.6;">INGRESA UN NOMBRE PARA GUARDAR RÉCORDS</p>
     </div>
     <div class="login-box">
       <input type="text" id="userInput" class="login-input" placeholder="TU NOMBRE" maxlength="12">
@@ -182,9 +182,9 @@
 
   <!-- MENÚ PRINCIPAL -->
   <div id="menuPrincipal" class="screen">
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px;">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 450px;">
       <div class="arcade-title">ARCADE HUB</div>
-      <p id="welcomeUser" style="color: #38bdf8; font-size: 0.8rem; margin-top: 0; margin-bottom: 30px; text-align:center;"></p>
+      <p id="welcomeUser" style="color: #38bdf8; font-size: 0.75rem; margin-top: 0; margin-bottom: 25px; text-align:center;"></p>
       
       <div class="menu-grid">
         <div class="game-card" onclick="cambiarPantalla('vistaCulebrita')">
@@ -207,7 +207,7 @@
         </div>
       </div>
 
-      <button onclick="cerrarSesion()" class="back-btn" style="width: 100%; text-align: center; margin-top: 15px; justify-content: center; display: flex;" id="btnSalirSesion">CAMBIAR JUGADOR</button>
+      <button onclick="cerrarSesion()" class="back-btn" style="width: 100%; text-align: center; justify-content: center; display: flex;" id="btnSalirSesion">CAMBIAR JUGADOR</button>
     </div>
   </div>
 
@@ -216,10 +216,10 @@
     <div class="main-wrapper">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
       <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">CULEBRITA</h1>
-        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreCulebra">0</span></p>
-        <canvas id="gameCanvasCulebra" width="300" height="300"></canvas>
-        <button id="respawnBtnCulebra" onclick="resetCulebra()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">REINTENTAR</button>
+        <h1>CULEBRITA</h1>
+        <p style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 14px 0;">PTS: <span id="scoreCulebra">0</span></p>
+        <canvas id="gameCanvasCulebra" width="260" height="260"></canvas>
+        <button id="respawnBtnCulebra" onclick="resetCulebra()" style="display:none; font-family:'Press Start 2P'; font-size:0.75rem; background:#38bdf8; color:#0f172a; padding:12px 24px; border:3px solid #000; margin-top:15px; cursor:pointer;">REINTENTAR</button>
         <div class="mobile-controls">
           <button class="ctrl-btn btn-up" ontouchstart="intentarMoverC(0, -20); event.preventDefault();" onclick="intentarMoverC(0, -20)">▲</button>
           <button class="ctrl-btn btn-left" ontouchstart="intentarMoverC(-20, 0); event.preventDefault();" onclick="intentarMoverC(-20, 0)">◄</button>
@@ -241,11 +241,11 @@
     <div class="main-wrapper">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
       <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">TIGRE SELVA</h1>
-        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreTigre">0</span></p>
-        <canvas id="gameCanvasTigre" width="300" height="300" style="cursor:pointer;" onclick="saltarTigre()"></canvas>
-        <button id="respawnBtnTigre" onclick="resetTigre()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">SALTAR OTRA VEZ</button>
-        <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px; text-align:center;">TOCA PANTALLA O ESPACIO</p>
+        <h1>TIGRE SELVA</h1>
+        <p style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 14px 0;">PTS: <span id="scoreTigre">0</span></p>
+        <canvas id="gameCanvasTigre" width="260" height="260" style="cursor:pointer;" onclick="saltarTigre()"></canvas>
+        <button id="respawnBtnTigre" onclick="resetTigre()" style="display:none; font-family:'Press Start 2P'; font-size:0.75rem; background:#38bdf8; color:#0f172a; padding:12px 24px; border:3px solid #000; margin-top:15px; cursor:pointer;">SALTAR OTRA VEZ</button>
+        <p style="font-size:0.6rem; color:#94a3b8; margin-top:10px; text-align:center;">TOCA PANTALLA O ESPACIO</p>
       </div>
       <div class="dashboard">
         <div style="flex: 1;">
@@ -261,18 +261,18 @@
     <div class="main-wrapper">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
       <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">BOMBER MAN</h1>
-        <p style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 18px 0;">NIVEL <span id="nivelBomber">1</span> | PTS: <span id="scoreBomber">0</span></p>
-        <canvas id="gameCanvasBomber" width="300" height="300"></canvas>
-        <button id="respawnBtnBomber" onclick="resetBomber()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">¡JUGAR DE NUEVO!</button>
+        <h1>BOMBER MAN</h1>
+        <p style="color: #38bdf8; font-size: 0.75rem; margin: 0 0 14px 0;">NIVEL <span id="nivelBomber">1</span> | PTS: <span id="scoreBomber">0</span></p>
+        <canvas id="gameCanvasBomber" width="260" height="260"></canvas>
+        <button id="respawnBtnBomber" onclick="resetBomber()" style="display:none; font-family:'Press Start 2P'; font-size:0.75rem; background:#38bdf8; color:#0f172a; padding:12px 24px; border:3px solid #000; margin-top:15px; cursor:pointer;">¡JUGAR DE NUEVO!</button>
         <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-          <div class="mobile-controls" style="margin-top:15px;">
+          <div class="mobile-controls" style="margin-top:12px;">
             <button class="ctrl-btn btn-up" ontouchstart="moverBomber(0, -1); event.preventDefault();" onclick="moverBomber(0, -1)">▲</button>
             <button class="ctrl-btn btn-left" ontouchstart="moverBomber(-1, 0); event.preventDefault();" onclick="moverBomber(-1, 0)">◄</button>
             <button class="ctrl-btn btn-down" ontouchstart="moverBomber(0, 1); event.preventDefault();" onclick="moverBomber(0, 1)">▼</button>
             <button class="ctrl-btn btn-right" ontouchstart="moverBomber(1, 0); event.preventDefault();" onclick="moverBomber(1, 0)">►</button>
           </div>
-          <button onclick="ponerBomba()" style="margin-top:18px; width:100%; max-width:275px; background:#ef4444; color:white; border:3px solid #000; padding:16px; font-family:'Press Start 2P'; font-size:0.8rem; cursor:pointer;">💣 BOMBA</button>
+          <button onclick="ponerBomba()" style="margin-top:14px; width:100%; max-width:245px; background:#ef4444; color:white; border:3px solid #000; padding:12px; font-family:'Press Start 2P'; font-size:0.75rem; cursor:pointer;">💣 BOMBA</button>
         </div>
       </div>
       <div class="dashboard">
@@ -293,17 +293,12 @@
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
 
-    // --- SINTETIZADOR DE AUDIO ---
     let audioCtx = null;
     let currentMusicInterval = null;
 
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (audioCtx.state === 'suspended') { audioCtx.resume(); }
     }
 
     document.addEventListener('pointerdown', () => {
@@ -352,9 +347,7 @@
       let bufferSize = audioCtx.sampleRate * duration;
       let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       let data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
       let noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
       let filter = audioCtx.createBiquadFilter();
@@ -371,10 +364,7 @@
     }
 
     function stopMusic() {
-      if (currentMusicInterval) {
-        clearInterval(currentMusicInterval);
-        currentMusicInterval = null;
-      }
+      if (currentMusicInterval) { clearInterval(currentMusicInterval); currentMusicInterval = null; }
     }
 
     function startMenuMusic() {
@@ -430,22 +420,10 @@
       playTone(659.25, 0.08, 'square', 80);
       playTone(783.99, 0.12, 'square', 160);
     }
-    function soundCulebraCrash() {
-      playNoise(0.3);
-      playTone(150, 0.2, 'sawtooth', 0);
-    }
-    function soundTigreJump() {
-      playSlide(200, 500, 0.1, 'square');
-    }
-    function soundBomberExplosion() {
-      playNoise(0.4);
-      playTone(100, 0.3, 'sawtooth', 0);
-    }
-    function soundBomberLose() {
-      playSlide(400, 100, 0.4, 'sawtooth');
-    }
+    function soundCulebraCrash() { playNoise(0.3); playTone(150, 0.2, 'sawtooth', 0); }
+    function soundTigreJump() { playSlide(200, 500, 0.1, 'square'); }
+    function soundBomberExplosion() { playNoise(0.4); playTone(100, 0.3, 'sawtooth', 0); }
 
-    // --- GESTIÓN DE SESIÓN Y ARRANQUE ---
     window.onload = function() {
       let savedUser = localStorage.getItem('arcadeUser');
       if (savedUser) {
@@ -465,10 +443,7 @@
       initAudio();
       let u = document.getElementById('userInput').value.trim();
       let msg = document.getElementById('loginMsg');
-      if (!u) {
-        msg.innerText = "POR FAVOR, INGRESA UN NOMBRE";
-        return;
-      }
+      if (!u) { msg.innerText = "POR FAVOR, INGRESA UN NOMBRE"; return; }
       usuarioActual = u;
       localStorage.setItem('arcadeUser', usuarioActual);
       document.getElementById('welcomeUser').innerText = "HOLA, " + usuarioActual;
@@ -496,14 +471,10 @@
     function cambiarPantalla(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      
-      juegoCulebraActivo = false;
-      juegoTigreActivo = false;
-      juegoBomberActivo = false;
+      juegoCulebraActivo = false; juegoTigreActivo = false; juegoBomberActivo = false;
       if (animIdCulebra) cancelAnimationFrame(animIdCulebra);
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
-
       stopMusic();
       if(id === 'menuPrincipal') { startMenuMusic(); }
       if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
@@ -516,15 +487,11 @@
       if (!usuarioActual) return;
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
       let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
-
       if (indexExistente !== -1) {
-        if (puntaje > scores[indexExistente].score) {
-          scores[indexExistente].score = puntaje;
-        }
+        if (puntaje > scores[indexExistente].score) { scores[indexExistente].score = puntaje; }
       } else {
         scores.push({ name: usuarioActual, score: puntaje, game: juego });
       }
-
       scores.sort((a, b) => b.score - a.score);
       localStorage.setItem('arcadeScores', JSON.stringify(scores));
       cargarTablaRécordsGenerica(juego);
@@ -534,14 +501,11 @@
       let tablaId = "scoreTableCulebra";
       if (nombreJuego === "TigreSelva") tablaId = "scoreTableTigre";
       if (nombreJuego === "BomberMan") tablaId = "scoreTableBomber";
-      
       let scoreTable = document.getElementById(tablaId);
       if (!scoreTable) return;
       scoreTable.innerHTML = "<tr><th>JUGADOR</th><th>PTS</th></tr>";
-      
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
       let filtered = scores.filter(item => item.game === nombreJuego).slice(0, 5);
-
       if(filtered.length === 0) {
         scoreTable.innerHTML += "<tr><td colspan='2' style='text-align:center; color:#64748b;'>SIN RÉCORDS</td></tr>";
         return;
@@ -561,61 +525,38 @@
 
     function iniciarCulebra() {
       if (animIdCulebra) cancelAnimationFrame(animIdCulebra);
-      snake = [{x: 140, y: 140}];
-      dxC = 20; dyC = 0; scoreC = 0;
+      snake = [{x: 120, y: 120}]; dxC = 20; dyC = 0; scoreC = 0;
       document.getElementById('scoreCulebra').innerText = scoreC;
-      gameOverC = false;
-      lastTimeC = 0; acumuladorC = 0;
+      gameOverC = false; lastTimeC = 0; acumuladorC = 0;
       document.getElementById('respawnBtnCulebra').style.display = 'none';
-      placeFoodC();
-      juegoCulebraActivo = true;
-      startCulebraMusic();
+      placeFoodC(); juegoCulebraActivo = true; startCulebraMusic();
       animIdCulebra = requestAnimationFrame(updateCulebra);
     }
-
     function placeFoodC() {
       food.x = Math.floor(Math.random() * (canvasC.width / 20)) * 20;
       food.y = Math.floor(Math.random() * (canvasC.height / 20)) * 20;
     }
-
     function updateCulebra(time) {
       if (!juegoCulebraActivo || gameOverC) return;
       animIdCulebra = requestAnimationFrame(updateCulebra);
-
       if (!lastTimeC) lastTimeC = time;
-      acumuladorC += (time - lastTimeC);
-      lastTimeC = time;
-
-      let currentSnakeSpeed = 110;
-      if (scoreC >= 500) currentSnakeSpeed = 65;   
-      else if (scoreC >= 100) currentSnakeSpeed = 90;   
-
+      acumuladorC += (time - lastTimeC); lastTimeC = time;
+      let currentSnakeSpeed = scoreC >= 500 ? 65 : (scoreC >= 100 ? 90 : 110);
       while (acumuladorC >= currentSnakeSpeed) {
-        acumuladorC -= currentSnakeSpeed;
-        cambiandoDirC = false;
+        acumuladorC -= currentSnakeSpeed; cambiandoDirC = false;
         const head = {x: snake[0].x + dxC, y: snake[0].y + dyC};
-
         if (head.x < 0 || head.x >= canvasC.width || head.y < 0 || head.y >= canvasC.height || snake.some(p => p.x === head.x && p.y === head.y)) {
-          gameOverC = true;
-          juegoCulebraActivo = false;
-          stopMusic();
-          soundCulebraCrash();
+          gameOverC = true; juegoCulebraActivo = false; stopMusic(); soundCulebraCrash();
           document.getElementById('respawnBtnCulebra').style.display = 'block';
           if (scoreC > 0) guardarPuntajeAutomatico("Culebrita", scoreC);
           return;
         }
-
         snake.unshift(head);
         if (head.x === food.x && head.y === food.y) {
-          scoreC += 10;
-          soundCulebraEat();
-          document.getElementById('scoreCulebra').innerText = scoreC;
-          placeFoodC();
-        } else {
-          snake.pop();
-        }
+          scoreC += 10; soundCulebraEat();
+          document.getElementById('scoreCulebra').innerText = scoreC; placeFoodC();
+        } else { snake.pop(); }
       }
-
       ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
       for (let r = 0; r < canvasC.height / 20; r++) {
         for (let c = 0; c < canvasC.width / 20; c++) {
@@ -623,23 +564,13 @@
           ctxC.fillRect(c * 20, r * 20, 20, 20);
         }
       }
-      ctxC.fillStyle = '#ff2a2a';
-      ctxC.fillRect(food.x + 3, food.y + 6, 14, 10);
-      ctxC.fillRect(food.x + 5, food.y + 4, 10, 14);
-      ctxC.fillStyle = '#55ff55';
-      ctxC.fillRect(food.x + 8, food.y + 2, 4, 4);
-
+      ctxC.fillStyle = '#ff2a2a'; ctxC.fillRect(food.x + 3, food.y + 6, 14, 10);
+      ctxC.fillStyle = '#55ff55'; ctxC.fillRect(food.x + 8, food.y + 2, 4, 4);
       snake.forEach((p, index) => {
-        if (index === 0) {
-          ctxC.fillStyle = '#00ccff';
-          ctxC.fillRect(p.x + 1, p.y + 1, 18, 18);
-        } else {
-          ctxC.fillStyle = '#0099cc';
-          ctxC.fillRect(p.x + 2, p.y + 2, 16, 16);
-        }
+        ctxC.fillStyle = index === 0 ? '#00ccff' : '#0099cc';
+        ctxC.fillRect(p.x + 1, p.y + 1, 18, 18);
       });
     }
-
     function intentarMoverC(nx, ny) {
       if (gameOverC || cambiandoDirC) return;
       if (ny !== 0 && dyC === 0) { dxC = 0; dyC = ny; cambiandoDirC = true; }
@@ -650,55 +581,40 @@
     // --- TIGRE EN LA SELVA ---
     const canvasT = document.getElementById('gameCanvasTigre');
     const ctxT = canvasT.getContext('2d');
-    let tigre = { x: 40, y: 220, w: 32, h: 24, vy: 0, jump: -9.5, gravity: 0.5, grounded: true };
+    let tigre = { x: 40, y: 190, w: 28, h: 22, vy: 0, jump: -8.5, gravity: 0.45, grounded: true };
     let obstaculos = [], distance = 0, scoreT = 0, gameOverT = false, nextSpawn = 0;
-
     function iniciarTigre() {
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
-      tigre.y = 220; tigre.vy = 0; tigre.grounded = true;
-      obstaculos = []; distance = 0; scoreT = 0;
+      tigre.y = 190; tigre.vy = 0; tigre.grounded = true; obstaculos = []; distance = 0; scoreT = 0;
       nextSpawn = 40 + Math.floor(Math.random() * 100);
       document.getElementById('scoreTigre').innerText = scoreT;
-      gameOverT = false;
-      document.getElementById('respawnBtnTigre').style.display = 'none';
-      juegoTigreActivo = true;
-      startTigerMusic();
+      gameOverT = false; document.getElementById('respawnBtnTigre').style.display = 'none';
+      juegoTigreActivo = true; startTigerMusic();
       animIdTigre = requestAnimationFrame(updateTigre);
     }
-
     function saltarTigre() {
       if (tigre.grounded && juegoTigreActivo && !gameOverT) {
-        tigre.vy = tigre.jump; 
-        tigre.grounded = false;
-        soundTigreJump();
+        tigre.vy = tigre.jump; tigre.grounded = false; soundTigreJump();
       }
     }
-
     function updateTigre() {
       if (!juegoTigreActivo || gameOverT) return;
       animIdTigre = requestAnimationFrame(updateTigre);
-
-      let currentSpeed = scoreT >= 1000 ? 7 : (scoreT >= 400 ? 6 : 4.5);
-      distance += currentSpeed;
-      scoreT = Math.floor(distance / 10);
+      let currentSpeed = scoreT >= 1000 ? 6.5 : (scoreT >= 400 ? 5.5 : 4);
+      distance += currentSpeed; scoreT = Math.floor(distance / 10);
       document.getElementById('scoreTigre').innerText = scoreT;
-
-      tigre.vy += tigre.gravity;
-      tigre.y += tigre.vy;
-      if (tigre.y >= 220) { tigre.y = 220; tigre.vy = 0; tigre.grounded = true; }
-
+      tigre.vy += tigre.gravity; tigre.y += tigre.vy;
+      if (tigre.y >= 190) { tigre.y = 190; tigre.vy = 0; tigre.grounded = true; }
       nextSpawn--;
       if (nextSpawn <= 0) {
         let esLoro = scoreT >= 1000 && Math.random() > 0.55;
         if (esLoro) {
-          let alturaLoro = (Math.random() > 0.5) ? 185 : 215; 
-          obstaculos.push({ x: 300, y: alturaLoro, w: 24, h: 12, tipo: 'loro', sonado: false });
+          obstaculos.push({ x: 260, y: (Math.random() > 0.5 ? 150 : 185), w: 22, h: 10, tipo: 'loro', sonado: false });
         } else {
-          obstaculos.push({ x: 300, y: 228, w: 16, h: 16, tipo: 'tronco' });
+          obstaculos.push({ x: 260, y: 198, w: 14, h: 14, tipo: 'tronco' });
         }
-        nextSpawn = 35 + Math.floor(Math.random() * 100); 
+        nextSpawn = 35 + Math.floor(Math.random() * 90);
       }
-
       for (let i = obstaculos.length - 1; i >= 0; i--) {
         obstaculos[i].x -= currentSpeed;
         if (
@@ -707,28 +623,21 @@
           tigre.y < obstaculos[i].y + obstaculos[i].h &&
           tigre.y + tigre.h > obstaculos[i].y
         ) {
-          gameOverT = true;
-          juegoTigreActivo = false;
-          stopMusic();
-          soundCulebraCrash();
+          gameOverT = true; juegoTigreActivo = false; stopMusic(); soundCulebraCrash();
           document.getElementById('respawnBtnTigre').style.display = 'block';
           if (scoreT > 0) guardarPuntajeAutomatico("TigreSelva", scoreT);
           return;
         }
         if (obstaculos[i].x + obstaculos[i].w < 0) obstaculos.splice(i, 1);
       }
-
       ctxT.clearRect(0, 0, canvasT.width, canvasT.height);
       ctxT.fillStyle = '#ff7b54'; ctxT.fillRect(0, 0, canvasT.width, canvasT.height);
-      ctxT.fillStyle = '#1b431b'; ctxT.fillRect(0, 244, canvasT.width, 56);
-      
+      ctxT.fillStyle = '#1b431b'; ctxT.fillRect(0, 212, canvasT.width, 48);
       obstaculos.forEach(o => {
         ctxT.fillStyle = o.tipo === 'loro' ? '#ef4444' : '#5c4033';
         ctxT.fillRect(o.x, o.y, o.w, o.h);
       });
-
-      ctxT.fillStyle = '#f97316';
-      ctxT.fillRect(tigre.x, tigre.y, tigre.w, tigre.h);
+      ctxT.fillStyle = '#f97316'; ctxT.fillRect(tigre.x, tigre.y, tigre.w, tigre.h);
     }
     function resetTigre() { iniciarTigre(); }
 
@@ -736,37 +645,30 @@
     const canvasB = document.getElementById('gameCanvasBomber');
     const ctxB = canvasB.getContext('2d');
     const colsB = 11, rowsB = 11;
-    let mapB = [], playerB = { x: 1, y: 1, dir: 'down' }, bombasB = [], explosionesB = [], enemigosB = [];
-    let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0;
-
+    let mapB = [], playerB = { x: 1, y: 1, dir: 'down' }, bombasB = [], tiempoRecargaBomba = 0;
+    let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false;
     function iniciarBomber(siguienteNivel = false) {
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
       if (!siguienteNivel) { scoreBomber = 0; nivelBomber = 1; }
       document.getElementById('scoreBomber').innerText = scoreBomber;
       document.getElementById('nivelBomber').innerText = nivelBomber;
       gameOverBomber = false; document.getElementById('respawnBtnBomber').style.display = 'none';
-      playerB = { x: 1, y: 1, dir: 'down' }; bombasB = []; explosionesB = []; tiempoRecargaBomba = 0;
-      
+      playerB = { x: 1, y: 1, dir: 'down' }; bombasB = []; tiempoRecargaBomba = 0;
       mapB = [];
       for (let r = 0; r < rowsB; r++) {
         let row = [];
         for (let c = 0; c < colsB; c++) {
           if (r === 0 || r === rowsB - 1 || c === 0 || c === colsB - 1 || (r % 2 === 0 && c % 2 === 0)) {
-            row.push(1); 
+            row.push(1);
           } else if ((r === 1 && c === 1) || (r === 1 && c === 2) || (r === 2 && c === 1)) {
-            row.push(0); 
-          } else {
-            row.push(Math.random() < 0.6 ? 2 : 0);
-          }
+            row.push(0);
+          } else { row.push(Math.random() < 0.6 ? 2 : 0); }
         }
         mapB.push(row);
       }
-      enemigosB = [{ x: 5, y: 5, timerMov: 0 }];
-      juegoBomberActivo = true;
-      startBomberMusic();
+      juegoBomberActivo = true; startBomberMusic();
       animIdBomber = requestAnimationFrame(updateBomber);
     }
-
     function moverBomber(dx, dy) {
       if (!juegoBomberActivo || gameOverBomber) return;
       let nx = playerB.x + dx, ny = playerB.y + dy;
@@ -774,26 +676,21 @@
         playerB.x = nx; playerB.y = ny;
       }
     }
-
     function ponerBomba() {
       if (!juegoBomberActivo || gameOverBomber || tiempoRecargaBomba > 0) return;
-      bombasB.push({ x: playerB.x, y: playerB.y, timer: 120, alcance: 2 });
+      bombasB.push({ x: playerB.x, y: playerB.y, timer: 120 });
       tiempoRecargaBomba = 180;
     }
-
     function updateBomber() {
       if (!juegoBomberActivo || gameOverBomber) return;
       animIdBomber = requestAnimationFrame(updateBomber);
       if (tiempoRecargaBomba > 0) tiempoRecargaBomba--;
-
       for (let i = bombasB.length - 1; i >= 0; i--) {
         bombasB[i].timer--;
         if (bombasB[i].timer <= 0) {
-          bombasB.splice(i, 1);
-          soundBomberExplosion();
+          bombasB.splice(i, 1); soundBomberExplosion();
         }
       }
-
       ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
       let cellW = canvasB.width / colsB, cellH = canvasB.height / rowsB;
       for (let r = 0; r < rowsB; r++) {
@@ -803,13 +700,12 @@
         }
       }
       ctxB.fillStyle = '#3b82f6';
-      ctxB.fillRect(playerB.x * cellW + 4, playerB.y * cellH + 4, cellW - 8, cellH - 8);
+      ctxB.fillRect(playerB.x * cellW + 3, playerB.y * cellH + 3, cellW - 6, cellH - 6);
     }
     function resetBomber() { iniciarBomber(false); }
 
     document.addEventListener('keydown', (e) => {
       if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
-
       if (document.getElementById('vistaCulebrita').classList.contains('active')) {
         if (gameOverC && (e.key === ' ' || e.code === 'Space')) return resetCulebra();
         if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') intentarMoverC(0, -20);
@@ -817,13 +713,11 @@
         if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') intentarMoverC(-20, 0);
         if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') intentarMoverC(20, 0);
       }
-
       if (document.getElementById('vistaTigre').classList.contains('active')) {
         if (e.key === ' ' || e.code === 'Space' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
           gameOverT ? resetTigre() : saltarTigre();
         }
       }
-
       if (document.getElementById('vistaBomber').classList.contains('active')) {
         if (gameOverBomber && (e.key === ' ' || e.code === 'Space')) return resetBomber();
         if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') moverBomber(0, -1);
