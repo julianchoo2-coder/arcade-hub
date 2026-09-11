@@ -1,1 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kong Arcade - Sandbox Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #050b14; color: #f8fafc; font-family: 'Press Start 2P', monospace;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0;
+    }
+    .container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    canvas { border: 5px solid #334155; background-color: #020617; width: 300px; height: 300px; image-rendering: pixelated; box-shadow: 8px 8px 0px #000; }
+    .mobile-controls { display: grid; grid-template-columns: repeat(3, 75px); grid-template-rows: repeat(2, 65px); gap: 10px; margin-top: 10px; justify-content: center; }
+    .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .ctrl-btn:active { background: #38bdf8; color: #0f172a; }
+    .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-right { grid-column: 3; grid-row: 2; }
+    button#respawnBtn { font-family: 'Press Start 2P'; font-size: 0.8rem; background: #38bdf8; color: #0f172a; padding: 12px 24px; border: 3px solid #000; cursor: pointer; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KONG TEST</h1>
+    <p style="font-size: 0.8rem; color: #38bdf8;">PTS: <span id="scoreKong">0</span></p>
+    <canvas id="gameCanvasKong" width="260" height="260"></canvas>
+    <button id="respawnBtn" onclick="iniciarKong()" style="display:none;">OTRA VEZ</button>
+    <div class="mobile-controls">
+      <button class="ctrl-btn btn-up" ontouchstart="moverKongInput('up'); event.preventDefault();" onclick="moverKongInput('up')">▲</button>
+      <button class="ctrl-btn btn-left" ontouchstart="moverKongInput('left'); event.preventDefault();" onclick="moverKongInput('left')">◄</button>
+      <button class="ctrl-btn btn-right" ontouchstart="moverKongInput('right'); event.preventDefault();" onclick="moverKongInput('right')">►</button>
+    </div>
+  </div>
 
+  <script>
+    const canvasK = document.getElementById('gameCanvasKong');
+    const ctxK = canvasK.getContext('2d');
+    let kongPlayer = { x: 30, y: 220, w: 16, h: 22, vx: 0, vy: 0, grounded: false };
+    let scoreKong = 0, gameOverKong = false, timerLanzamiento = 0;
+    
+    // Plataformas inclinadas
+    let plataformasKong = [
+      { x1: 10, y1: 240, x2: 250, y2: 240 },
+      { x1: 20, y1: 185, x2: 240, y2: 205 },
+      { x1: 20, y1: 130, x2: 240, y2: 110 },
+      { x1: 40, y1: 65,  x2: 220, y2: 80  }
+    ];
+    let barrilesKong = [];
+    let kongBoss = { x: 35, y: -40, targetY: 30, w: 32, h: 24, intro: true };
+    let animIdKong = null;
+
+    function iniciarKong() {
+      if (animIdKong) cancelAnimationFrame(animIdKong);
+      kongPlayer = { x: 30, y: 210, w: 16, h: 22, vx: 0, vy: 0, grounded: true };
+      scoreKong = 0; gameOverKong = false; barrilesKong = []; timerLanzamiento = 0;
+      kongBoss = { x: 35, y: -40, targetY: 30, w: 32, h: 24, intro: true };
+      document.getElementById('scoreKong').innerText = scoreKong;
+      document.getElementById('respawnBtn').style.display = 'none';
+      animIdKong = requestAnimationFrame(updateKong);
+    }
+
+    function moverKongInput(dir) {
+      if (gameOverKong || kongBoss.intro) return;
+      if (dir === 'left') kongPlayer.x -= 10;
+      if (dir === 'right') kongPlayer.x += 10;
+      if (dir === 'up' && kongPlayer.grounded) {
+        kongPlayer.vy = -5.8;
+        kongPlayer.grounded = false;
+      }
+    }
+
+    function obtenerYPlataforma(p, px) {
+      if (px < Math.min(p.x1, p.x2) || px > Math.max(p.x1, p.x2)) return null;
+      let t = (px - p.x1) / (p.x2 - p.x1);
+      return p.y1 + t * (p.y2 - p.y1);
+    }
+
+    function dibujarPersonajePictorico(ctx, px, py) {
+      const s = 1.5;
+      const coloresCabello = ['#7c2d12', '#9a3412', '#b45309', '#78350f'];
+      let matrizCabello = [
+        [0,1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,0,0,0,0,0,0,1],
+        [0,0,1,1,1,1,0,0]
+      ];
+      for(let r=0; r<matrizCabello.length; r++) {
+        for(let c=0; c<matrizCabello[r].length; c++) {
+          if(matrizCabello[r][c] === 1) {
+            ctx.fillStyle = coloresCabello[(r + c) % coloresCabello.length];
+            ctx.fillRect(px + (c-1)*s, py + (r-2)*s, s, s);
+          }
+        }
+      }
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(px + 1*s, py + 3*s, s*2, s*2);
+      ctx.fillRect(px + 5*s, py + 3*s, s*2, s*2);
+      ctx.fillStyle = '#fed7aa';
+      ctx.fillRect(px + 0*s, py + 5*s, s*8, s*3);
+      let franjas = ['#22c55e', '#f97316', '#eab308', '#22c55e'];
+      for(let r=0; r<4; r++) {
+        for(let c=0; c<8; c++) {
+          ctx.fillStyle = franjas[c % franjas.length];
+          ctx.fillRect(px + c*s, py + (8+r)*s, s, s);
+        }
+      }
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(px + 1*s, py + 12*s, s*6, s*2);
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(px + 1*s, py + 14*s, s*2, s*2);
+      ctx.fillRect(px + 5*s, py + 14*s, s*2, s*2);
+    }
+
+    function dibujarVillanoKong(ctx, bx, by) {
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(bx, by, 32, 24);
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(bx + 4, by + 4, 24, 16);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(bx + 6, by + 7, 5, 3);
+      ctx.fillRect(bx + 21, by + 7, 5, 3);
+      ctx.fillStyle = '#fde68a';
+      ctx.fillRect(bx + 9, by + 13, 14, 7);
+    }
+
+    function updateKong() {
+      if (gameOverKong) return;
+      animIdKong = requestAnimationFrame(updateKong);
+
+      if (kongBoss.intro) {
+        kongBoss.y += 2.5;
+        if (kongBoss.y >= kongBoss.targetY) {
+          kongBoss.y = kongBoss.targetY;
+          kongBoss.intro = false;
+        }
+      }
+
+      kongPlayer.vy += 0.35;
+      kongPlayer.y += kongPlayer.vy;
+      kongPlayer.grounded = false;
+
+      plataformasKong.forEach(p => {
+        let sueloY = obtenerYPlataforma(p, kongPlayer.x + kongPlayer.w/2);
+        if (sueloY !== null && kongPlayer.y + kongPlayer.h >= sueloY - 4 && kongPlayer.y + kongPlayer.h <= sueloY + 8 && kongPlayer.vy >= 0) {
+          kongPlayer.y = sueloY - kongPlayer.h;
+          kongPlayer.vy = 0;
+          kongPlayer.grounded = true;
+        }
+      });
+
+      if (!kongBoss.intro) {
+        timerLanzamiento++;
+        if (timerLanzamiento > 85) {
+          timerLanzamiento = 0;
+          barrilesKong.push({ x: kongBoss.x + 10, y: kongBoss.y + 18, vx: 1.6, vy: 0, platIndex: 3, rolling: true });
+        }
+      }
+
+      for (let i = barrilesKong.length - 1; i >= 0; i--) {
+        let b = barrilesKong[i];
+        if (b.rolling) {
+          let p = plataformasKong[b.platIndex];
+          let dir = (p.x2 > p.x1) ? 1 : -1;
+          b.x += b.vx * dir;
+          let sueloY = obtenerYPlataforma(p, b.x);
+          if (sueloY !== null) { b.y = sueloY - 7; }
+
+          if ((dir === 1 && b.x >= Math.max(p.x1, p.x2) - 5) || (dir === -1 && b.x <= Math.min(p.x1, p.x2) + 5)) {
+            if (b.platIndex > 0) {
+              b.platIndex--;
+              b.rolling = false;
+              b.vy = 1;
+            } else {
+              barrilesKong.splice(i, 1);
+              scoreKong += 10;
+              document.getElementById('scoreKong').innerText = scoreKong;
+              continue;
+            }
+          }
+        } else {
+          b.vy += 0.3;
+          b.y += b.vy;
+          let p = plataformasKong[b.platIndex];
+          let sueloY = obtenerYPlataforma(p, b.x);
+          if (sueloY !== null && b.y >= sueloY - 7) {
+            b.y = sueloY - 7;
+            b.rolling = true;
+          }
+        }
+
+        if (
+          kongPlayer.x < b.x + 6 &&
+          kongPlayer.x + kongPlayer.w > b.x - 6 &&
+          kongPlayer.y < b.y + 6 &&
+          kongPlayer.y + kongPlayer.h > b.y - 6
+        ) {
+          gameOverKong = true;
+          cancelAnimationFrame(animIdKong);
+          document.getElementById('respawnBtn').style.display = 'block';
+          return;
+        }
+
+        if (b.y > 260 || b.x < -10 || b.x > 270) {
+          barrilesKong.splice(i, 1);
+        }
+      }
+
+      ctxK.clearRect(0, 0, canvasK.width, canvasK.height);
+      ctxK.fillStyle = '#0f172a';
+      ctxK.fillRect(0, 0, canvasK.width, canvasK.height);
+
+      plataformasKong.forEach(p => {
+        ctxK.strokeStyle = '#b45309'; ctxK.lineWidth = 10;
+        ctxK.beginPath(); ctxK.moveTo(p.x1, p.y1); ctxK.lineTo(p.x2, p.y2); ctxK.stroke();
+        ctxK.strokeStyle = '#d97706'; ctxK.lineWidth = 3;
+        ctxK.beginPath(); ctxK.moveTo(p.x1, p.y1 - 3); ctxK.lineTo(p.x2, p.y2 - 3); ctxK.stroke();
+      });
+
+      dibujarVillanoKong(ctxK, kongBoss.x, kongBoss.y);
+
+      barrilesKong.forEach(b => {
+        ctxK.fillStyle = '#7f1d1d';
+        ctxK.beginPath(); ctxK.arc(b.x, b.y, 6, 0, Math.PI * 2); ctxK.fill();
+        ctxK.fillStyle = '#f87171';
+        ctxK.fillRect(b.x - 2, b.y - 2, 4, 4);
+      });
+
+      dibujarPersonajePictorico(ctxK, kongPlayer.x, kongPlayer.y);
+    }
+
+    window.onload = iniciarKong;
+
+    document.addEventListener('keydown', (e) => {
+      if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moverKongInput('left');
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moverKongInput('right');
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ' || e.code === 'Space') moverKongInput('up');
+    });
+  </script>
+</body>
+</html>
