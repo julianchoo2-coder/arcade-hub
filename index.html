@@ -365,7 +365,6 @@
       }
     }
 
-    // 1. Menú Principal: Melodía de 16 notas (jingle completo que resuelve de forma suave)
     function startMenuMusic() {
       stopMusic();
       let notes = [
@@ -381,7 +380,6 @@
       }, 200);
     }
 
-    // 2. Culebrita: Arpegio fluido y misterioso de 16 notas
     function startCulebraMusic() {
       stopMusic();
       let notes = [
@@ -397,7 +395,6 @@
       }, 180);
     }
 
-    // 3. Tigre: Secuencia de acción rápida y aventurera (16 notas)
     function startTigerMusic() {
       stopMusic();
       let notes = [
@@ -413,7 +410,6 @@
       }, 140);
     }
 
-    // 4. Bomber Man: Tema táctico de tensión y marcha (16 notas)
     function startBomberMusic() {
       stopMusic();
       let notes = [
@@ -429,7 +425,6 @@
       }, 190);
     }
 
-    // Efectos de sonido
     function soundCulebraEat() {
       playTone(523.25, 0.08, 'square', 0);
       playTone(659.25, 0.08, 'square', 80);
@@ -454,8 +449,7 @@
       playSlide(400, 100, 0.4, 'sawtooth');
     }
 
-    // ----------------------------------------
-
+    // --- GESTIÓN DE SESIÓN Y ARRANQUE ---
     window.onload = function() {
       let savedUser = localStorage.getItem('arcadeUser');
       if (savedUser) {
@@ -528,23 +522,17 @@
       if (!usuarioActual) return;
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
       
-      // Buscar si el usuario ya tiene un récord registrado para este juego
       let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
 
       if (indexExistente !== -1) {
-        // Si ya existe, actualizamos solo si el nuevo puntaje es mayor al anterior
         if (puntaje > scores[indexExistente].score) {
           scores[indexExistente].score = puntaje;
         }
       } else {
-        // Si no existe, lo agregamos por primera vez
         scores.push({ name: usuarioActual, score: puntaje, game: juego });
       }
 
-      // Ordenar de mayor a menor puntaje
       scores.sort((a, b) => b.score - a.score);
-      
-      // Guardar en el almacenamiento local
       localStorage.setItem('arcadeScores', JSON.stringify(scores));
       cargarTablaRécordsGenerica(juego);
     }
