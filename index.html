@@ -129,10 +129,10 @@
 
     .dashboard { 
       background: #0f172a; border: 4px solid #334155; border-radius: 0px; 
-      padding: 25px; width: 100%; display: flex; flex-direction: column; align-items: center;
+      padding: 20px; width: 100%; display: flex; gap: 15px;
       box-shadow: 6px 6px 0px #000;
     }
-    .dashboard h2 { font-size: 0.9rem; font-weight: 400; color: #94a3b8; margin: 0 0 15px 0; text-transform: uppercase; }
+    .dashboard h2 { font-size: 0.75rem; font-weight: 400; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; text-align: center; }
     
     .mobile-controls { display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(2, 75px); gap: 12px; margin-top: 20px; justify-content: center; }
     .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; border-radius: 0px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
@@ -146,9 +146,9 @@
     }
     .back-btn:hover { color: #f8fafc; border-color: #f8fafc; background: #1e293b; }
 
-    #scoreTableCulebra, #scoreTableTigre, #scoreTableBomber { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-    #scoreTableCulebra th, #scoreTableCulebra td, #scoreTableTigre th, #scoreTableTigre td, #scoreTableBomber th, #scoreTableBomber td { padding: 12px 8px; text-align: left; border-bottom: 2px dashed #1e293b; }
-    #scoreTableCulebra th, #scoreTableTigre th, #scoreTableBomber th { color: #38bdf8; }
+    .score-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+    .score-table th, .score-table td { padding: 8px 4px; text-align: left; border-bottom: 2px dashed #1e293b; }
+    .score-table th { color: #38bdf8; }
   </style>
 </head>
 <body>
@@ -214,8 +214,14 @@
       </div>
 
       <div class="dashboard">
-        <h2>TOP LOCAL</h2>
-        <table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableCulebra" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+        <div style="flex: 1; border-left: 2px dashed #334155; padding-left: 10px;">
+          <h2 style="color: #38bdf8;">TOP GLOBAL</h2>
+          <table id="scoreTableGlobalCulebra" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
       </div>
     </div>
   </div>
@@ -236,8 +242,14 @@
       </div>
 
       <div class="dashboard">
-        <h2>TOP LOCAL</h2>
-        <table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableTigre" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+        <div style="flex: 1; border-left: 2px dashed #334155; padding-left: 10px;">
+          <h2 style="color: #38bdf8;">TOP GLOBAL</h2>
+          <table id="scoreTableGlobalTigre" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
       </div>
     </div>
   </div>
@@ -267,8 +279,14 @@
       </div>
 
       <div class="dashboard">
-        <h2>TOP LOCAL</h2>
-        <table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableBomber" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+        <div style="flex: 1; border-left: 2px dashed #334155; padding-left: 10px;">
+          <h2 style="color: #38bdf8;">TOP GLOBAL</h2>
+          <table id="scoreTableGlobalBomber" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
       </div>
     </div>
   </div>
@@ -282,7 +300,369 @@
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
 
+    // --- CONFIGURACIÓN GLOBAL (JSONBIN) ---
+    const BIN_ID = "TU_ID_DE_BIN_AQUÍ"; 
+    const API_KEY = "TU_MASTER_KEY_AQUÍ";
+
     // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS EXPANDIDOS ---
+    let audioCtx = null;
+    let currentMusicInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    document.addEventListener('pointerdown', () => {
+      initAudio();
+      if (!currentMusicInterval && document.getElementById('menuPrincipal').classList.contains('active')) {
+        startMenuMusic();
+      }
+    }, { once: true });
+
+    function playTone(freq, duration, type = 'square', delay = 0) {
+      initAudio();
+      setTimeout(() => {
+        if (!audioCtx || audioCtx.state !== 'running') return;
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      }, delay);
+    }
+
+    function playSlide(startFreq, endFreq, duration, type = 'square') {
+      initAudio();
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      let osc = audioCtx.createOscillator();
+      let gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Arcade Hub</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22[http://www.w3.org/2000/svg%22](http://www.w3.org/2000/svg%22) viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
+  <link href="[https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap](https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap)" rel="stylesheet">
+  <style>
+    * { 
+      box-sizing: border-box; 
+      touch-action: manipulation; 
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    input {
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+    
+    html, body {
+      width: 100%; margin: 0; padding: 0;
+      background-color: #050b14; color: #f8fafc; 
+      font-family: 'Press Start 2P', monospace;
+      background-image: radial-gradient(#1e293b 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+
+    .screen { 
+      display: none; flex-direction: column; align-items: center; 
+      width: 100%; max-width: 750px; 
+      margin: 0 auto; padding: 40px 20px; 
+      min-height: 100vh;
+    }
+    .screen.active { display: flex; }
+
+    .arcade-title {
+      font-size: 1.8rem;
+      color: #38bdf8;
+      text-shadow: 4px 4px 0px #1e293b, 8px 8px 0px #020617;
+      text-align: center;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      letter-spacing: 3px;
+      border-bottom: 4px dashed #334155;
+      padding-bottom: 20px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 1.2rem; font-weight: 400;
+      color: #38bdf8; margin: 0 0 15px 0; text-align: center;
+      line-height: 1.5;
+      text-shadow: 3px 3px 0px #000;
+    }
+
+    .login-box {
+      background: #0f172a; border: 4px solid #334155; border-radius: 0px;
+      padding: 35px; width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 20px;
+      box-shadow: 8px 8px 0px #000; align-items: center;
+    }
+    .login-input {
+      width: 100%; padding: 16px; font-size: 0.9rem; background: #020617;
+      border: 3px solid #475569; color: white; border-radius: 0px; text-align: center;
+      outline: none; font-family: 'Press Start 2P', monospace;
+    }
+    .login-input:focus { border-color: #38bdf8; }
+    .login-btn {
+      width: 100%; padding: 16px; font-family: 'Press Start 2P', monospace; font-size: 0.9rem;
+      background-color: #38bdf8; color: #0f172a; border: 3px solid #020617; border-radius: 0px; cursor: pointer;
+      box-shadow: 4px 4px 0px #020617; transition: transform 0.1s;
+    }
+    .login-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #020617; }
+    
+    .guest-btn {
+      width: 100%; padding: 14px; font-family: 'Press Start 2P', monospace; font-size: 0.75rem;
+      background-color: transparent; color: #94a3b8; border: 3px solid #475569; border-radius: 0px; cursor: pointer;
+    }
+    .guest-btn:hover { color: #f8fafc; border-color: #f8fafc; }
+    #loginMsg { font-size: 0.7rem; color: #f43f5e; text-align: center; min-height: 20px; }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+    .game-card {
+      background: #0f172a; border: 4px solid #334155; border-radius: 0px;
+      overflow: hidden; cursor: pointer;
+      box-shadow: 6px 6px 0px #000;
+      transition: transform 0.1s;
+      display: flex; flex-direction: column; align-items: center; padding-bottom: 18px;
+    }
+    .game-card:hover {
+      transform: translateY(-4px); border-color: #38bdf8;
+    }
+    .game-cover {
+      width: 100%; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 3rem;
+      background-size: cover; background-position: center;
+      border-bottom: 3px solid #334155;
+    }
+    
+    .cover-snake { background-color: #163820; }
+    .cover-tiger { background: linear-gradient(135deg, #ff7b54 0%, #2d5a27 100%); }
+    .cover-bomber { background: linear-gradient(135deg, #451a03 0%, #7c2d12 100%); }
+    .game-title { font-size: 0.85rem; color: #f8fafc; margin-top: 15px; text-align: center; }
+
+    .main-wrapper { 
+      display: flex; flex-direction: column; gap: 30px; 
+      width: 100%; max-width: 600px; 
+      align-items: center; 
+    }
+    
+    .game-container {
+      display: flex; flex-direction: column; align-items: center; width: 100%;
+    }
+
+    canvas { 
+      border: 5px solid #334155; border-radius: 0px; background-color: #020617; 
+      width: 100%; max-width: 580px; height: auto; aspect-ratio: 1 / 1; 
+      image-rendering: pixelated; 
+      box-shadow: 8px 8px 0px #000;
+    }
+
+    .dashboard { 
+      background: #0f172a; border: 4px solid #334155; border-radius: 0px; 
+      padding: 20px; width: 100%; display: flex; gap: 15px;
+      box-shadow: 6px 6px 0px #000;
+    }
+    .dashboard h2 { font-size: 0.75rem; font-weight: 400; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; text-align: center; }
+    
+    .mobile-controls { display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(2, 75px); gap: 12px; margin-top: 20px; justify-content: center; }
+    .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; border-radius: 0px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
+    .ctrl-btn:active { background: #38bdf8; color: #0f172a; transform: translate(2px, 2px); box-shadow: none; }
+    .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-down { grid-column: 2; grid-row: 2; } .btn-right { grid-column: 3; grid-row: 2; }
+    
+    .back-btn { 
+      background: transparent; color: #94a3b8; border: 3px solid #475569; font-family: 'Press Start 2P', monospace; 
+      font-size: 0.75rem; padding: 14px 20px; border-radius: 0px; cursor: pointer; 
+      margin-bottom: 10px; align-self: flex-start; box-shadow: 3px 3px 0px #000;
+    }
+    .back-btn:hover { color: #f8fafc; border-color: #f8fafc; background: #1e293b; }
+
+    #scoreTableCulebra, #scoreTableGlobalCulebra, #scoreTableTigre, #scoreTableGlobalTigre, #scoreTableBomber, #scoreTableGlobalBomber { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+    #scoreTableCulebra th, #scoreTableCulebra td, #scoreTableGlobalCulebra th, #scoreTableGlobalCulebra td,
+    #scoreTableTigre th, #scoreTableTigre td, #scoreTableGlobalTigre th, #scoreTableGlobalTigre td,
+    #scoreTableBomber th, #scoreTableBomber td, #scoreTableGlobalBomber th, #scoreTableGlobalBomber td { padding: 8px 4px; text-align: left; border-bottom: 2px dashed #1e293b; }
+    th { color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN LOCAL -->
+  <div id="vistaLogin" class="screen">
+    <div style="margin-bottom: 25px; text-align: center; width: 100%;">
+      <div class="arcade-title">ARCADE HUB</div>
+      <p style="color: #94a3b8; margin: 0; font-size: 0.7rem; line-height: 1.8;">INGRESA UN NOMBRE PARA GUARDAR RÉCORDS</p>
+    </div>
+    <div class="login-box">
+      <input type="text" id="userInput" class="login-input" placeholder="TU NOMBRE" maxlength="12">
+      <div id="loginMsg"></div>
+      <button class="login-btn" onclick="intentarLogin()">JUGAR AHORA</button>
+      <button class="guest-btn" onclick="jugarComoInvitado()">JUGAR COMO INVITADO</button>
+    </div>
+  </div>
+
+  <!-- MENÚ PRINCIPAL -->
+  <div id="menuPrincipal" class="screen">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px;">
+      <div class="arcade-title">ARCADE HUB</div>
+      <p id="welcomeUser" style="color: #38bdf8; font-size: 0.8rem; margin-top: 0; margin-bottom: 30px; text-align:center;"></p>
+      
+      <div class="menu-grid">
+        <div class="game-card" onclick="cambiarPantalla('vistaCulebrita')">
+          <div class="game-cover cover-snake">🐍</div>
+          <div class="game-title">CULEBRITA</div>
+        </div>
+        <div class="game-card" onclick="cambiarPantalla('vistaTigre')">
+          <div class="game-cover cover-tiger">🐅</div>
+          <div class="game-title">TIGRE</div>
+        </div>
+        <div class="game-card" onclick="cambiarPantalla('vistaBomber')">
+          <div class="game-cover cover-bomber">💣</div>
+          <div class="game-title">BOMBER</div>
+        </div>
+      </div>
+
+      <button onclick="cerrarSesion()" class="back-btn" style="width: 100%; text-align: center; margin-top: 15px; justify-content: center; display: flex;" id="btnSalirSesion">CAMBIAR JUGADOR</button>
+    </div>
+  </div>
+
+  <!-- CULEBRITA -->
+  <div id="vistaCulebrita" class="screen">
+    <div class="main-wrapper">
+      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
+      
+      <div class="game-container">
+        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">CULEBRITA</h1>
+        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreCulebra">0</span></p>
+        
+        <canvas id="gameCanvasCulebra" width="300" height="300"></canvas>
+        
+        <button id="respawnBtnCulebra" onclick="resetCulebra()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">REINTENTAR</button>
+        
+        <div class="mobile-controls">
+          <button class="ctrl-btn btn-up" ontouchstart="intentarMoverC(0, -20); event.preventDefault();" onclick="intentarMoverC(0, -20)">▲</button>
+          <button class="ctrl-btn btn-left" ontouchstart="intentarMoverC(-20, 0); event.preventDefault();" onclick="intentarMoverC(-20, 0)">◄</button>
+          <button class="ctrl-btn btn-down" ontouchstart="intentarMoverC(0, 20); event.preventDefault();" onclick="intentarMoverC(0, 20)">▼</button>
+          <button class="ctrl-btn btn-right" ontouchstart="intentarMoverC(20, 0); event.preventDefault();" onclick="intentarMoverC(20, 0)">►</button>
+        </div>
+      </div>
+
+      <div class="dashboard">
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+        <div style="flex: 1; border-left: 2px dashed #334155; padding-left: 12px;">
+          <h2 style="color: #38bdf8;">TOP GLOBAL</h2>
+          <table id="scoreTableGlobalCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIGRE EN LA SELVA -->
+  <div id="vistaTigre" class="screen">
+    <div class="main-wrapper">
+      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
+      
+      <div class="game-container">
+        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">TIGRE SELVA</h1>
+        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreTigre">0</span></p>
+        
+        <canvas id="gameCanvasTigre" width="300" height="300" style="cursor:pointer;" onclick="saltarTigre()"></canvas>
+        
+        <button id="respawnBtnTigre" onclick="resetTigre()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">SALTAR OTRA VEZ</button>
+        <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px; text-align:center;">TOCA PANTALLA O ESPACIO</p>
+      </div>
+
+      <div class="dashboard">
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+        <div style="flex: 1; border-left: 2px dashed #334155; padding-left: 12px;">
+          <h2 style="color: #38bdf8;">TOP GLOBAL</h2>
+          <table id="scoreTableGlobalTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOMBER MAN -->
+  <div id="vistaBomber" class="screen">
+    <div class="main-wrapper">
+      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
+      
+      <div class="game-container">
+        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">BOMBER MAN</h1>
+        <p style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 18px 0;">NIVEL <span id="nivelBomber">1</span> | PTS: <span id="scoreBomber">0</span></p>
+        
+        <canvas id="gameCanvasBomber" width="300" height="300"></canvas>
+        
+        <button id="respawnBtnBomber" onclick="resetBomber()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">¡JUGAR DE NUEVO!</button>
+        
+        <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+          <div class="mobile-controls" style="margin-top:15px;">
+            <button class="ctrl-btn btn-up" ontouchstart="moverBomber(0, -1); event.preventDefault();" onclick="moverBomber(0, -1)">▲</button>
+            <button class="ctrl-btn btn-left" ontouchstart="moverBomber(-1, 0); event.preventDefault();" onclick="moverBomber(-1, 0)">◄</button>
+            <button class="ctrl-btn btn-down" ontouchstart="moverBomber(0, 1); event.preventDefault();" onclick="moverBomber(0, 1)">▼</button>
+            <button class="ctrl-btn btn-right" ontouchstart="moverBomber(1, 0); event.preventDefault();" onclick="moverBomber(1, 0)">►</button>
+          </div>
+          <button onclick="ponerBomba()" style="margin-top:18px; width:100%; max-width:275px; background:#ef4444; color:white; border:3px solid #000; padding:16px; font-family:'Press Start 2P'; font-size:0.8rem; cursor:pointer; box-shadow:4px 4px 0px #000;">💣 BOMBA</button>
+        </div>
+      </div>
+
+      <div class="dashboard">
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+        <div style="flex: 1; border-left: 2px dashed #334155; padding-left: 12px;">
+          <h2 style="color: #38bdf8;">TOP GLOBAL</h2>
+          <table id="scoreTableGlobalBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let usuarioActual = "";
+    let animIdCulebra = null;
+    let animIdTigre = null;
+    let animIdBomber = null;
+    let juegoCulebraActivo = false;
+    let juegoTigreActivo = false;
+    let juegoBomberActivo = false;
+
+    // --- CONFIGURACIÓN DE BASE DE DATOS GLOBAL (JSONBIN) ---
+    const BIN_ID = "TU_ID_DE_BIN_AQUÍ";
+    const API_KEY = "TU_MASTER_KEY_AQUÍ";
+
+    // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS ---
     let audioCtx = null;
     let currentMusicInterval = null;
 
@@ -368,10 +748,7 @@
 
     function startMenuMusic() {
       stopMusic();
-      let notes = [
-        330, 392, 523, 659, 523, 392, 330, 261,
-        293, 349, 440, 523, 440, 349, 392, 330
-      ];
+      let notes = [330, 392, 523, 659, 523, 392, 330, 261, 293, 349, 440, 523, 440, 349, 392, 330];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (document.getElementById('menuPrincipal').classList.contains('active')) {
@@ -383,10 +760,7 @@
 
     function startCulebraMusic() {
       stopMusic();
-      let notes = [
-        164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81,
-        146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47
-      ];
+      let notes = [164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81, 146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoCulebraActivo) {
@@ -398,10 +772,7 @@
 
     function startTigerMusic() {
       stopMusic();
-      let notes = [
-        261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23,
-        440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66
-      ];
+      let notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23, 440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoTigreActivo) {
@@ -413,10 +784,7 @@
 
     function startBomberMusic() {
       stopMusic();
-      let notes = [
-        110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00,
-        123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50
-      ];
+      let notes = [110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00, 123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoBomberActivo) {
@@ -513,16 +881,15 @@
 
       stopMusic();
       if(id === 'menuPrincipal') { startMenuMusic(); }
-      if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
-      if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
-      if(id === 'vistaBomber') { cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
+      if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); cargarTablaGlobal("Culebrita"); iniciarCulebra(); }
+      if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); cargarTablaGlobal("TigreSelva"); iniciarTigre(); }
+      if(id === 'vistaBomber') { cargarTablaRécordsGenerica("BomberMan"); cargarTablaGlobal("BomberMan"); iniciarBomber(); }
       window.scrollTo(0, 0);
     }
 
     function guardarPuntajeAutomatico(juego, puntaje) {
       if (!usuarioActual) return;
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
-      
       let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
 
       if (indexExistente !== -1) {
@@ -558,6 +925,78 @@
         let rowStyle = item.name === usuarioActual && usuarioActual !== "" ? "color: #38bdf8;" : "";
         scoreTable.innerHTML += `<tr style="${rowStyle}"><td>${item.name}</td><td>${item.score}</td></tr>`;
       });
+    }
+
+    // --- FUNCIONES GLOBAL / NUBE ---
+    async function cargarTablaGlobal(nombreJuego) {
+      let tablaId = "scoreTableGlobalCulebra";
+      if (nombreJuego === "TigreSelva") tablaId = "scoreTableGlobalTigre";
+      if (nombreJuego === "BomberMan") tablaId = "scoreTableGlobalBomber";
+
+      let scoreTable = document.getElementById(tablaId);
+      if (!scoreTable) return;
+
+      if (BIN_ID === "TU_ID_DE_BIN_AQUÍ") {
+        scoreTable.innerHTML = "<tr><th>JUGADOR</th><th>PTS</th></tr><tr><td colspan='2' style='text-align:center; color:#64748b;'>SIN CONFIG</td></tr>";
+        return;
+      }
+
+      try {
+        let response = await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}/latest`, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        let data = await response.json();
+        let scoresGlobales = data.record[nombreJuego] || [];
+
+        scoresGlobales.sort((a, b) => b.score - a.score);
+        let top5 = scoresGlobales.slice(0, 5);
+
+        scoreTable.innerHTML = "<tr><th>JUGADOR</th><th>PTS</th></tr>";
+        if (top5.length === 0) {
+          scoreTable.innerHTML += "<tr><td colspan='2' style='text-align:center; color:#64748b;'>SIN RÉCORDS</td></tr>";
+          return;
+        }
+
+        top5.forEach(item => {
+          let rowStyle = item.name === usuarioActual && usuarioActual !== "" ? "color: #38bdf8;" : "";
+          scoreTable.innerHTML += `<tr style="${rowStyle}"><td>${item.name}</td><td>${item.score}</td></tr>`;
+        });
+      } catch (error) {
+        scoreTable.innerHTML = "<tr><td colspan='2' style='text-align:center; color:#f43f5e;'>ERROR RED</td></tr>";
+      }
+    }
+
+    async function guardarPuntajeGlobal(juego, puntaje) {
+      if (!usuarioActual || BIN_ID === "TU_ID_DE_BIN_AQUÍ") return;
+      try {
+        let getRes = await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}/latest`, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        let getData = await getRes.json();
+        let db = getData.record;
+
+        if (!db[juego]) db[juego] = [];
+
+        let existente = db[juego].find(item => item.name === usuarioActual);
+        if (existente) {
+          if (puntaje > existente.score) existente.score = puntaje;
+        } else {
+          db[juego].push({ name: usuarioActual, score: puntaje });
+        }
+
+        await fetch(`[https://api.jsonbin.io/v3/b/$](https://api.jsonbin.io/v3/b/$){BIN_ID}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY
+          },
+          body: JSON.stringify(db)
+        });
+
+        cargarTablaGlobal(juego);
+      } catch (error) {
+        console.error("No se pudo guardar el récord global:", error);
+      }
     }
 
     // --- CULEBRITA ---
@@ -609,7 +1048,10 @@
           stopMusic();
           soundCulebraCrash();
           document.getElementById('respawnBtnCulebra').style.display = 'block';
-          if (scoreC > 0) guardarPuntajeAutomatico("Culebrita", scoreC);
+          if (scoreC > 0) {
+            guardarPuntajeAutomatico("Culebrita", scoreC);
+            guardarPuntajeGlobal("Culebrita", scoreC);
+          }
           return;
         }
 
@@ -739,7 +1181,10 @@
           stopMusic();
           soundCulebraCrash();
           document.getElementById('respawnBtnTigre').style.display = 'block';
-          if (scoreT > 0) guardarPuntajeAutomatico("TigreSelva", scoreT);
+          if (scoreT > 0) {
+            guardarPuntajeAutomatico("TigreSelva", scoreT);
+            guardarPuntajeGlobal("TigreSelva", scoreT);
+          }
           return;
         }
         if (obstaculos[i].x + obstaculos[i].w < 0) obstaculos.splice(i, 1);
@@ -931,7 +1376,10 @@
         stopMusic();
         soundBomberLose();
         document.getElementById('respawnBtnBomber').style.display = 'block';
-        if (scoreBomber > 0) guardarPuntajeAutomatico("BomberMan", scoreBomber);
+        if (scoreBomber > 0) {
+          guardarPuntajeAutomatico("BomberMan", scoreBomber);
+          guardarPuntajeGlobal("BomberMan", scoreBomber);
+        }
         return;
       }
 
