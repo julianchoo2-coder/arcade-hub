@@ -281,9 +281,9 @@
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
 
-    // --- SINTETIZADOR DE AUDIO 8-BITS (WEB AUDIO API) ---
+    // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS ---
     let audioCtx = null;
-    let menuMusicInterval = null;
+    let currentMusicInterval = null;
 
     function initAudio() {
       if (!audioCtx) {
@@ -294,53 +294,10 @@
       }
     }
 
-    // Reproduce un tono individual
-    function playTone(freq, duration, type = 'square', delay = 0) {
-      initAudio();
-      setTimeout(() => {
-        if (!audioCtx) return;
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      }, delay);
-    }
-
-    // Efecto deslizante de frecuencia (para saltos o loros)
-    function playSlide(startFreq, endFreq, duration, type = 'square') {
-      initAudio();
-      let osc = audioCtx.createOscillator();
-      let gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();// --- SINTETIZADOR DE AUDIO 8-BITS (WEB AUDIO API) ---
-    let audioCtx = null;
-    let menuMusicInterval = null;
-
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }
-
-    // Desbloquear audio automáticamente con el primer toque o clic en la página
+    // Desbloquear audio automáticamente con el primer toque o clic
     document.addEventListener('pointerdown', () => {
       initAudio();
-      if (!menuMusicInterval && document.getElementById('menuPrincipal').classList.contains('active')) {
+      if (!currentMusicInterval && document.getElementById('menuPrincipal').classList.contains('active')) {
         startMenuMusic();
       }
     }, { once: true });
@@ -353,7 +310,7 @@
         let gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -370,7 +327,7 @@
       osc.type = type;
       osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -394,7 +351,7 @@
       filter.frequency.setValueAtTime(800, audioCtx.currentTime);
       filter.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + duration);
       let gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       noise.connect(filter);
       filter.connect(gain);
@@ -402,11 +359,19 @@
       noise.start();
     }
 
+    function stopMusic() {
+      if (currentMusicInterval) {
+        clearInterval(currentMusicInterval);
+        currentMusicInterval = null;
+      }
+    }
+
+    // 1. Soundtrack del Menú Principal (Alegre y relajado)
     function startMenuMusic() {
-      stopMenuMusic();
+      stopMusic();
       let notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
       let index = 0;
-      menuMusicInterval = setInterval(() => {
+      currentMusicInterval = setInterval(() => {
         if (document.getElementById('menuPrincipal').classList.contains('active')) {
           playTone(notes[index], 0.15, 'square');
           index = (index + 1) % notes.length;
@@ -414,14 +379,46 @@
       }, 250);
     }
 
-    function stopMenuMusic() {
-      if (menuMusicInterval) {
-        clearInterval(menuMusicInterval);
-        menuMusicInterval = null;
-      }
+    // 2. Soundtrack de Culebrita (Ritmo serpenteante y misterioso)
+    function startCulebraMusic() {
+      stopMusic();
+      let notes = [150, 180, 220, 180, 140, 160, 200, 160];
+      let index = 0;
+      currentMusicInterval = setInterval(() => {
+        if (juegoCulebraActivo) {
+          playTone(notes[index], 0.12, 'triangle');
+          index = (index + 1) % notes.length;
+        }
+      }, 200);
     }
-    // --- SONIDOS ESPECÍFICOS SOLICITADOS ---
-    // Culebrita
+
+    // 3. Soundtrack del Tigre (Ritmo veloz y aventurero tipo runner)
+    function startTigerMusic() {
+      stopMusic();
+      let notes = [300, 350, 400, 450, 400, 350];
+      let index = 0;
+      currentMusicInterval = setInterval(() => {
+        if (juegoTigreActivo) {
+          playTone(notes[index], 0.08, 'sawtooth');
+          index = (index + 1) % notes.length;
+        }
+      }, 150);
+    }
+
+    // 4. Soundtrack de Bomber Man (Ritmo tenso y estratégico de acción)
+    function startBomberMusic() {
+      stopMusic();
+      let notes = [110, 110, 130, 110, 98, 110, 146, 130];
+      let index = 0;
+      currentMusicInterval = setInterval(() => {
+        if (juegoBomberActivo) {
+          playTone(notes[index], 0.1, 'square');
+          index = (index + 1) % notes.length;
+        }
+      }, 220);
+    }
+
+    // Efectos de sonido específicos
     function soundCulebraEat() {
       playTone(523.25, 0.08, 'square', 0);
       playTone(659.25, 0.08, 'square', 80);
@@ -431,8 +428,6 @@
       playNoise(0.3);
       playTone(150, 0.2, 'sawtooth', 0);
     }
-
-    // Tigre
     function soundTigreJump() {
       playSlide(200, 600, 0.12, 'square');
     }
@@ -440,8 +435,6 @@
       playSlide(900, 1300, 0.08, 'sine');
       setTimeout(() => playSlide(1300, 900, 0.08, 'sine'), 90);
     }
-
-    // Bomber Man
     function soundBomberExplosion() {
       playNoise(0.4);
       playTone(100, 0.3, 'sawtooth', 0);
@@ -512,7 +505,7 @@
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
 
-      stopMenuMusic();
+      stopMusic();
       if(id === 'menuPrincipal') { startMenuMusic(); }
       if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
       if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
@@ -568,6 +561,7 @@
       document.getElementById('respawnBtnCulebra').style.display = 'none';
       placeFoodC();
       juegoCulebraActivo = true;
+      startCulebraMusic();
       animIdCulebra = requestAnimationFrame(updateCulebra);
     }
 
@@ -595,6 +589,8 @@
 
         if (head.x < 0 || head.x >= canvasC.width || head.y < 0 || head.y >= canvasC.height || snake.some(p => p.x === head.x && p.y === head.y)) {
           gameOverC = true;
+          juegoCulebraActivo = false;
+          stopMusic();
           soundCulebraCrash();
           document.getElementById('respawnBtnCulebra').style.display = 'block';
           if (scoreC > 0) guardarPuntajeAutomatico("Culebrita", scoreC);
@@ -670,6 +666,7 @@
       gameOverT = false;
       document.getElementById('respawnBtnTigre').style.display = 'none';
       juegoTigreActivo = true;
+      startTigerMusic();
       animIdTigre = requestAnimationFrame(updateTigre);
     }
 
@@ -710,7 +707,6 @@
       for (let i = obstaculos.length - 1; i >= 0; i--) {
         obstaculos[i].x -= currentSpeed;
 
-        // Sonido cuando aparece el loro cerca del tigre
         if (obstaculos[i].tipo === 'loro' && !obstaculos[i].sonado && obstaculos[i].x < 150) {
           obstaculos[i].sonado = true;
           soundTigreParrot();
@@ -723,7 +719,9 @@
           tigre.y + tigre.h > obstaculos[i].y
         ) {
           gameOverT = true;
-          soundCulebraCrash(); // Ruido de colisión
+          juegoTigreActivo = false;
+          stopMusic();
+          soundCulebraCrash();
           document.getElementById('respawnBtnTigre').style.display = 'block';
           if (scoreT > 0) guardarPuntajeAutomatico("TigreSelva", scoreT);
           return;
@@ -841,7 +839,9 @@
         enemigosB.push({ x: pos.c, y: pos.r, timerMov: 0 });
       }
 
-      juegoBomberActivo = true; animIdBomber = requestAnimationFrame(updateBomber);
+      juegoBomberActivo = true;
+      startBomberMusic();
+      animIdBomber = requestAnimationFrame(updateBomber);
     }
 
     function moverBomber(dx, dy) {
@@ -910,7 +910,9 @@
       enemigosB.forEach(en => { if (en.x === playerB.x && en.y === playerB.y) murio = true; });
 
       if (murio) {
-        gameOverBomber = true; 
+        gameOverBomber = true;
+        juegoBomberActivo = false;
+        stopMusic();
         soundBomberLose();
         document.getElementById('respawnBtnBomber').style.display = 'block';
         if (scoreBomber > 0) guardarPuntajeAutomatico("BomberMan", scoreBomber);
@@ -1026,7 +1028,7 @@
     }
 
     function explotarBomba(bx, by, alcance) {
-      soundBomberExplosion(); // Sonido de estallido de la bomba
+      soundBomberExplosion();
       explosionesB.push({ x: bx, y: by, timer: 15 });
       let dirs = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
       
