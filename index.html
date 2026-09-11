@@ -603,11 +603,11 @@
     }
     function resetTigre() { iniciarTigre(); }
 
-    // --- BOMBER MAN (PIXEL ART REDISEÑADO) ---
+    // --- BOMBER MAN (DIRECCIÓN DE SPRITE DINÁMICA) ---
     const canvasB = document.getElementById('gameCanvasBomber');
     const ctxB = canvasB.getContext('2d');
     const colsB = 11, rowsB = 11;
-    let mapB = [], playerB = { x: 1, y: 1 }, bombasB = [], explosionesB = [], enemigosB = [];
+    let mapB = [], playerB = { x: 1, y: 1, dir: 'down' }, bombasB = [], explosionesB = [], enemigosB = [];
     let puertaB = { x: -1, y: -1, encontrada: false };
     let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0;
 
@@ -617,7 +617,7 @@
       document.getElementById('scoreBomber').innerText = scoreBomber;
       document.getElementById('nivelBomber').innerText = nivelBomber;
       gameOverBomber = false; document.getElementById('respawnBtnBomber').style.display = 'none';
-      playerB = { x: 1, y: 1 }; bombasB = []; explosionesB = []; tiempoRecargaBomba = 0;
+      playerB = { x: 1, y: 1, dir: 'down' }; bombasB = []; explosionesB = []; tiempoRecargaBomba = 0;
       puertaB = { x: -1, y: -1, encontrada: false };
       
       mapB = []; let bloquesDestructiblesOcultanPuerta = [];
@@ -653,7 +653,7 @@
       for (let i = 0; i < cantidadEnemigos && casillasLibres.length > 0; i++) {
         let index = Math.floor(Math.random() * casillasLibres.length);
         let pos = casillasLibres.splice(index, 1)[0];
-        enemigosB.push({ x: pos.c, y: pos.r, timerMov: 0 });
+        enemigosB.push({ x: pos.c, x: pos.c, y: pos.r, timerMov: 0 });
       }
 
       juegoBomberActivo = true; animIdBomber = requestAnimationFrame(updateBomber);
@@ -661,6 +661,13 @@
 
     function moverBomber(dx, dy) {
       if (!juegoBomberActivo || gameOverBomber) return;
+      
+      // Actualizar dirección de movimiento para voltear el sprite
+      if (dx === 1) playerB.dir = 'right';
+      if (dx === -1) playerB.dir = 'left';
+      if (dy === 1) playerB.dir = 'down';
+      if (dy === -1) playerB.dir = 'up';
+
       let nuevoX = playerB.x + dx, nuevoY = playerB.y + dy;
       let hayBomba = bombasB.some(b => b.x === nuevoX && b.y === nuevoY);
       if (nuevoX >= 0 && nuevoX < colsB && nuevoY >= 0 && nuevoY < rowsB) {
@@ -732,14 +739,12 @@
         for (let c = 0; c < colsB; c++) {
           let px = c * cellW, py = r * cellH;
 
-          // PUERTA SALIDA
           if (puertaB.encontrada && puertaB.x === c && puertaB.y === r) {
             ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py, cellW, cellH); 
             ctxB.fillStyle = '#22c55e'; ctxB.fillRect(px + 4, py + 2, cellW - 8, cellH - 4); 
             ctxB.fillStyle = '#14532d'; ctxB.fillRect(px + 6, py + 4, cellW - 12, cellH - 6); 
             ctxB.fillStyle = '#eab308'; ctxB.fillRect(px + 10, py + 10, cellW - 20, cellH - 18); 
           }
-          // MURO SÓLIDO PIXEL ART
           else if (mapB[r][c] === 1) {
             ctxB.fillStyle = '#475569'; ctxB.fillRect(px, py, cellW, cellH);
             ctxB.fillStyle = '#94a3b8'; ctxB.fillRect(px, py, cellW, 4); 
@@ -747,7 +752,6 @@
             ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8); 
             ctxB.fillStyle = '#334155'; ctxB.fillRect(px + 8, py + 8, cellW - 16, cellH - 16);
           } 
-          // BLOQUE DESTRUCTIBLE PIXEL ART
           else if (mapB[r][c] === 2) {
             ctxB.fillStyle = '#9a3412'; ctxB.fillRect(px, py, cellW, cellH); 
             ctxB.fillStyle = '#fdba74'; ctxB.fillRect(px, py, cellW, 2); 
@@ -757,7 +761,6 @@
             ctxB.fillRect(px + cellW/3, py, 2, cellH/2);
             ctxB.fillRect(px + (cellW/3)*2, py + cellH/2, 2, cellH/2);
           } 
-          // SUELO
           else if (!puertaB.encontrada || puertaB.x !== c || puertaB.y !== r) {
             ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py, cellW, cellH);
           }
@@ -770,11 +773,11 @@
         let cx = px + cellW/2, cy = py + cellH/2;
         ctxB.fillStyle = '#111';
         ctxB.beginPath(); ctxB.arc(cx, cy + 2, cellW/2.5, 0, Math.PI*2); ctxB.fill();
-        ctxB.fillStyle = '#555'; // Brillo
+        ctxB.fillStyle = '#555';
         ctxB.beginPath(); ctxB.arc(cx - 4, cy - 2, cellW/8, 0, Math.PI*2); ctxB.fill();
-        ctxB.fillStyle = '#78350f'; // Mecha
+        ctxB.fillStyle = '#78350f';
         ctxB.fillRect(cx - 2, py + 2, 4, 6);
-        ctxB.fillStyle = (b.timer % 10 < 5) ? '#ef4444' : '#facc15'; // Chispa
+        ctxB.fillStyle = (b.timer % 10 < 5) ? '#ef4444' : '#facc15';
         ctxB.fillRect(cx - 3, py, 6, 4);
       });
 
@@ -796,38 +799,58 @@
         ctxB.fillStyle = '#ec4899'; 
         ctxB.beginPath(); ctxB.arc(px + cellW/2, ey + cellH/2, cellW/2.2, Math.PI, 0); ctxB.fill();
         ctxB.fillRect(px + 2, ey + cellH/2, cellW - 4, cellH/2.5);
-        ctxB.fillRect(px + 2, ey + cellH/2 + cellH/3, cellW/5, cellH/5); // Tentáculo 1
-        ctxB.fillRect(px + cellW/2 - cellW/10, ey + cellH/2 + cellH/3, cellW/5, cellH/5); // Tentáculo 2
-        ctxB.fillRect(px + cellW - 2 - cellW/5, ey + cellH/2 + cellH/3, cellW/5, cellH/5); // Tentáculo 3
+        ctxB.fillRect(px + 2, ey + cellH/2 + cellH/3, cellW/5, cellH/5);
+        ctxB.fillRect(px + cellW/2 - cellW/10, ey + cellH/2 + cellH/3, cellW/5, cellH/5);
+        ctxB.fillRect(px + cellW - 2 - cellW/5, ey + cellH/2 + cellH/3, cellW/5, cellH/5);
         
-        ctxB.fillStyle = '#ffffff'; // Ojos
+        ctxB.fillStyle = '#ffffff';
         ctxB.fillRect(px + 6, ey + 8, 6, 8); ctxB.fillRect(px + cellW - 12, ey + 8, 6, 8);
-        ctxB.fillStyle = '#2563eb'; // Pupilas
+        ctxB.fillStyle = '#2563eb';
         ctxB.fillRect(px + 6, ey + 10, 4, 4); ctxB.fillRect(px + cellW - 10, ey + 10, 4, 4);
       });
 
-      // JUGADOR (BOMBERMAN CLÁSICO)
+      // JUGADOR CON ORIENTACIÓN DINÁMICA (DIRECCIÓN)
       let px = playerB.x * cellW, py = playerB.y * cellH;
-      // Cabeza
+      let dir = playerB.dir || 'down';
+
+      // Cabeza base
       ctxB.fillStyle = '#ffffff'; ctxB.fillRect(px + 4, py + 2, cellW - 8, cellH/2 + 2);
-      // Visor oscuro
-      ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 8, cellW - 8, cellH/3);
-      // Ojos azules
-      ctxB.fillStyle = '#38bdf8'; 
-      ctxB.fillRect(px + 8, py + 10, 3, 5); ctxB.fillRect(px + cellW - 11, py + 10, 3, 5);
-      // Antena superior
+
+      // Antena
       ctxB.fillStyle = '#f472b6'; ctxB.fillRect(px + cellW/2 - 2, py - 4, 4, 6);
       ctxB.fillStyle = '#ef4444'; ctxB.fillRect(px + cellW/2 - 3, py - 6, 6, 3);
+
+      if (dir === 'up') {
+        // Espalda (Casco liso sin visor)
+        ctxB.fillStyle = '#e2e8f0'; ctxB.fillRect(px + 6, py + 8, cellW - 12, cellH/3);
+      } else if (dir === 'down') {
+        // Frente (Visor completo y dos ojos)
+        ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 8, cellW - 8, cellH/3);
+        ctxB.fillStyle = '#38bdf8'; 
+        ctxB.fillRect(px + 8, py + 10, 3, 5); 
+        ctxB.fillRect(px + cellW - 11, py + 10, 3, 5);
+      } else if (dir === 'left') {
+        // Perfil Izquierdo
+        ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 2, py + 8, cellW - 10, cellH/3);
+        ctxB.fillStyle = '#38bdf8'; 
+        ctxB.fillRect(px + 5, py + 10, 3, 5);
+      } else if (dir === 'right') {
+        // Perfil Derecho
+        ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 8, py + 8, cellW - 10, cellH/3);
+        ctxB.fillStyle = '#38bdf8'; 
+        ctxB.fillRect(px + cellW - 8, py + 10, 3, 5);
+      }
+
       // Cuerpo azul
       ctxB.fillStyle = '#3b82f6'; ctxB.fillRect(px + 6, py + cellH/2 + 4, cellW - 12, cellH/2 - 4);
-      // Cinturón negro y hebilla dorada
+      // Cinturón y hebilla
       ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px + 6, py + cellH - 7, cellW - 12, 3);
       ctxB.fillStyle = '#facc15'; ctxB.fillRect(px + cellW/2 - 3, py + cellH - 8, 6, 5);
       // Manos rosadas
       ctxB.fillStyle = '#f472b6'; 
       ctxB.fillRect(px + 1, py + cellH/2 + 4, 5, 5); 
       ctxB.fillRect(px + cellW - 6, py + cellH/2 + 4, 5, 5);
-      // Pies rosados redondeados
+      // Pies
       ctxB.beginPath(); ctxB.arc(px + 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
       ctxB.beginPath(); ctxB.arc(px + cellW - 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
     }
