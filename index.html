@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Arcade Hub</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * { 
@@ -82,8 +83,8 @@
 
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 25px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
       width: 100%;
       max-width: 600px;
       margin-bottom: 30px;
@@ -99,7 +100,7 @@
       transform: translateY(-4px); border-color: #38bdf8;
     }
     .game-cover {
-      width: 100%; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 3rem;
+      width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
       background-size: cover; background-position: center;
       border-bottom: 3px solid #334155;
     }
@@ -107,7 +108,8 @@
     .cover-snake { background-color: #163820; }
     .cover-tiger { background: linear-gradient(135deg, #ff7b54 0%, #2d5a27 100%); }
     .cover-bomber { background: linear-gradient(135deg, #451a03 0%, #7c2d12 100%); }
-    .game-title { font-size: 0.85rem; color: #f8fafc; margin-top: 15px; text-align: center; }
+    .cover-kong { background: linear-gradient(135deg, #78350f 0%, #1e1b4b 100%); }
+    .game-title { font-size: 0.75rem; color: #f8fafc; margin-top: 15px; text-align: center; }
 
     .main-wrapper { 
       display: flex; flex-direction: column; gap: 30px; 
@@ -128,10 +130,10 @@
 
     .dashboard { 
       background: #0f172a; border: 4px solid #334155; border-radius: 0px; 
-      padding: 25px; width: 100%; display: flex; flex-direction: column; align-items: center;
+      padding: 20px; width: 100%; display: flex; gap: 15px;
       box-shadow: 6px 6px 0px #000;
     }
-    .dashboard h2 { font-size: 0.9rem; font-weight: 400; color: #94a3b8; margin: 0 0 15px 0; text-transform: uppercase; }
+    .dashboard h2 { font-size: 0.75rem; font-weight: 400; color: #94a3b8; margin: 0 0 10px 0; text-transform: uppercase; text-align: center; }
     
     .mobile-controls { display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(2, 75px); gap: 12px; margin-top: 20px; justify-content: center; }
     .ctrl-btn { background: #1e293b; border: 3px solid #475569; color: white; font-size: 26px; border-radius: 0px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 4px 4px 0px #020617; }
@@ -145,9 +147,9 @@
     }
     .back-btn:hover { color: #f8fafc; border-color: #f8fafc; background: #1e293b; }
 
-    #scoreTableCulebra, #scoreTableTigre, #scoreTableBomber { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-    #scoreTableCulebra th, #scoreTableCulebra td, #scoreTableTigre th, #scoreTableTigre td, #scoreTableBomber th, #scoreTableBomber td { padding: 12px 8px; text-align: left; border-bottom: 2px dashed #1e293b; }
-    #scoreTableCulebra th, #scoreTableTigre th, #scoreTableBomber th { color: #38bdf8; }
+    .score-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+    .score-table th, .score-table td { padding: 8px 4px; text-align: left; border-bottom: 2px dashed #1e293b; }
+    .score-table th { color: #38bdf8; }
   </style>
 </head>
 <body>
@@ -185,6 +187,10 @@
           <div class="game-cover cover-bomber">💣</div>
           <div class="game-title">BOMBER</div>
         </div>
+        <div class="game-card" onclick="cambiarPantalla('vistaKong')">
+          <div class="game-cover cover-kong">🦍</div>
+          <div class="game-title">KONG ARCADE</div>
+        </div>
       </div>
 
       <button onclick="cerrarSesion()" class="back-btn" style="width: 100%; text-align: center; margin-top: 15px; justify-content: center; display: flex;" id="btnSalirSesion">CAMBIAR JUGADOR</button>
@@ -195,15 +201,11 @@
   <div id="vistaCulebrita" class="screen">
     <div class="main-wrapper">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      
       <div class="game-container">
         <h1 style="font-size: 1.1rem; margin-bottom: 10px;">CULEBRITA</h1>
         <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreCulebra">0</span></p>
-        
         <canvas id="gameCanvasCulebra" width="300" height="300"></canvas>
-        
-        <button id="respawnBtnCulebra" onclick="resetCulebra()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">REINTENTAR</button>
-        
+        <button id="respawnBtnCulebra" onclick="resetCulebra()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">REINTENTAR</button>
         <div class="mobile-controls">
           <button class="ctrl-btn btn-up" ontouchstart="intentarMoverC(0, -20); event.preventDefault();" onclick="intentarMoverC(0, -20)">▲</button>
           <button class="ctrl-btn btn-left" ontouchstart="intentarMoverC(-20, 0); event.preventDefault();" onclick="intentarMoverC(-20, 0)">◄</button>
@@ -211,10 +213,11 @@
           <button class="ctrl-btn btn-right" ontouchstart="intentarMoverC(20, 0); event.preventDefault();" onclick="intentarMoverC(20, 0)">►</button>
         </div>
       </div>
-
       <div class="dashboard">
-        <h2>TOP LOCAL</h2>
-        <table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableCulebra" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
       </div>
     </div>
   </div>
@@ -223,20 +226,18 @@
   <div id="vistaTigre" class="screen">
     <div class="main-wrapper">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      
       <div class="game-container">
         <h1 style="font-size: 1.1rem; margin-bottom: 10px;">TIGRE SELVA</h1>
         <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreTigre">0</span></p>
-        
         <canvas id="gameCanvasTigre" width="300" height="300" style="cursor:pointer;" onclick="saltarTigre()"></canvas>
-        
-        <button id="respawnBtnTigre" onclick="resetTigre()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">SALTAR OTRA VEZ</button>
+        <button id="respawnBtnTigre" onclick="resetTigre()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">SALTAR OTRA VEZ</button>
         <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px; text-align:center;">TOCA PANTALLA O ESPACIO</p>
       </div>
-
       <div class="dashboard">
-        <h2>TOP LOCAL</h2>
-        <table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableTigre" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
       </div>
     </div>
   </div>
@@ -245,15 +246,11 @@
   <div id="vistaBomber" class="screen">
     <div class="main-wrapper">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      
       <div class="game-container">
         <h1 style="font-size: 1.1rem; margin-bottom: 10px;">BOMBER MAN</h1>
         <p style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 18px 0;">NIVEL <span id="nivelBomber">1</span> | PTS: <span id="scoreBomber">0</span></p>
-        
         <canvas id="gameCanvasBomber" width="300" height="300"></canvas>
-        
-        <button id="respawnBtnBomber" onclick="resetBomber()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">¡JUGAR DE NUEVO!</button>
-        
+        <button id="respawnBtnBomber" onclick="resetBomber()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">¡JUGAR DE NUEVO!</button>
         <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
           <div class="mobile-controls" style="margin-top:15px;">
             <button class="ctrl-btn btn-up" ontouchstart="moverBomber(0, -1); event.preventDefault();" onclick="moverBomber(0, -1)">▲</button>
@@ -261,13 +258,39 @@
             <button class="ctrl-btn btn-down" ontouchstart="moverBomber(0, 1); event.preventDefault();" onclick="moverBomber(0, 1)">▼</button>
             <button class="ctrl-btn btn-right" ontouchstart="moverBomber(1, 0); event.preventDefault();" onclick="moverBomber(1, 0)">►</button>
           </div>
-          <button onclick="ponerBomba()" style="margin-top:18px; width:100%; max-width:275px; background:#ef4444; color:white; border:3px solid #000; padding:16px; font-family:'Press Start 2P'; font-size:0.8rem; cursor:pointer; box-shadow:4px 4px 0px #000;">💣 BOMBA</button>
+          <button onclick="ponerBomba()" style="margin-top:18px; width:100%; max-width:275px; background:#ef4444; color:white; border:3px solid #000; padding:16px; font-family:'Press Start 2P'; font-size:0.8rem; cursor:pointer;">💣 BOMBA</button>
         </div>
       </div>
-
       <div class="dashboard">
-        <h2>TOP LOCAL</h2>
-        <table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableBomber" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KONG ARCADE -->
+  <div id="vistaKong" class="screen">
+    <div class="main-wrapper">
+      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
+      <div class="game-container">
+        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">KONG ARCADE</h1>
+        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreKong">0</span></p>
+        <canvas id="gameCanvasKong" width="300" height="300"></canvas>
+        <button id="respawnBtnKong" onclick="resetKong()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer;">OTRA VEZ</button>
+        <div class="mobile-controls">
+          <button class="ctrl-btn btn-up" ontouchstart="moverKongInput('up'); event.preventDefault();" onclick="moverKongInput('up')">▲</button>
+          <button class="ctrl-btn btn-left" ontouchstart="moverKongInput('left'); event.preventDefault();" onclick="moverKongInput('left')">◄</button>
+          <button class="ctrl-btn btn-down" ontouchstart="moverKongInput('down'); event.preventDefault();" onclick="moverKongInput('down')">▼</button>
+          <button class="ctrl-btn btn-right" ontouchstart="moverKongInput('right'); event.preventDefault();" onclick="moverKongInput('right')">►</button>
+        </div>
+      </div>
+      <div class="dashboard">
+        <div style="flex: 1;">
+          <h2>TOP LOCAL</h2>
+          <table id="scoreTableKong" class="score-table"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+        </div>
       </div>
     </div>
   </div>
@@ -277,11 +300,13 @@
     let animIdCulebra = null;
     let animIdTigre = null;
     let animIdBomber = null;
+    let animIdKong = null;
     let juegoCulebraActivo = false;
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
+    let juegoKongActivo = false;
 
-    // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS EXPANDIDOS ---
+    // --- SINTETIZADOR DE AUDIO ---
     let audioCtx = null;
     let currentMusicInterval = null;
 
@@ -367,10 +392,7 @@
 
     function startMenuMusic() {
       stopMusic();
-      let notes = [
-        330, 392, 523, 659, 523, 392, 330, 261,
-        293, 349, 440, 523, 440, 349, 392, 330
-      ];
+      let notes = [330, 392, 523, 659, 523, 392, 330, 261, 293, 349, 440, 523, 440, 349, 392, 330];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (document.getElementById('menuPrincipal').classList.contains('active')) {
@@ -382,10 +404,7 @@
 
     function startCulebraMusic() {
       stopMusic();
-      let notes = [
-        164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81,
-        146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47
-      ];
+      let notes = [164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81, 146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoCulebraActivo) {
@@ -397,10 +416,7 @@
 
     function startTigerMusic() {
       stopMusic();
-      let notes = [
-        261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23,
-        440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66
-      ];
+      let notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23, 440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoTigreActivo) {
@@ -412,10 +428,7 @@
 
     function startBomberMusic() {
       stopMusic();
-      let notes = [
-        110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00,
-        123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50
-      ];
+      let notes = [110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00, 123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50];
       let index = 0;
       currentMusicInterval = setInterval(() => {
         if (juegoBomberActivo) {
@@ -423,6 +436,18 @@
           index = (index + 1) % notes.length;
         }
       }, 190);
+    }
+
+    function startKongMusic() {
+      stopMusic();
+      let notes = [220, 247, 261, 293, 329, 293, 261, 247, 220, 196, 220, 247, 261, 247, 220, 196];
+      let index = 0;
+      currentMusicInterval = setInterval(() => {
+        if (juegoKongActivo) {
+          playTone(notes[index], 0.12, 'sawtooth');
+          index = (index + 1) % notes.length;
+        }
+      }, 170);
     }
 
     function soundCulebraEat() {
@@ -469,12 +494,10 @@
       initAudio();
       let u = document.getElementById('userInput').value.trim();
       let msg = document.getElementById('loginMsg');
-
       if (!u) {
         msg.innerText = "POR FAVOR, INGRESA UN NOMBRE";
         return;
       }
-
       usuarioActual = u;
       localStorage.setItem('arcadeUser', usuarioActual);
       document.getElementById('welcomeUser').innerText = "HOLA, " + usuarioActual;
@@ -506,22 +529,24 @@
       juegoCulebraActivo = false;
       juegoTigreActivo = false;
       juegoBomberActivo = false;
+      juegoKongActivo = false;
       if (animIdCulebra) cancelAnimationFrame(animIdCulebra);
       if (animIdTigre) cancelAnimationFrame(animIdTigre);
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
+      if (animIdKong) cancelAnimationFrame(animIdKong);
 
       stopMusic();
       if(id === 'menuPrincipal') { startMenuMusic(); }
       if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
       if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
       if(id === 'vistaBomber') { cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
+      if(id === 'vistaKong') { cargarTablaRécordsGenerica("KongArcade"); iniciarKong(); }
       window.scrollTo(0, 0);
     }
 
     function guardarPuntajeAutomatico(juego, puntaje) {
       if (!usuarioActual) return;
       let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
-      
       let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
 
       if (indexExistente !== -1) {
@@ -541,6 +566,7 @@
       let tablaId = "scoreTableCulebra";
       if (nombreJuego === "TigreSelva") tablaId = "scoreTableTigre";
       if (nombreJuego === "BomberMan") tablaId = "scoreTableBomber";
+      if (nombreJuego === "KongArcade") tablaId = "scoreTableKong";
       
       let scoreTable = document.getElementById(tablaId);
       if (!scoreTable) return;
@@ -624,14 +650,12 @@
       }
 
       ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
-      
       for (let r = 0; r < canvasC.height / 20; r++) {
         for (let c = 0; c < canvasC.width / 20; c++) {
           ctxC.fillStyle = (r + c) % 2 === 0 ? '#1b431b' : '#225222';
           ctxC.fillRect(c * 20, r * 20, 20, 20);
         }
       }
-
       ctxC.fillStyle = '#ff2a2a';
       ctxC.fillRect(food.x + 3, food.y + 6, 14, 10);
       ctxC.fillRect(food.x + 5, food.y + 4, 10, 14);
@@ -642,16 +666,6 @@
         if (index === 0) {
           ctxC.fillStyle = '#00ccff';
           ctxC.fillRect(p.x + 1, p.y + 1, 18, 18);
-          ctxC.fillStyle = 'white';
-          if (dxC > 0) { ctxC.fillRect(p.x+12, p.y+4, 4, 4); ctxC.fillRect(p.x+12, p.y+12, 4, 4); }
-          else if (dxC < 0) { ctxC.fillRect(p.x+4, p.y+4, 4, 4); ctxC.fillRect(p.x+4, p.y+12, 4, 4); }
-          else if (dyC < 0) { ctxC.fillRect(p.x+4, p.y+4, 4, 4); ctxC.fillRect(p.x+12, p.y+4, 4, 4); }
-          else { ctxC.fillRect(p.x+4, p.y+12, 4, 4); ctxC.fillRect(p.x+12, p.y+12, 4, 4); }
-          ctxC.fillStyle = 'black';
-          if (dxC > 0) { ctxC.fillRect(p.x+14, p.y+6, 2, 2); ctxC.fillRect(p.x+14, p.y+14, 2, 2); }
-          else if (dxC < 0) { ctxC.fillRect(p.x+4, p.y+6, 2, 2); ctxC.fillRect(p.x+4, p.y+14, 2, 2); }
-          else if (dyC < 0) { ctxC.fillRect(p.x+6, p.y+4, 2, 2); ctxC.fillRect(p.x+14, p.y+4, 2, 2); }
-          else { ctxC.fillRect(p.x+6, p.y+14, 2, 2); ctxC.fillRect(p.x+14, p.y+14, 2, 2); }
         } else {
           ctxC.fillStyle = '#0099cc';
           ctxC.fillRect(p.x + 2, p.y + 2, 16, 16);
@@ -715,18 +729,15 @@
         } else {
           obstaculos.push({ x: 300, y: 228, w: 16, h: 16, tipo: 'tronco' });
         }
-        let randomnessRange = scoreT >= 1000 ? 75 : (scoreT >= 400 ? 90 : 100); 
-        nextSpawn = 35 + Math.floor(Math.random() * randomnessRange); 
+        nextSpawn = 35 + Math.floor(Math.random() * 100); 
       }
 
       for (let i = obstaculos.length - 1; i >= 0; i--) {
         obstaculos[i].x -= currentSpeed;
-
         if (obstaculos[i].tipo === 'loro' && !obstaculos[i].sonado && obstaculos[i].x < 150) {
           obstaculos[i].sonado = true;
           soundTigreParrot();
         }
-
         if (
           tigre.x < obstaculos[i].x + obstaculos[i].w &&
           tigre.x + tigre.w > obstaculos[i].x &&
@@ -746,58 +757,15 @@
 
       ctxT.clearRect(0, 0, canvasT.width, canvasT.height);
       ctxT.fillStyle = '#ff7b54'; ctxT.fillRect(0, 0, canvasT.width, canvasT.height);
-      ctxT.fillStyle = '#ffb26b'; ctxT.fillRect(200, 40, 40, 40);
-
-      ctxT.fillStyle = '#939b62';
-      let bgLayer3 = (distance * 0.15) % 300;
-      for(let i=-1; i<3; i++) {
-         let bx = i*150 - bgLayer3;
-         ctxT.fillRect(bx, 100, 100, 200); ctxT.fillRect(bx+20, 80, 60, 200); ctxT.fillRect(bx+40, 60, 20, 200);
-      }
-
-      let bgLayer2 = (distance * 0.4) % 200;
-      for(let i=-1; i<4; i++) {
-         let bx = i*200 - bgLayer2;
-         ctxT.fillStyle = '#5c4033'; ctxT.fillRect(bx+40, 100, 20, 150);
-         ctxT.fillStyle = '#1e3f1a'; ctxT.fillRect(bx+10, 60, 80, 40);
-         ctxT.fillRect(bx+20, 40, 60, 20); ctxT.fillRect(bx+30, 20, 40, 20);
-      }
-
       ctxT.fillStyle = '#1b431b'; ctxT.fillRect(0, 244, canvasT.width, 56);
-      ctxT.fillStyle = '#0a1c0a'; ctxT.fillRect(0, 244, canvasT.width, 4);
-
+      
       obstaculos.forEach(o => {
-        if (o.tipo === 'loro') {
-          let wingOffset = (distance % 20 < 10) ? -3 : 2;
-          ctxT.fillStyle = '#d1d5db'; ctxT.fillRect(o.x, o.y + 2, 4, 4);
-          ctxT.fillStyle = '#ef4444'; ctxT.fillRect(o.x + 4, o.y, 6, 6); ctxT.fillRect(o.x + 8, o.y + 2, 10, 8); 
-          ctxT.fillStyle = '#111'; ctxT.fillRect(o.x + 6, o.y + 2, 2, 2);
-          ctxT.fillStyle = '#3b82f6'; ctxT.fillRect(o.x + 18, o.y + 4, 6, 4);
-          let wingY = o.y + 2 + wingOffset;
-          ctxT.fillStyle = '#eab308'; ctxT.fillRect(o.x + 10, wingY, 6, 3);
-          ctxT.fillStyle = '#3b82f6'; ctxT.fillRect(o.x + 10, wingY + 3, 6, 3);
-        } else {
-          ctxT.fillStyle = '#5c4033'; ctxT.fillRect(o.x, o.y, o.w, o.h);
-          ctxT.fillStyle = '#3e2723'; ctxT.fillRect(o.x, o.y+4, o.w, 4); ctxT.fillRect(o.x+4, o.y, 4, o.h);
-        }
+        ctxT.fillStyle = o.tipo === 'loro' ? '#ef4444' : '#5c4033';
+        ctxT.fillRect(o.x, o.y, o.w, o.h);
       });
 
-      let tailOffset = (distance % 30 < 15 && tigre.grounded) ? 0 : 4;
-      ctxT.fillStyle = '#f97316'; ctxT.fillRect(tigre.x - 6, tigre.y + 8 - tailOffset, 10, 2);
-      ctxT.fillStyle = '#f97316'; ctxT.fillRect(tigre.x + 4, tigre.y + 8, 20, 12); ctxT.fillRect(tigre.x + 20, tigre.y + 4, 12, 10);
-      ctxT.fillStyle = '#fff'; ctxT.fillRect(tigre.x + 28, tigre.y + 10, 4, 4);
-      ctxT.fillStyle = '#c2410c'; ctxT.fillRect(tigre.x + 22, tigre.y + 2, 4, 4);
-      ctxT.fillStyle = '#111'; ctxT.fillRect(tigre.x + 26, tigre.y + 6, 2, 2);
-      ctxT.fillStyle = '#111'; ctxT.fillRect(tigre.x + 8, tigre.y + 8, 2, 12); ctxT.fillRect(tigre.x + 14, tigre.y + 8, 2, 12); ctxT.fillRect(tigre.x + 20, tigre.y + 8, 2, 12);
-      
-      let legFront = 0, legBack = 0;
-      if (tigre.grounded) {
-        legFront = (distance % 20 < 10) ? 4 : -2; legBack = (distance % 20 < 10) ? -2 : 4;
-      } else {
-        legFront = 4; legBack = -4; 
-      }
-      ctxT.fillStyle = '#c2410c';
-      ctxT.fillRect(tigre.x + 6 + legBack, tigre.y + 20, 4, 4); ctxT.fillRect(tigre.x + 18 + legFront, tigre.y + 20, 4, 4);
+      ctxT.fillStyle = '#f97316';
+      ctxT.fillRect(tigre.x, tigre.y, tigre.w, tigre.h);
     }
     function resetTigre() { iniciarTigre(); }
 
@@ -806,7 +774,6 @@
     const ctxB = canvasB.getContext('2d');
     const colsB = 11, rowsB = 11;
     let mapB = [], playerB = { x: 1, y: 1, dir: 'down' }, bombasB = [], explosionesB = [], enemigosB = [];
-    let puertaB = { x: -1, y: -1, encontrada: false };
     let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0;
 
     function iniciarBomber(siguienteNivel = false) {
@@ -816,9 +783,8 @@
       document.getElementById('nivelBomber').innerText = nivelBomber;
       gameOverBomber = false; document.getElementById('respawnBtnBomber').style.display = 'none';
       playerB = { x: 1, y: 1, dir: 'down' }; bombasB = []; explosionesB = []; tiempoRecargaBomba = 0;
-      puertaB = { x: -1, y: -1, encontrada: false };
       
-      mapB = []; let bloquesDestructiblesOcultanPuerta = [];
+      mapB = [];
       for (let r = 0; r < rowsB; r++) {
         let row = [];
         for (let c = 0; c < colsB; c++) {
@@ -827,33 +793,12 @@
           } else if ((r === 1 && c === 1) || (r === 1 && c === 2) || (r === 2 && c === 1)) {
             row.push(0); 
           } else {
-            let esDestructible = Math.random() < 0.6;
-            row.push(esDestructible ? 2 : 0);
-            if (esDestructible) bloquesDestructiblesOcultanPuerta.push({r, c});
+            row.push(Math.random() < 0.6 ? 2 : 0);
           }
         }
         mapB.push(row);
       }
-
-      if (bloquesDestructiblesOcultanPuerta.length > 0) {
-        let elegido = bloquesDestructiblesOcultanPuerta[Math.floor(Math.random() * bloquesDestructiblesOcultanPuerta.length)];
-        puertaB = { x: elegido.c, y: elegido.r, encontrada: false };
-      }
-
-      let cantidadEnemigos = 2 + (nivelBomber - 1);
-      enemigosB = []; let casillasLibres = [];
-      for (let r = 1; r < rowsB - 1; r++) {
-        for (let c = 1; c < colsB - 1; c++) {
-          if (mapB[r][c] === 0 && !(r <= 2 && c <= 2)) casillasLibres.push({r, c});
-        }
-      }
-      
-      for (let i = 0; i < cantidadEnemigos && casillasLibres.length > 0; i++) {
-        let index = Math.floor(Math.random() * casillasLibres.length);
-        let pos = casillasLibres.splice(index, 1)[0];
-        enemigosB.push({ x: pos.c, y: pos.r, timerMov: 0 });
-      }
-
+      enemigosB = [{ x: 5, y: 5, timerMov: 0 }];
       juegoBomberActivo = true;
       startBomberMusic();
       animIdBomber = requestAnimationFrame(updateBomber);
@@ -861,227 +806,225 @@
 
     function moverBomber(dx, dy) {
       if (!juegoBomberActivo || gameOverBomber) return;
-      if (dx === 1) playerB.dir = 'right';
-      if (dx === -1) playerB.dir = 'left';
-      if (dy === 1) playerB.dir = 'down';
-      if (dy === -1) playerB.dir = 'up';
-
-      let nuevoX = playerB.x + dx, nuevoY = playerB.y + dy;
-      let hayBomba = bombasB.some(b => b.x === nuevoX && b.y === nuevoY);
-      if (nuevoX >= 0 && nuevoX < colsB && nuevoY >= 0 && nuevoY < rowsB) {
-        if (mapB[nuevoY][nuevoX] === 0 && !hayBomba) {
-          playerB.x = nuevoX; playerB.y = nuevoY;
-          if (puertaB.encontrada && playerB.x === puertaB.x && playerB.y === puertaB.y && enemigosB.length === 0) {
-            nivelBomber++; scoreBomber += 300; iniciarBomber(true);
-          }
-        }
+      let nx = playerB.x + dx, ny = playerB.y + dy;
+      if (nx >= 0 && nx < colsB && ny >= 0 && ny < rowsB && mapB[ny][nx] === 0) {
+        playerB.x = nx; playerB.y = ny;
       }
     }
 
     function ponerBomba() {
       if (!juegoBomberActivo || gameOverBomber || tiempoRecargaBomba > 0) return;
-      let existe = bombasB.some(b => b.x === playerB.x && b.y === playerB.y);
-      if (!existe) {
-        bombasB.push({ x: playerB.x, y: playerB.y, timer: 120, alcance: 2 });
-        tiempoRecargaBomba = 180;
-      }
+      bombasB.push({ x: playerB.x, y: playerB.y, timer: 120, alcance: 2 });
+      tiempoRecargaBomba = 180;
     }
 
     function updateBomber() {
       if (!juegoBomberActivo || gameOverBomber) return;
       animIdBomber = requestAnimationFrame(updateBomber);
-
       if (tiempoRecargaBomba > 0) tiempoRecargaBomba--;
 
       for (let i = bombasB.length - 1; i >= 0; i--) {
         bombasB[i].timer--;
         if (bombasB[i].timer <= 0) {
-          let b = bombasB.splice(i, 1)[0]; 
-          explotarBomba(b.x, b.y, b.alcance);
+          let b = bombasB.splice(i, 1)[0];
+          soundBomberExplosion();
+          explosionesB.push({ x: b.x, y: b.y, timer: 15 });
         }
-      }
-
-      for (let i = explosionesB.length - 1; i >= 0; i--) {
-        explosionesB[i].timer--;
-        if (explosionesB[i].timer <= 0) explosionesB.splice(i, 1);
-      }
-
-      let velocidadEnemigo = Math.max(15, 30 - (nivelBomber * 2));
-      enemigosB.forEach(en => {
-        en.timerMov++;
-        if (en.timerMov > velocidadEnemigo) {
-          en.timerMov = 0;
-          let dirs = [{x:0, y:1}, {x:0, y:-1}, {x:1, y:0}, {x:-1, y:0}];
-          let d = dirs[Math.floor(Math.random() * dirs.length)];
-          let nx = en.x + d.x, ny = en.y + d.y;
-          if (nx >= 0 && nx < colsB && ny >= 0 && ny < rowsB && mapB[ny][nx] === 0) {
-            en.x = nx; en.y = ny;
-          }
-        }
-      });
-
-      let murio = false;
-      explosionesB.forEach(ex => { if (ex.x === playerB.x && ex.y === playerB.y) murio = true; });
-      enemigosB.forEach(en => { if (en.x === playerB.x && en.y === playerB.y) murio = true; });
-
-      if (murio) {
-        gameOverBomber = true;
-        juegoBomberActivo = false;
-        stopMusic();
-        soundBomberLose();
-        document.getElementById('respawnBtnBomber').style.display = 'block';
-        if (scoreBomber > 0) guardarPuntajeAutomatico("BomberMan", scoreBomber);
-        return;
       }
 
       ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
       let cellW = canvasB.width / colsB, cellH = canvasB.height / rowsB;
-
       for (let r = 0; r < rowsB; r++) {
         for (let c = 0; c < colsB; c++) {
-          let px = c * cellW, py = r * cellH;
-
-          if (puertaB.encontrada && puertaB.x === c && puertaB.y === r) {
-            ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py, cellW, cellH); 
-            ctxB.fillStyle = '#22c55e'; ctxB.fillRect(px + 4, py + 2, cellW - 8, cellH - 4); 
-            ctxB.fillStyle = '#14532d'; ctxB.fillRect(px + 6, py + 4, cellW - 12, cellH - 6); 
-            ctxB.fillStyle = '#eab308'; ctxB.fillRect(px + 10, py + 10, cellW - 20, cellH - 18); 
-          }
-          else if (mapB[r][c] === 1) {
-            ctxB.fillStyle = '#475569'; ctxB.fillRect(px, py, cellW, cellH);
-            ctxB.fillStyle = '#94a3b8'; ctxB.fillRect(px, py, cellW, 4); 
-            ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py + cellH - 4, cellW, 4); 
-            ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8); 
-            ctxB.fillStyle = '#334155'; ctxB.fillRect(px + 8, py + 8, cellW - 16, cellH - 16);
-          } 
-          else if (mapB[r][c] === 2) {
-            ctxB.fillStyle = '#9a3412'; ctxB.fillRect(px, py, cellW, cellH); 
-            ctxB.fillStyle = '#fdba74'; ctxB.fillRect(px, py, cellW, 2); 
-            ctxB.fillStyle = '#ea580c'; ctxB.fillRect(px + 2, py + 2, cellW - 4, cellH - 4);
-            ctxB.fillStyle = '#431407'; 
-            ctxB.fillRect(px, py + cellH/2, cellW, 2);
-            ctxB.fillRect(px + cellW/3, py, 2, cellH/2);
-            ctxB.fillRect(px + (cellW/3)*2, py + cellH/2, 2, cellH/2);
-          } 
-          else if (!puertaB.encontrada || puertaB.x !== c || puertaB.y !== r) {
-            ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px, py, cellW, cellH);
-          }
+          ctxB.fillStyle = mapB[r][c] === 1 ? '#475569' : (mapB[r][c] === 2 ? '#9a3412' : '#1e293b');
+          ctxB.fillRect(c * cellW, r * cellH, cellW, cellH);
         }
       }
-
-      bombasB.forEach(b => {
-        let px = b.x * cellW, py = b.y * cellH;
-        let cx = px + cellW/2, cy = py + cellH/2;
-        ctxB.fillStyle = '#111';
-        ctxB.beginPath(); ctxB.arc(cx, cy + 2, cellW/2.5, 0, Math.PI*2); ctxB.fill();
-        ctxB.fillStyle = '#555';
-        ctxB.beginPath(); ctxB.arc(cx - 4, cy - 2, cellW/8, 0, Math.PI*2); ctxB.fill();
-        ctxB.fillStyle = '#78350f';
-        ctxB.fillRect(cx - 2, py + 2, 4, 6);
-        ctxB.fillStyle = (b.timer % 10 < 5) ? '#ef4444' : '#facc15';
-        ctxB.fillRect(cx - 3, py, 6, 4);
-      });
-
-      explosionesB.forEach(ex => {
-        let px = ex.x * cellW, py = ex.y * cellH;
-        ctxB.fillStyle = '#ef4444'; ctxB.fillRect(px, py, cellW, cellH);
-        ctxB.fillStyle = '#f97316'; ctxB.fillRect(px + 4, py + 4, cellW - 8, cellH - 8);
-        ctxB.fillStyle = '#facc15'; ctxB.fillRect(px + 8, py + 8, cellW - 16, cellH - 16);
-        ctxB.fillStyle = '#ffffff'; ctxB.fillRect(px + 12, py + 12, cellW - 24, cellH - 24);
-      });
-
-      enemigosB.forEach(en => {
-        let px = en.x * cellW, py = en.y * cellH;
-        let floatY = Math.sin(en.timerMov * 0.3) * 3;
-        let ey = py + floatY;
-        
-        ctxB.fillStyle = '#ec4899'; 
-        ctxB.beginPath(); ctxB.arc(px + cellW/2, ey + cellH/2, cellW/2.2, Math.PI, 0); ctxB.fill();
-        ctxB.fillRect(px + 2, ey + cellH/2, cellW - 4, cellH/2.5);
-        ctxB.fillRect(px + 2, ey + cellH/2 + cellH/3, cellW/5, cellH/5);
-        ctxB.fillRect(px + cellW/2 - cellW/10, ey + cellH/2 + cellH/3, cellW/5, cellH/5);
-        ctxB.fillRect(px + cellW - 2 - cellW/5, ey + cellH/2 + cellH/3, cellW/5, cellH/5);
-        
-        ctxB.fillStyle = '#ffffff';
-        ctxB.fillRect(px + 6, ey + 8, 6, 8); ctxB.fillRect(px + cellW - 12, ey + 8, 6, 8);
-        ctxB.fillStyle = '#2563eb';
-        ctxB.fillRect(px + 6, ey + 10, 4, 4); ctxB.fillRect(px + cellW - 10, ey + 10, 4, 4);
-      });
-
-      let px = playerB.x * cellW, py = playerB.y * cellH;
-      let dir = playerB.dir || 'down';
-
-      ctxB.fillStyle = '#ffffff'; ctxB.fillRect(px + 4, py + 2, cellW - 8, cellH/2 + 2);
-      ctxB.fillStyle = '#f472b6'; ctxB.fillRect(px + cellW/2 - 2, py - 4, 4, 6);
-      ctxB.fillStyle = '#ef4444'; ctxB.fillRect(px + cellW/2 - 3, py - 6, 6, 3);
-
-      if (dir === 'up') {
-        ctxB.fillStyle = '#e2e8f0'; ctxB.fillRect(px + 6, py + 8, cellW - 12, cellH/3);
-      } else if (dir === 'down') {
-        ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 4, py + 8, cellW - 8, cellH/3);
-        ctxB.fillStyle = '#38bdf8'; 
-        ctxB.fillRect(px + 8, py + 10, 3, 5); 
-        ctxB.fillRect(px + cellW - 11, py + 10, 3, 5);
-      } else if (dir === 'left') {
-        ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 2, py + 8, cellW - 10, cellH/3);
-        ctxB.fillStyle = '#38bdf8'; 
-        ctxB.fillRect(px + 5, py + 10, 3, 5);
-      } else if (dir === 'right') {
-        ctxB.fillStyle = '#0f172a'; ctxB.fillRect(px + 8, py + 8, cellW - 10, cellH/3);
-        ctxB.fillStyle = '#38bdf8'; 
-        ctxB.fillRect(px + cellW - 8, py + 10, 3, 5);
-      }
-
-      ctxB.fillStyle = '#3b82f6'; ctxB.fillRect(px + 6, py + cellH/2 + 4, cellW - 12, cellH/2 - 4);
-      ctxB.fillStyle = '#1e293b'; ctxB.fillRect(px + 6, py + cellH - 7, cellW - 12, 3);
-      ctxB.fillStyle = '#facc15'; ctxB.fillRect(px + cellW/2 - 3, py + cellH - 8, 6, 5);
-      ctxB.fillStyle = '#f472b6'; 
-      ctxB.fillRect(px + 1, py + cellH/2 + 4, 5, 5); 
-      ctxB.fillRect(px + cellW - 6, py + cellH/2 + 4, 5, 5);
-      ctxB.beginPath(); ctxB.arc(px + 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
-      ctxB.beginPath(); ctxB.arc(px + cellW - 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
+      ctxB.fillStyle = '#3b82f6';
+      ctxB.fillRect(playerB.x * cellW + 4, playerB.y * cellH + 4, cellW - 8, cellH - 8);
     }
-
-    function explotarBomba(bx, by, alcance) {
-      soundBomberExplosion();
-      explosionesB.push({ x: bx, y: by, timer: 15 });
-      let dirs = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
-      
-      dirs.forEach(d => {
-        for (let i = 1; i <= alcance; i++) {
-          let nx = bx + (d.x * i), ny = by + (d.y * i);
-          if (nx < 0 || nx >= colsB || ny < 0 || ny >= rowsB) break;
-          if (mapB[ny][nx] === 1) break; 
-          
-          if (mapB[ny][nx] === 2) {
-            mapB[ny][nx] = 0; scoreBomber += 25; 
-            document.getElementById('scoreBomber').innerText = scoreBomber;
-            if (puertaB.x === nx && puertaB.y === ny) puertaB.encontrada = true;
-            explosionesB.push({ x: nx, y: ny, timer: 15 });
-            break; 
-          }
-
-          explosionesB.push({ x: nx, y: ny, timer: 15 });
-
-          for (let e = enemigosB.length - 1; e >= 0; e--) {
-            if (enemigosB[e].x === nx && enemigosB[e].y === ny) {
-              enemigosB.splice(e, 1); scoreBomber += 100; 
-              document.getElementById('scoreBomber').innerText = scoreBomber;
-            }
-          }
-        }
-      });
-
-      for (let e = enemigosB.length - 1; e >= 0; e--) {
-        if (enemigosB[e].x === bx && enemigosB[e].y === by) {
-          enemigosB.splice(e, 1); scoreBomber += 100;
-          document.getElementById('scoreBomber').innerText = scoreBomber;
-        }
-      }
-    }
-
     function resetBomber() { iniciarBomber(false); }
 
+    // --- KONG ARCADE (CON ARTE PICTÓRICO / TEXTURIZADO) ---
+    const canvasK = document.getElementById('gameCanvasKong');
+    const ctxK = canvasK.getContext('2d');
+    let kongPlayer = { x: 40, y: 220, w: 20, h: 26, vx: 0, vy: 0, grounded: false };
+    let scoreKong = 0, gameOverKong = false;
+    let plataformasKong = [
+      { x: 0, y: 250, w: 300, h: 15 },
+      { x: 30, y: 190, w: 240, h: 12 },
+      { x: 20, y: 130, w: 240, h: 12 },
+      { x: 40, y: 70, w: 220, h: 12 }
+    ];
+    let barrilesKong = [];
+
+    function iniciarKong() {
+      if (animIdKong) cancelAnimationFrame(animIdKong);
+      kongPlayer = { x: 40, y: 210, w: 20, h: 26, vx: 0, vy: 0, grounded: true };
+      scoreKong = 0; gameOverKong = false; barrilesKong = [];
+      document.getElementById('scoreKong').innerText = scoreKong;
+      document.getElementById('respawnBtnKong').style.display = 'none';
+      juegoKongActivo = true;
+      startKongMusic();
+      animIdKong = requestAnimationFrame(updateKong);
+    }
+
+    function moverKongInput(dir) {
+      if (!juegoKongActivo || gameOverKong) return;
+      if (dir === 'left') kongPlayer.x -= 15;
+      if (dir === 'right') kongPlayer.x += 15;
+      if (dir === 'up' && kongPlayer.grounded) {
+        kongPlayer.vy = -8;
+        kongPlayer.grounded = false;
+        soundTigreJump();
+      }
+    }
+
+    // Función que dibuja tu personaje con micro-píxeles y textura pictórica
+    function dibujarPersonajePictorico(ctx, px, py) {
+      // Usamos una rejilla de micro-bloques (escala de 2px) para dar aspecto artesanal/pictórico
+      const s = 2;
+      
+      // Cabello castaño texturizado (variaciones de tonos marrones como pinceladas)
+      const coloresCabello = ['#7c2d12', '#9a3412', '#b45309', '#78350f'];
+      let idxC = 0;
+      
+      // Forma característica del cabello del boceto
+      let matrizCabello = [
+        [0,1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1,1],
+        [1,1,0,0,0,0,1,1],
+        [1,0,0,0,0,0,0,1],
+        [0,0,1,1,1,1,0,0] // mechón superior
+      ];
+      
+      for(let r=0; r<matrizCabello.length; r++) {
+        for(let c=0; c<matrizCabello[r].length; c++) {
+          if(matrizCabello[r][c] === 1) {
+            ctx.fillStyle = coloresCabello[(r + c) % coloresCabello.length];
+            ctx.fillRect(px + (c-1)*s, py + (r-2)*s, s, s);
+          }
+        }
+      }
+
+      // Ojos negros profundos
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(px + 1*s, py + 3*s, s*2, s*2);
+      ctx.fillRect(px + 5*s, py + 3*s, s*2, s*2);
+
+      // Tono de piel cálido con textura de pincel
+      ctx.fillStyle = '#fed7aa';
+      ctx.fillRect(px + 0*s, py + 5*s, s*8, s*3);
+      ctx.fillStyle = '#ffedd5'; // toque de luz
+      ctx.fillRect(px + 2*s, py + 5*s, s*2, s*1);
+
+      // Camiseta colorida (Verde, Naranja, Amarillo según tu boceto)
+      let franjas = ['#22c55e', '#f97316', '#eab308', '#22c55e'];
+      for(let r=0; r<4; r++) {
+        for(let c=0; c<8; c++) {
+          ctx.fillStyle = franjas[c % franjas.length];
+          ctx.fillRect(px + c*s, py + (8+r)*s, s, s);
+        }
+      }
+
+      // Pantalón / Cinturón oscuro
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(px + 1*s, py + 12*s, s*6, s*2);
+
+      // Zapatos negros
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(px + 1*s, py + 14*s, s*2, s*2);
+      ctx.fillRect(px + 5*s, py + 14*s, s*2, s*2);
+    }
+
+    function updateKong() {
+      if (!juegoKongActivo || gameOverKong) return;
+      animIdKong = requestAnimationFrame(updateKong);
+
+      // Gravedad y físicas sencillas
+      kongPlayer.vy += 0.4;
+      kongPlayer.y += kongPlayer.vy;
+      kongPlayer.grounded = false;
+
+      // Colisión con plataformas
+      plataformasKong.forEach(p => {
+        if (
+          kongPlayer.x + kongPlayer.w > p.x &&
+          kongPlayer.x < p.x + p.w &&
+          kongPlayer.y + kongPlayer.h >= p.y &&
+          kongPlayer.y + kongPlayer.h <= p.y + 12 &&
+          kongPlayer.vy >= 0
+        ) {
+          kongPlayer.y = p.y - kongPlayer.h;
+          kongPlayer.vy = 0;
+          kongPlayer.grounded = true;
+        }
+      });
+
+      // Generar barriles rodantes ocasionales
+      if (Math.random() < 0.02) {
+        barrilesKong.push({ x: 20, y: 55, vx: 2, r: 8 });
+      }
+
+      // Actualizar barriles
+      for (let i = barrilesKong.length - 1; i >= 0; i--) {
+        let b = barrilesKong[i];
+        b.x += b.vx;
+        if (b.x > 300 || b.x < 0) {
+          barrilesKong.splice(i, 1);
+          scoreKong += 10;
+          document.getElementById('scoreKong').innerText = scoreKong;
+        }
+
+        // Colisión con el jugador
+        if (
+          kongPlayer.x < b.x + b.r &&
+          kongPlayer.x + kongPlayer.w > b.x - b.r &&
+          kongPlayer.y < b.y + b.r &&
+          kongPlayer.y + kongPlayer.h > b.y - b.r
+        ) {
+          gameOverKong = true;
+          juegoKongActivo = false;
+          stopMusic();
+          soundBomberLose();
+          document.getElementById('respawnBtnKong').style.display = 'block';
+          if (scoreKong > 0) guardarPuntajeAutomatico("KongArcade", scoreKong);
+          return;
+        }
+      }
+
+      // Renderizado del juego
+      ctxK.clearRect(0, 0, canvasK.width, canvasK.height);
+
+      // Fondo estilo arcade nocturno con textura
+      ctxK.fillStyle = '#0f172a';
+      ctxK.fillRect(0, 0, canvasK.width, canvasK.height);
+
+      // Dibujar plataformas escalonadas con textura de pintura
+      plataformasKong.forEach(p => {
+        ctxK.fillStyle = '#b45309';
+        ctxK.fillRect(p.x, p.y, p.w, p.h);
+        ctxK.fillStyle = '#d97706'; // detalle superior
+        ctxK.fillRect(p.x, p.y, p.w, 3);
+      });
+
+      // Dibujar barriles
+      barrilesKong.forEach(b => {
+        ctxK.fillStyle = '#7f1d1d';
+        ctxK.beginPath();
+        ctxK.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctxK.fill();
+        ctxK.fillStyle = '#f87171';
+        ctxK.fillRect(b.x - 2, b.y - 2, 4, 4);
+      });
+
+      // Dibujar a tu personaje con estilo pictórico
+      dibujarPersonajePictorico(ctxK, kongPlayer.x, kongPlayer.y);
+    }
+
+    function resetKong() { iniciarKong(); }
+
+    // Controles de teclado generales
     document.addEventListener('keydown', (e) => {
       if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
 
@@ -1106,6 +1049,13 @@
         if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moverBomber(-1, 0);
         if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moverBomber(1, 0);
         if (e.key === ' ' || e.code === 'Space') ponerBomba();
+      }
+
+      if (document.getElementById('vistaKong').classList.contains('active')) {
+        if (gameOverKong && (e.key === ' ' || e.code === 'Space')) return resetKong();
+        if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moverKongInput('left');
+        if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moverKongInput('right');
+        if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ' || e.code === 'Space') moverKongInput('up');
       }
     });
   </script>
