@@ -49,6 +49,7 @@
   let nextStepAt = 0;
   let playing = false;
   let enabled = true;
+  let intensity = 0; // Grows subtly with gameplay progress.
   try { enabled = localStorage.getItem('arcadeSound') !== 'off'; } catch {}
 
   function midi(n) { return 440 * 2 ** ((n - 69) / 12); }
@@ -169,6 +170,7 @@
     const sixteenth = 60 / config.bpm / 4;
     const when = nominal + (step % 2 ? sixteenth * 0.15 : 0);
     const variation = rnd(bar * 3.9 + index * 0.17);
+    const rhythmicDensity = Math.min(0.98, config.density + intensity * 0.13);
 
     if (step === 0) {
       // Gently overlapping seventh/ninth chords: the lo-fi foundation.
@@ -181,13 +183,13 @@
       const degree = step === 7 ? 7 : step === 12 ? 12 : 0;
       musicNote(root - 12 + degree, when, step === 7 ? 0.19 : 0.34, 0.09, 'sine', 0.009);
     }
-    if (step === 0 || step === 8 || (config.density > 0.9 && step === 10))
+    if (step === 0 || step === 8 || ((config.density > 0.9 || intensity > 0.62) && step === 10))
       kick(when, step === 0 ? 1 : 0.70);
     if (step === 4 || step === 12) {
       noiseHit(when, 0.115, 1100, 0.045, false);
       musicNote(root, when, 0.09, 0.022, 'triangle');
     }
-    if (step % 2 === 0 && variation < config.density) {
+    if (step % 2 === 0 && variation < rhythmicDensity) {
       noiseHit(when, 0.045, 4200, step % 4 === 2 ? 0.012 : 0.007);
     }
     if (step === 15 && bar % 4 === 3) noiseHit(when, 0.065, 3200, 0.013);
@@ -217,7 +219,7 @@
     if (!playing || !enabled || !context || document.hidden || context.state !== 'running') return;
     const config = THEMES[themeName];
     if (!config) return;
-    const interval = 60 / config.bpm / 4;
+    const interval = 60 / (config.bpm + intensity * 5) / 4;
     // Schedule just ahead of the audio clock, not from setInterval timing.
     let safety = 0;
     while (nextStepAt < context.currentTime + 0.13 && safety++ < 12) {
@@ -242,6 +244,7 @@
   function start(name) {
     if (!Object.prototype.hasOwnProperty.call(THEMES, name)) return;
     if (name === themeName && (playing || !enabled)) return;
+    if (themeName !== name) intensity = 0;
     themeName = name;
     if (!enabled) { stopScheduler(); return; }
     // Audio begins only after the browser receives a real interaction.
@@ -281,6 +284,8 @@
     else if (themeName && enabled && context?.state === 'running') launch();
   });
 
-  window.ArcadeMusic = { start, stop, setEnabled, getContext, unlock,
+  function setIntensity(value) { intensity = Math.max(0, Math.min(1, Number(value) || 0)); }
+
+  window.ArcadeMusic = { start, stop, setEnabled, getContext, unlock, setIntensity,
     isEnabled: () => enabled, currentTheme: () => themeName };
 })();
