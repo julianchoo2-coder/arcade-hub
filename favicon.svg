@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Arcade Hub</title>
+  <path d="M9 3h46l6 6v46l-6 6H9l-6-6V9z" fill="#0b1430" stroke="#59e7fa" stroke-width="4"/>
+  <path d="M12 12h40" stroke="#263e61" stroke-width="3"/>
+  <rect x="12" y="37" width="40" height="17" rx="2" fill="#22395b" stroke="#59e7fa" stroke-width="3"/>
+  <rect x="23" y="24" width="6" height="19" fill="#e2f5ff"/>
+  <rect x="18" y="13" width="16" height="16" rx="2" fill="#ffcf5c"/>
+  <path d="M20 15h7v4h-7z" fill="#fff0bd"/>
+  <rect x="35" y="41" width="7" height="7" rx="1" fill="#ff64b8"/>
+  <rect x="44" y="41" width="6" height="7" rx="1" fill="#68ffb8"/>
+  <path d="M17 48h12" stroke="#162743" stroke-width="3"/>
+</svg>
