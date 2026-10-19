@@ -232,3 +232,19 @@ h1,h2,h3,p{margin-top:0}
   .game-title{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Selector de récords: mismo HUD retro en los cuatro juegos. */
+[hidden]{display:none!important}
+.ranking-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:16px 0 12px}
+.ranking-tab{
+  padding:10px 3px;min-width:0;text-align:center;
+  background:#0b1831;color:#9baed0;border:2px solid #334d70;
+  font:8px/1.65 var(--pixel);cursor:pointer;
+  transition:border-color .16s,background-color .16s
+}
+.ranking-tab:hover{border-color:var(--cyan)}
+.ranking-tab.is-active{background:#274b6e;border-color:var(--cyan);color:#fff}
+.ranking-message{margin:11px 0;color:#acbfdd;font:12px/1.6 system-ui,sans-serif}
+.ranking-global-table{width:100%;table-layout:fixed;border-collapse:collapse}
+.ranking-global-table td,.ranking-global-table th{overflow-wrap:anywhere}
+@media(max-width:540px){.ranking-tab{font-size:7px;padding:11px 2px}}
