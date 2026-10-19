@@ -311,6 +311,7 @@ let usuarioActual = "";
         snake.unshift(head);
         if (head.x === food.x && head.y === food.y) {
           scoreC += 10;
+          window.ArcadeMusic?.setIntensity(Math.min(1,scoreC / 300));
           soundCulebraEat();
           document.getElementById('scoreCulebra').innerText = scoreC;
           placeFoodC();
@@ -377,6 +378,7 @@ let usuarioActual = "";
       let currentSpeed = scoreT >= 1000 ? 7 : (scoreT >= 400 ? 6 : 4.5);
       distance += currentSpeed*dt;
       scoreT = Math.floor(distance / 10);
+      window.ArcadeMusic?.setIntensity(Math.min(1,scoreT / 1200));
       document.getElementById('scoreTigre').innerText = scoreT;
 
       tigre.vy += tigre.gravity*dt;
@@ -520,6 +522,7 @@ let usuarioActual = "";
       const dt=ultimaMarcaBomber?Math.min(2.2,Math.max(0,(t-ultimaMarcaBomber)/(1000/60))):1;
       ultimaMarcaBomber=t;
 
+      window.ArcadeMusic?.setIntensity(Math.min(1,(nivelBomber-1)/5 + scoreBomber/1800));
       if (tiempoRecargaBomba > 0) tiempoRecargaBomba-=dt;
 
       for (let i = bombasB.length - 1; i >= 0; i--) {
