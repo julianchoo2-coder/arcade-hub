@@ -75,8 +75,9 @@
   }
   function mount(game, tableOrSelector) {
     if (!allowed.has(game)) return;
-    const table = typeof tableOrSelector === 'string'
+    let table = typeof tableOrSelector === 'string'
       ? document.querySelector(tableOrSelector) : tableOrSelector;
+    if (table?.tagName === 'TBODY') table = table.closest('table');
     if (!table || table.dataset.rankMounted === '1') return;
     table.dataset.rankMounted = '1';
     const tabBar = document.createElement('div');
