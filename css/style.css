@@ -315,3 +315,32 @@ button:focus-visible,a:focus-visible,input:focus-visible{
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+/* ARCADE HUB 2.0 | refinamiento retro */
+:root{--neon:#38bdf8;--pink:#fb7185;--gold:#facc15;--panel:#0f172a}
+body{min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#15274c 0%,#050b14 60%) fixed;color:#f8fafc}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1000;background:repeating-linear-gradient(transparent 0 4px,#00000010 5px 6px);opacity:.3}
+.screen{max-width:980px;padding:42px 22px 68px}
+.arcade-title{position:relative;font-size:clamp(1.3rem,4vw,2.25rem);letter-spacing:.12em;color:#7dd3fc;text-shadow:0 0 25px #0ea5e977,5px 5px #082f49;border-bottom:0;margin-bottom:16px}
+.arcade-title::after{content:"";display:block;height:5px;width:min(340px,75%);margin:22px auto 0;background:repeating-linear-gradient(90deg,var(--neon) 0 25px,transparent 25px 35px,var(--pink) 35px 50px,transparent 50px 60px);box-shadow:0 0 15px #38bdf855}
+.menu-grid{max-width:850px;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.game-card{position:relative;background:linear-gradient(150deg,#172747,#0b1428);border:3px solid #38517a;padding-bottom:22px;box-shadow:7px 7px #020617;min-width:0;transition:transform .16s,border-color .16s,box-shadow .16s}
+.game-card::after{content:"PRESS START";position:absolute;top:12px;right:10px;font-size:.48rem;color:#e2e8f0;background:#02061799;padding:6px 7px;border:1px solid #64748b}
+.game-card:hover,.game-card:focus-visible{transform:translateY(-5px);border-color:#7dd3fc;box-shadow:7px 10px #020617,0 0 23px #38bdf84d;outline:none}
+.game-cover{height:178px;font-size:3.8rem;text-shadow:4px 5px #02061766}
+.game-title{line-height:1.8;letter-spacing:.03em}
+.cover-snake{background:radial-gradient(circle,#177a4c,#09251f)}
+.cover-tiger{background:linear-gradient(135deg,#b45309,#365314,#052e16)}
+.cover-bomber{background:linear-gradient(135deg,#7c2d12,#581c87,#1e1b4b)}
+.hub-subtitle{font-size:.58rem;line-height:2.2;text-align:center;max-width:680px;color:#94a3b8;margin:0 0 28px}
+.hub-status{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;font-size:.52rem;line-height:1.8;color:#facc15}
+.hub-status span{background:#0f172a;border:2px solid #334155;padding:10px 12px}
+.hub-footer{font-size:.5rem;color:#64748b;text-align:center;line-height:2.2;margin:0 0 18px}
+.game-container{background:linear-gradient(180deg,#111e37bb,#0b1425aa);border:2px solid #334155;padding:24px 12px 26px;box-shadow:7px 7px #020617}
+.dashboard{background:linear-gradient(145deg,#142443,#0b1424);border-color:#365477}
+.dashboard h2{color:#facc15}
+.login-box{background:linear-gradient(160deg,#152749,#0b1427);border-color:#365477}
+.login-btn:hover,.back-btn:hover,.guest-btn:hover{filter:brightness(1.15)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #facc15;outline-offset:3px}
+@media(max-width:540px){.screen{padding:28px 14px 55px}.menu-grid{gap:14px}.game-cover{height:125px;font-size:2.8rem}.game-card{border-width:2px}.game-title{font-size:.58rem}.game-card::after{font-size:.32rem;padding:5px}.game-container{padding:17px 9px}.dashboard{padding:17px 8px}.mobile-controls{grid-template-columns:repeat(3,70px);grid-template-rows:repeat(2,65px)}.ctrl-btn{min-width:0}.hub-status{font-size:.42rem}}
+@media(prefers-reduced-motion:reduce){.game-card{transition:none}}
