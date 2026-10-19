@@ -6,17 +6,50 @@ let usuarioActual = "";
     let juegoTigreActivo = false;
     let juegoBomberActivo = false;
 
+    // Sesión, preferencias y marcadores seguros.
+    function storageGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+    function storageSet(k,v) { try { localStorage.setItem(k,v); } catch {} }
+    function storageRemove(k) { try { localStorage.removeItem(k); } catch {} }
+    function leerRecords() {
+      try {
+        const scores=JSON.parse(storageGet('arcadeScores') || '[]');
+        return Array.isArray(scores) ? scores.filter(x=>x && typeof x.name==='string' &&
+          typeof x.game==='string' && Number.isFinite(x.score) && x.score>=0) : [];
+      } catch { return []; }
+    }
+    let sonidoActivo=storageGet('arcadeSound')!=='off';
+    function actualizarSonidoUI() {
+      const b=document.getElementById('soundToggle');
+      if(b){ b.textContent=sonidoActivo?'♫ SOUND ON':'♫ SOUND OFF'; b.setAttribute('aria-pressed',String(sonidoActivo)); }
+    }
+    function toggleSonido() {
+      sonidoActivo=!sonidoActivo;
+      storageSet('arcadeSound',sonidoActivo?'on':'off');
+      actualizarSonidoUI(); stopMusic();
+      if(!sonidoActivo)return;
+      initAudio();
+      if(document.getElementById('menuPrincipal').classList.contains('active'))startMenuMusic();
+      else if(juegoCulebraActivo)startCulebraMusic();
+      else if(juegoTigreActivo)startTigerMusic();
+      else if(juegoBomberActivo)startBomberMusic();
+    }
+    function actualizarResumenMenu() {
+      const count=document.getElementById('totalRecords'),who=document.getElementById('playerStatus');
+      if(count)count.textContent=String(leerRecords().length).padStart(2,'0');
+      if(who)who.textContent=usuarioActual || 'INVITADO';
+    }
     // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS EXPANDIDOS ---
     let audioCtx = null;
     let currentMusicInterval = null;
 
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(!sonidoActivo) return;
+      if(!audioCtx){
+        const AC=window.AudioContext || window.webkitAudioContext;
+        if(!AC)return;
+        try { audioCtx=new AC(); } catch { return; }
       }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
     }
 
     document.addEventListener('pointerdown', () => {
@@ -27,9 +60,10 @@ let usuarioActual = "";
     }, { once: true });
 
     function playTone(freq, duration, type = 'square', delay = 0) {
+      if(!sonidoActivo || document.hidden)return;
       initAudio();
       setTimeout(() => {
-        if (!audioCtx || audioCtx.state !== 'running') return;
+        if(!sonidoActivo || !audioCtx || audioCtx.state !== 'running') return;
         let osc = audioCtx.createOscillator();
         let gain = audioCtx.createGain();
         osc.type = type;
@@ -44,6 +78,7 @@ let usuarioActual = "";
     }
 
     function playSlide(startFreq, endFreq, duration, type = 'square') {
+      if(!sonidoActivo || document.hidden)return;
       initAudio();
       if (!audioCtx || audioCtx.state !== 'running') return;
       let osc = audioCtx.createOscillator();
@@ -60,6 +95,7 @@ let usuarioActual = "";
     }
 
     function playNoise(duration) {
+      if(!sonidoActivo || document.hidden)return;
       initAudio();
       if (!audioCtx || audioCtx.state !== 'running') return;
       let bufferSize = audioCtx.sampleRate * duration;
@@ -92,6 +128,7 @@ let usuarioActual = "";
 
     function startMenuMusic() {
       stopMusic();
+      if(!sonidoActivo)return;
       let notes = [
         330, 392, 523, 659, 523, 392, 330, 261,
         293, 349, 440, 523, 440, 349, 392, 330
@@ -107,6 +144,7 @@ let usuarioActual = "";
 
     function startCulebraMusic() {
       stopMusic();
+      if(!sonidoActivo)return;
       let notes = [
         164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81,
         146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47
@@ -122,6 +160,7 @@ let usuarioActual = "";
 
     function startTigerMusic() {
       stopMusic();
+      if(!sonidoActivo)return;
       let notes = [
         261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23,
         440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66
@@ -137,6 +176,7 @@ let usuarioActual = "";
 
     function startBomberMusic() {
       stopMusic();
+      if(!sonidoActivo)return;
       let notes = [
         110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00,
         123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50
@@ -176,7 +216,8 @@ let usuarioActual = "";
 
     // --- GESTIÓN DE SESIÓN Y ARRANQUE ---
     window.onload = function() {
-      let savedUser = localStorage.getItem('arcadeUser');
+      actualizarSonidoUI();
+      let savedUser = storageGet('arcadeUser');
       if (savedUser) {
         usuarioActual = savedUser;
         document.getElementById('welcomeUser').innerText = "HOLA, " + usuarioActual;
@@ -201,7 +242,7 @@ let usuarioActual = "";
       }
 
       usuarioActual = u;
-      localStorage.setItem('arcadeUser', usuarioActual);
+      storageSet('arcadeUser',usuarioActual);
       document.getElementById('welcomeUser').innerText = "HOLA, " + usuarioActual;
       document.getElementById('btnSalirSesion').innerText = "CAMBIAR JUGADOR";
       cambiarPantalla('menuPrincipal');
@@ -210,14 +251,14 @@ let usuarioActual = "";
     function jugarComoInvitado() {
       initAudio();
       usuarioActual = "";
-      localStorage.removeItem('arcadeUser');
+      storageRemove('arcadeUser');
       document.getElementById('welcomeUser').innerText = "MODO INVITADO";
       document.getElementById('btnSalirSesion').innerText = "PONER MI NOMBRE";
       cambiarPantalla('menuPrincipal');
     }
 
     function cerrarSesion() {
-      localStorage.removeItem('arcadeUser');
+      storageRemove('arcadeUser');
       usuarioActual = "";
       document.getElementById('userInput').value = "";
       document.getElementById('loginMsg').innerText = "";
@@ -236,54 +277,34 @@ let usuarioActual = "";
       if (animIdBomber) cancelAnimationFrame(animIdBomber);
 
       stopMusic();
-      if(id === 'menuPrincipal') { startMenuMusic(); }
+      if(id === 'menuPrincipal') { startMenuMusic(); actualizarResumenMenu(); }
       if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
-      if(id === 'vistaTigre') { cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
-      if(id === 'vistaBomber') { cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
+      if(id === 'vistaTigre') { ultimaMarcaT=0; cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
+      if(id === 'vistaBomber') { ultimaMarcaBomber=0; cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
       window.scrollTo(0, 0);
     }
 
-    function guardarPuntajeAutomatico(juego, puntaje) {
-      if (!usuarioActual) return;
-      let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
-      
-      let indexExistente = scores.findIndex(item => item.game === juego && item.name === usuarioActual);
-
-      if (indexExistente !== -1) {
-        if (puntaje > scores[indexExistente].score) {
-          scores[indexExistente].score = puntaje;
-        }
-      } else {
-        scores.push({ name: usuarioActual, score: puntaje, game: juego });
-      }
-
-      scores.sort((a, b) => b.score - a.score);
-      localStorage.setItem('arcadeScores', JSON.stringify(scores));
+    function guardarPuntajeAutomatico(juego,puntaje) {
+      if(!usuarioActual || !Number.isFinite(puntaje) || puntaje<0)return;
+      const scores=leerRecords(),name=usuarioActual.slice(0,12);
+      const prev=scores.find(x=>x.name===name && x.game===juego);
+      if(prev)prev.score=Math.max(prev.score,puntaje);
+      else scores.push({name,game:juego,score:puntaje});
+      storageSet('arcadeScores',JSON.stringify(scores));
       cargarTablaRécordsGenerica(juego);
     }
-
-    function cargarTablaRécordsGenerica(nombreJuego) {
-      let tablaId = "scoreTableCulebra";
-      if (nombreJuego === "TigreSelva") tablaId = "scoreTableTigre";
-      if (nombreJuego === "BomberMan") tablaId = "scoreTableBomber";
-      
-      let scoreTable = document.getElementById(tablaId);
-      if (!scoreTable) return;
-      scoreTable.innerHTML = "<tr><th>JUGADOR</th><th>PTS</th></tr>";
-      
-      let scores = JSON.parse(localStorage.getItem('arcadeScores')) || [];
-      let filtered = scores.filter(item => item.game === nombreJuego).slice(0, 5);
-
-      if(filtered.length === 0) {
-        scoreTable.innerHTML += "<tr><td colspan='2' style='text-align:center; color:#64748b;'>SIN RÉCORDS</td></tr>";
-        return;
-      }
-      filtered.forEach(function(item) {
-        let rowStyle = item.name === usuarioActual && usuarioActual !== "" ? "color: #38bdf8;" : "";
-        scoreTable.innerHTML += `<tr style="${rowStyle}"><td>${item.name}</td><td>${item.score}</td></tr>`;
-      });
+    function cargarTablaRécordsGenerica(juego) {
+      const ids={Culebrita:'scoreTableCulebra',TigreSelva:'scoreTableTigre',BomberMan:'scoreTableBomber'};
+      const tabla=document.getElementById(ids[juego]); if(!tabla)return;
+      tabla.replaceChildren();
+      const th=document.createElement('tr');
+      ['JUGADOR','PTS'].forEach(t=>{const el=document.createElement('th');el.textContent=t;th.appendChild(el)});
+      tabla.appendChild(th);
+      const lista=leerRecords().filter(x=>x.game===juego).sort((x,y)=>y.score-x.score).slice(0,5);
+      if(!lista.length){const row=tabla.insertRow(),td=row.insertCell();td.colSpan=2;td.textContent='SIN RÉCORDS';return;}
+      lista.forEach(x=>{const row=tabla.insertRow();if(usuarioActual&&x.name===usuarioActual)row.classList.add('score-me');
+        row.insertCell().textContent=x.name;row.insertCell().textContent=x.score.toLocaleString('es-CO');});
     }
-
     // --- CULEBRITA ---
     const canvasC = document.getElementById('gameCanvasCulebra');
     const ctxC = canvasC.getContext('2d');
@@ -297,6 +318,7 @@ let usuarioActual = "";
       dxC = 20; dyC = 0; scoreC = 0;
       document.getElementById('scoreCulebra').innerText = scoreC;
       gameOverC = false;
+      cambiandoDirC = false;
       lastTimeC = 0; acumuladorC = 0;
       document.getElementById('respawnBtnCulebra').style.display = 'none';
       placeFoodC();
@@ -306,10 +328,16 @@ let usuarioActual = "";
     }
 
     function placeFoodC() {
-      food.x = Math.floor(Math.random() * (canvasC.width / 20)) * 20;
-      food.y = Math.floor(Math.random() * (canvasC.height / 20)) * 20;
+      const free=[];
+      for(let y=0;y<canvasC.height;y+=20)for(let x=0;x<canvasC.width;x+=20)
+        if(!snake.some(p=>p.x===x&&p.y===y))free.push({x,y});
+      if(!free.length) {
+        gameOverC=true;juegoCulebraActivo=false;stopMusic();
+        document.getElementById('respawnBtnCulebra').style.display='block';
+        guardarPuntajeAutomatico('Culebrita',scoreC);return;
+      }
+      food=free[Math.floor(Math.random()*free.length)];
     }
-
     function updateCulebra(time) {
       if (!juegoCulebraActivo || gameOverC) return;
       animIdCulebra = requestAnimationFrame(updateCulebra);
@@ -327,7 +355,7 @@ let usuarioActual = "";
         cambiandoDirC = false;
         const head = {x: snake[0].x + dxC, y: snake[0].y + dyC};
 
-        if (head.x < 0 || head.x >= canvasC.width || head.y < 0 || head.y >= canvasC.height || snake.some(p => p.x === head.x && p.y === head.y)) {
+        if (head.x < 0 || head.x >= canvasC.width || head.y < 0 || head.y >= canvasC.height || (head.x === food.x && head.y === food.y ? snake : snake.slice(0,-1)).some(p => p.x === head.x && p.y === head.y)) {
           gameOverC = true;
           juegoCulebraActivo = false;
           stopMusic();
@@ -395,22 +423,24 @@ let usuarioActual = "";
     const canvasT = document.getElementById('gameCanvasTigre');
     const ctxT = canvasT.getContext('2d');
     let tigre = { x: 40, y: 220, w: 32, h: 24, vy: 0, jump: -9.5, gravity: 0.5, grounded: true };
-    let obstaculos = [], distance = 0, scoreT = 0, gameOverT = false, nextSpawn = 0;
+    let obstaculos = [], distance = 0, scoreT = 0, gameOverT = false, nextSpawn = 0, ultimaMarcaT = 0;
 
-    function updateTigre() {
+    function updateTigre(t) {
       if (!juegoTigreActivo || gameOverT) return;
       animIdTigre = requestAnimationFrame(updateTigre);
+      const dt=ultimaMarcaT?Math.min(2.2,Math.max(0,(t-ultimaMarcaT)/(1000/60))):1;
+      ultimaMarcaT=t;
 
       let currentSpeed = scoreT >= 1000 ? 7 : (scoreT >= 400 ? 6 : 4.5);
-      distance += currentSpeed;
+      distance += currentSpeed*dt;
       scoreT = Math.floor(distance / 10);
       document.getElementById('scoreTigre').innerText = scoreT;
 
-      tigre.vy += tigre.gravity;
-      tigre.y += tigre.vy;
+      tigre.vy += tigre.gravity*dt;
+      tigre.y += tigre.vy*dt;
       if (tigre.y >= 220) { tigre.y = 220; tigre.vy = 0; tigre.grounded = true; }
 
-      nextSpawn--;
+      nextSpawn-=dt;
       if (nextSpawn <= 0) {
         let esLoro = scoreT >= 1000 && Math.random() > 0.55;
         if (esLoro) {
@@ -424,7 +454,7 @@ let usuarioActual = "";
       }
 
       for (let i = obstaculos.length - 1; i >= 0; i--) {
-        obstaculos[i].x -= currentSpeed;
+        obstaculos[i].x -= currentSpeed*dt;
 
         if (obstaculos[i].tipo === 'loro' && !obstaculos[i].sonado && obstaculos[i].x < 150) {
           obstaculos[i].sonado = true;
@@ -511,7 +541,7 @@ let usuarioActual = "";
     const colsB = 11, rowsB = 11;
     let mapB = [], playerB = { x: 1, y: 1, dir: 'down' }, bombasB = [], explosionesB = [], enemigosB = [];
     let puertaB = { x: -1, y: -1, encontrada: false };
-    let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0;
+    let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0, ultimaMarcaBomber = 0;
 
     function moverBomber(dx, dy) {
       if (!juegoBomberActivo || gameOverBomber) return;
@@ -541,14 +571,16 @@ let usuarioActual = "";
       }
     }
 
-    function updateBomber() {
+    function updateBomber(t) {
       if (!juegoBomberActivo || gameOverBomber) return;
       animIdBomber = requestAnimationFrame(updateBomber);
+      const dt=ultimaMarcaBomber?Math.min(2.2,Math.max(0,(t-ultimaMarcaBomber)/(1000/60))):1;
+      ultimaMarcaBomber=t;
 
-      if (tiempoRecargaBomba > 0) tiempoRecargaBomba--;
+      if (tiempoRecargaBomba > 0) tiempoRecargaBomba-=dt;
 
       for (let i = bombasB.length - 1; i >= 0; i--) {
-        bombasB[i].timer--;
+        bombasB[i].timer-=dt;
         if (bombasB[i].timer <= 0) {
           let b = bombasB.splice(i, 1)[0]; 
           explotarBomba(b.x, b.y, b.alcance);
@@ -556,13 +588,13 @@ let usuarioActual = "";
       }
 
       for (let i = explosionesB.length - 1; i >= 0; i--) {
-        explosionesB[i].timer--;
+        explosionesB[i].timer-=dt;
         if (explosionesB[i].timer <= 0) explosionesB.splice(i, 1);
       }
 
       let velocidadEnemigo = Math.max(15, 30 - (nivelBomber * 2));
       enemigosB.forEach(en => {
-        en.timerMov++;
+        en.timerMov+=dt;
         if (en.timerMov > velocidadEnemigo) {
           en.timerMov = 0;
           let dirs = [{x:0, y:1}, {x:0, y:-1}, {x:1, y:0}, {x:-1, y:0}];
@@ -699,7 +731,12 @@ let usuarioActual = "";
     function resetBomber() { iniciarBomber(false); }
 
     document.addEventListener('keydown', (e) => {
-      if (["Space", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) e.preventDefault();
+      if(e.target.closest('input,textarea,[contenteditable="true"]')) {
+        if(e.key==='Enter'&&e.target.id==='userInput')intentarLogin();
+        return;
+      }
+      const jugando=['vistaCulebrita','vistaTigre','vistaBomber'].some(id=>document.getElementById(id).classList.contains('active'));
+      if(jugando&&['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
 
       if (document.getElementById('vistaCulebrita').classList.contains('active')) {
         if (gameOverC && (e.key === ' ' || e.code === 'Space')) return resetCulebra();

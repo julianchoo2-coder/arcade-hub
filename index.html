@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Arcade Hub</title>
+  <meta name="theme-color" content="#080d20">
+  <meta name="description" content="Cuatro juegos retro con marcadores locales."><title>Arcade Hub | Press Start</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 
 </head>
 <body>
+<header class="site-header">
+  <a href="index.html" class="brand-mark" aria-label="Arcade Hub inicio"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a>
+  <div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="soundToggle" class="sound-btn" onclick="toggleSonido()" aria-pressed="true">♫ SOUND ON</button></div>
+</header>
 
   <!-- LOGIN LOCAL -->
   <div id="vistaLogin" class="screen">
@@ -25,38 +30,53 @@
   </div>
 
   <!-- MENÚ PRINCIPAL -->
-  <div id="menuPrincipal" class="screen">
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px;">
-      <div class="arcade-title">ARCADE HUB</div>
-      <p id="welcomeUser" style="color: #38bdf8; font-size: 0.8rem; margin-top: 0; margin-bottom: 30px; text-align:center;"></p>
+  <section id="menuPrincipal" class="screen menu-screen">
+    <div class="eyebrow">◈ WELCOME TO THE GAME ZONE <span>//////////////// EST. 2026</span></div>
+    <div class="hero-layout">
+      <div class="hero-copy"><span class="edition-tag">EDICIÓN RETRO / VOL. 01</span>
+      <h1 class="hero-title">PRESS<br><span>START</span><em>TO PLAY.</em></h1>
+      <p>La nostalgia tiene botón de inicio. Elige tu máquina, supera tus límites y deja tu nombre en el salón de la fama.</p>
+      <a href="#arcadeGames" class="primary-cta">▶ EXPLORAR JUEGOS</a></div>
+      <div class="hero-machine" aria-hidden="true"><div class="machine-light">● ● ● <span>ARCADE SYS-01</span></div><div class="machine-screen"><span class="pixel-star">✦</span><div class="machine-emoji">👾</div><div class="machine-screen-text">HIGH SCORE<br>999999</div></div><div class="machine-panel"><span class="machine-knob"></span><span class="machine-buttons"><i></i><i></i><i></i></span><span>1UP ▸</span></div></div>
+    </div>
+    <div class="status-cards"><div class="status-card"><small>ESTADO DEL SISTEMA</small><strong>● ONLINE</strong></div><div class="status-card"><small>JUGADOR ACTIVO</small><strong id="playerStatus">INVITADO</strong></div><div class="status-card"><small>VIDEOJUEGOS</small><strong>04 / 04</strong></div><div class="status-card"><small>RÉCORDS GUARDADOS</small><strong id="totalRecords">00</strong></div></div>
+    <div class="section-head" id="arcadeGames"><div><div class="eyebrow">◈ CHOOSE YOUR DESTINY</div><h2>SELECCIONA <span>TU JUEGO</span></h2></div><span>[ 01 - 04 ]</span></div>
+    <div class="menu-inner"><p id="welcomeUser" class="welcome-user"></p>
       
+      <p class="hub-subtitle">ELIGE TU DESAFÍO • SUPERA TU RÉCORD • CONQUISTA LA ARCADE</p>
+      <div class="hub-status"><span>● 4 JUEGOS</span><span>★ RÉCORDS LOCALES</span><span>⚡ MODO RETRO</span></div>
       <div class="menu-grid">
-        <div class="game-card" onclick="cambiarPantalla('vistaCulebrita')">
-          <div class="game-cover cover-snake">🐍</div>
+        <button type="button" class="game-card" onclick="cambiarPantalla('vistaCulebrita')">
+          <div class="game-cover cover-snake"><span class="cover-number">01 / CLASSIC</span><span class="cover-emoji">🐍</span></div>
           <div class="game-title">CULEBRITA</div>
-        </div>
-        <div class="game-card" onclick="cambiarPantalla('vistaTigre')">
-          <div class="game-cover cover-tiger">🐅</div>
+        </button>
+        <button type="button" class="game-card" onclick="cambiarPantalla('vistaTigre')">
+          <div class="game-cover cover-tiger"><span class="cover-number">02 / RUNNER</span><span class="cover-emoji">🐅</span></div>
           <div class="game-title">TIGRE</div>
-        </div>
-        <div class="game-card" onclick="cambiarPantalla('vistaBomber')">
-          <div class="game-cover cover-bomber">💣</div>
+        </button>
+        <a class="game-card" href="torre.html" >
+          <div class="game-cover cover-torre"><span class="cover-number">04 / PLATFORM</span><span class="cover-emoji">🦍</span></div>
+          <div class="game-title">TORRE ARCADE</div>
+        </a>
+        <button type="button" class="game-card" onclick="cambiarPantalla('vistaBomber')">
+          <div class="game-cover cover-bomber"><span class="cover-number">03 / ACTION</span><span class="cover-emoji">💣</span></div>
           <div class="game-title">BOMBER</div>
-        </div>
+        </button>
       </div>
 
-      <button onclick="cerrarSesion()" class="back-btn" style="width: 100%; text-align: center; margin-top: 15px; justify-content: center; display: flex;" id="btnSalirSesion">CAMBIAR JUGADOR</button>
+      <p class="hub-footer">ARCADE HUB · INSERT COIN · PRESS START</p>
+      <button onclick="cerrarSesion()" class="back-btn" id="btnSalirSesion">CAMBIAR JUGADOR</button>
     </div>
-  </div>
+  </section>
 
   <!-- CULEBRITA -->
   <div id="vistaCulebrita" class="screen">
-    <div class="main-wrapper">
+    <div class="main-wrapper game-layout">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
       
       <div class="game-container">
         <h1 style="font-size: 1.1rem; margin-bottom: 10px;">CULEBRITA</h1>
-        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreCulebra">0</span></p>
+        <div class="score-strip"><p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreCulebra">0</span></p> <span class="hud-extra">● EN VIVO</span></div>
         
         <canvas id="gameCanvasCulebra" width="300" height="300"></canvas>
         
@@ -70,8 +90,8 @@
         </div>
       </div>
 
-      <div class="dashboard">
-        <h2>TOP LOCAL</h2>
+      <div class="dashboard leaderboard">
+        <div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p class="sidebar-copy">LOS MEJORES PUNTAJES</p>
         <table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
       </div>
     </div>
@@ -79,12 +99,12 @@
 
   <!-- TIGRE EN LA SELVA -->
   <div id="vistaTigre" class="screen">
-    <div class="main-wrapper">
+    <div class="main-wrapper game-layout">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
       
       <div class="game-container">
         <h1 style="font-size: 1.1rem; margin-bottom: 10px;">TIGRE SELVA</h1>
-        <p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreTigre">0</span></p>
+        <div class="score-strip"><p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreTigre">0</span></p> <span class="hud-extra">● EN VIVO</span></div>
         
         <canvas id="gameCanvasTigre" width="300" height="300" style="cursor:pointer;" onclick="saltarTigre()"></canvas>
         
@@ -92,8 +112,8 @@
         <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px; text-align:center;">TOCA PANTALLA O ESPACIO</p>
       </div>
 
-      <div class="dashboard">
-        <h2>TOP LOCAL</h2>
+      <div class="dashboard leaderboard">
+        <div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p class="sidebar-copy">LOS MEJORES PUNTAJES</p>
         <table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
       </div>
     </div>
@@ -101,7 +121,7 @@
 
   <!-- BOMBER MAN -->
   <div id="vistaBomber" class="screen">
-    <div class="main-wrapper">
+    <div class="main-wrapper game-layout">
       <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
       
       <div class="game-container">
@@ -123,13 +143,14 @@
         </div>
       </div>
 
-      <div class="dashboard">
-        <h2>TOP LOCAL</h2>
+      <div class="dashboard leaderboard">
+        <div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p class="sidebar-copy">LOS MEJORES PUNTAJES</p>
         <table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
       </div>
     </div>
   </div>
 
+  <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> PRESS START ▸</footer>
   <script src="js/app.js"></script>
 <script src="js/games/culebrita.js"></script>
 <script src="js/games/tigre.js"></script>
