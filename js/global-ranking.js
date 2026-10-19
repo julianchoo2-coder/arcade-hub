@@ -16,7 +16,7 @@
     return new Promise((resolve, reject) => {
       if (window.supabase?.createClient) return resolve(window.supabase);
       const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
       script.async = true;
       script.onload = () => window.supabase?.createClient ? resolve(window.supabase) : reject(new Error('SDK no disponible'));
       script.onerror = () => reject(new Error('No se pudo cargar Supabase'));
