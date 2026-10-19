@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Torre Arcade · Arcade Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=3">
 <style>
 :root{color-scheme:dark}
 body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#080d20}
@@ -150,20 +150,37 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     }
     if(hero.y>H+30)takeHit();
     spawnClock++;
-    if(spawnClock>=115){
-      barrels.push({x:550,y:74,r:10,vx:-1.65,vy:0});spawnClock=0;
+    if(spawnClock>=145){
+      // Nivel 4 = plataforma superior. Bajarán hasta la 0 (suelo).
+      barrels.push({x:550,y:floors[4].y-10,r:10,level:4,phase:'roll',vy:0});
+      spawnClock=0;
     }
     for(const b of barrels){
-      const prev=b.y+b.r;b.vy=Math.min(b.vy+gravity*.7,9);b.x+=b.vx;b.y+=b.vy;
-      for(let i=floors.length-1;i>=0;i--){
-        const f=floors[i];
-        if(b.x+b.r>f.x&&b.x-b.r<f.x+f.w&&prev<=f.y+4&&b.y+b.r>=f.y){
-          b.y=f.y-b.r;b.vy=0;b.vx=i%2===0?-1.65:1.65;break;
+      if(b.phase==='roll'){
+        // El sentido alterna en cada plataforma.
+        const direction=b.level%2===0?-1:1;
+        b.x+=direction*1.75;
+        b.y=floors[b.level].y-b.r;
+        if(b.level>0){
+          // Las trampillas conectan físicamente con el siguiente piso.
+          const hatch=direction<0?90:540;
+          if((direction<0&&b.x<=hatch)||(direction>0&&b.x>=hatch)){
+            b.x=hatch;b.phase='fall';b.vy=0;
+          }
+        }
+      }else if(b.phase==='fall'){
+        b.vy=Math.min(b.vy+0.7,9);
+        b.y+=b.vy;
+        const nextLevel=b.level-1;
+        const landingY=floors[nextLevel].y-b.r;
+        if(b.y>=landingY){
+          b.y=landingY;b.level=nextLevel;b.vy=0;b.phase='roll';
         }
       }
       if(overlap(hero,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2}))takeHit();
     }
-    barrels=barrels.filter(b=>b.x>-25&&b.x<W+25&&b.y<H+25);
+    // Solo salen del escenario después de recorrer el suelo.
+    barrels=barrels.filter(b=>b.y<H+25&&b.x>-25&&b.x<W+25);
     if(hero.y<65&&hero.x>495){
       status='won';addScore(500);saveRecord();messageEl.textContent='🏆 ¡TORRE CONQUISTADA! +500 puntos. ¡Ganaste!'
     }
@@ -174,7 +191,14 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     for(let i=0;i<30;i++){ctx.fillStyle=i%2?'#253a70':'#40568e';ctx.fillRect((i*173)%W,(i*83)%H,2,2)}
     floors.forEach((f,i)=>{
       ctx.fillStyle=i%2?'#f97316':'#ef4444';ctx.fillRect(f.x,f.y,f.w,12);
-      ctx.fillStyle='#7c2d12';for(let x=f.x+14;x<f.x+f.w;x+=36)ctx.fillRect(x,f.y+3,14,3)
+      ctx.fillStyle='#7c2d12';for(let x=f.x+14;x<f.x+f.w;x+=36)ctx.fillRect(x,f.y+3,14,3);
+      // Señal de las bajadas para que el recorrido del barril sea claro.
+      if(i>0){
+        const hatch=i%2===0?90:540;
+        ctx.fillStyle='#facc15';ctx.fillRect(hatch-16,f.y-3,32,4);
+        ctx.fillStyle='#fb923c';ctx.font='bold 14px monospace';ctx.textAlign='center';
+        ctx.fillText('▼',hatch,f.y+26);
+      }
     });
     ladders.forEach(l=>{
       ctx.strokeStyle='#facc15';ctx.lineWidth=5;ctx.beginPath();
