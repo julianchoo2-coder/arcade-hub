@@ -41,7 +41,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 </style>
 </head>
 <body class="tower-page">
-<header class="site-header"><a href="index.html" class="brand-mark"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a><span class="online-indicator">● PLAYER ONE READY</span></header>
+<header class="site-header"><a href="index.html" class="brand-mark"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a><div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="towerSound" class="sound-btn" aria-pressed="true" title="Música lo-fi">♫ LO-FI ON</button></div></header>
 <main>
   <div class="tower-heading"><div><div class="tower-kicker">◈ MACHINE 04 / PLATFORM CHALLENGE</div><h1>🦍 TORRE ARCADE</h1><p>Cuatro pisos de adrenalina. Recoge estrellas, esquiva barriles y alcanza la bandera.</p></div><a class="tower-back" href="index.html">← VOLVER AL ARCADE</a></div>
   <div class="tower-layout"><div class="tower-main">
@@ -59,6 +59,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> INSERT COIN TO CONTINUE ▸</footer>
 <script src="js/global-ranking-config.js?v=1"></script>
 <script src="js/global-ranking.js?v=1"></script>
+<script src="js/lofi-audio.js?v=1"></script>
 <script>
 (() => {
   'use strict';
@@ -66,6 +67,21 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const scoreEl=document.getElementById('score'),livesEl=document.getElementById('lives');
   const bestEl=document.getElementById('best'),messageEl=document.getElementById('message');
   const W=640,H=480,ground=456,gravity=.52,speed=2.8,jump=-7.2;
+  const towerMusic=window.ArcadeMusic;
+  const towerSoundBtn=document.getElementById('towerSound');
+  function updateTowerSoundUI(){
+    const on=towerMusic?.isEnabled() ?? true;
+    towerSoundBtn.textContent=on?'♫ LO-FI ON':'♫ LO-FI OFF';
+    towerSoundBtn.setAttribute('aria-pressed',String(on));
+  }
+  towerSoundBtn.addEventListener('click',()=>{
+    const enabled=!(towerMusic?.isEnabled()??true);
+    try{localStorage.setItem('arcadeSound',enabled?'on':'off')}catch{}
+    towerMusic?.setEnabled(enabled);
+    if(enabled&&status==='playing')towerMusic?.start('tower');
+    updateTowerSoundUI();
+  });
+  updateTowerSoundUI();
   const floors=[
     {x:18,y:456,w:604},{x:62,y:365,w:560},{x:18,y:274,w:560},
     {x:62,y:183,w:560},{x:18,y:92,w:560}
@@ -111,7 +127,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false};invuln=80}
   function reset(){
     score=0;lives=3;barrels=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;status='playing';freshHero();
-    messageEl.textContent='¡Sube las escaleras y alcanza la bandera!';sync()
+    messageEl.textContent='¡Sube las escaleras y alcanza la bandera!';sync();
+    towerMusic?.start('tower');
   }
   function sync(){scoreEl.textContent=score;livesEl.textContent=lives;bestEl.textContent=best}
   function addScore(value){
@@ -123,7 +140,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function takeHit(){
     if(invuln>0||status!=='playing')return;
     lives--;barrels=[];freshHero();sync();
-    if(lives===0){status='lost';saveRecord();messageEl.textContent='¡Sin vidas! Reinicia para volver a jugar.'}
+    if(lives===0){status='lost';saveRecord();towerMusic?.stop();messageEl.textContent='¡Sin vidas! Reinicia para volver a jugar.'}
     else messageEl.textContent='¡Cuidado con los barriles!'
   }
   function update(){
@@ -189,7 +206,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     // Solo salen del escenario después de recorrer el suelo.
     barrels=barrels.filter(b=>b.y<H+25&&b.x>-25&&b.x<W+25);
     if(hero.y<65&&hero.x>495){
-      status='won';addScore(500);saveRecord();messageEl.textContent='🏆 ¡TORRE CONQUISTADA! +500 puntos. ¡Ganaste!'
+      status='won';addScore(500);saveRecord();towerMusic?.stop();messageEl.textContent='🏆 ¡TORRE CONQUISTADA! +500 puntos. ¡Ganaste!'
     }
   }
   function draw(){
@@ -242,8 +259,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   }
   let accumulator=0;
   function togglePause(){
-    if(status==='playing'){status='paused';keys.clear();messageEl.textContent='⏸ JUEGO PAUSADO';}
-    else if(status==='paused'){status='playing';messageEl.textContent='▶ ¡A JUGAR!';}
+    if(status==='playing'){status='paused';keys.clear();towerMusic?.stop();messageEl.textContent='⏸ JUEGO PAUSADO';}
+    else if(status==='paused'){status='playing';towerMusic?.start('tower');messageEl.textContent='▶ ¡A JUGAR!';}
     document.getElementById('pause').textContent=status==='paused'?'▶ CONTINUAR (P)':'⏸ PAUSAR (P)';
   }
   function down(key){
