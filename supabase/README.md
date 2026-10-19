@@ -1,3 +1,13 @@
+## Estado del proyecto Arcade Hub (19/10/2026)
+
+✅ Proyecto Supabase creado y activo en São Paulo (`sa-east-1`).
+✅ Migración SQL aplicada y políticas RLS verificadas.
+✅ URL y clave **publicable** añadidas al archivo `js/global-ranking-config.js`.
+⏳ Comprobar y habilitar **Authentication → Providers → Anonymous Sign-Ins** en el panel de Supabase.
+⏳ Fusionar el Pull Request con los cambios de frontend y probar dos navegadores.
+
+---
+
 # Ranking global de Arcade Hub 🌍
 
 El sitio funciona **sin configurar nada**: conserva los récords locales. Cuando actives Supabase, aparecerán los resultados globales de los cuatro juegos al pulsar **🌍 GLOBAL**.
