@@ -285,13 +285,17 @@ let usuarioActual = "";
     }
 
     function guardarPuntajeAutomatico(juego,puntaje) {
-      if(!usuarioActual || !Number.isFinite(puntaje) || puntaje<0)return;
+      if(!usuarioActual || !Number.isSafeInteger(puntaje) || puntaje<=0)return;
       const scores=leerRecords(),name=usuarioActual.slice(0,12);
       const prev=scores.find(x=>x.name===name && x.game===juego);
+      if(prev && puntaje<prev.score)return;
       if(prev)prev.score=Math.max(prev.score,puntaje);
       else scores.push({name,game:juego,score:puntaje});
       storageSet('arcadeScores',JSON.stringify(scores));
       cargarTablaRécordsGenerica(juego);
+      // La partida se guarda localmente, aunque Supabase falle o no esté configurado.
+      window.ArcadeGlobal?.submitScore(juego,name,puntaje)
+        .catch(error=>console.warn('Ranking global no disponible:',error.message));
     }
     function cargarTablaRécordsGenerica(juego) {
       const ids={Culebrita:'scoreTableCulebra',TigreSelva:'scoreTableTigre',BomberMan:'scoreTableBomber'};

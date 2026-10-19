@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Torre Arcade · Arcade Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=3">
+<link rel="stylesheet" href="css/style.css?v=4">
 <style>
 :root{color-scheme:dark}
 body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#080d20}
@@ -52,17 +52,19 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     <button id="restart">↻ REINICIAR PARTIDA</button>
     <p class="tower-note">⌨️ ← → / A D: moverte · ↑ ↓ / W S: escaleras · ESPACIO: saltar · P: pausa</p>
   </div>
-  <aside class="tower-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p>Mejores puntuaciones de Torre Arcade en este navegador.</p><table><thead><tr><th>JUGADOR</th><th>PUNTOS</th></tr></thead><tbody id="towerRecords"><tr><td colspan="2">SIN RÉCORDS</td></tr></tbody></table>
+  <aside class="tower-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Puntuaciones locales y globales de Torre Arcade.</p><table><thead><tr><th>JUGADOR</th><th>PUNTOS</th></tr></thead><tbody id="towerRecords"><tr><td colspan="2">SIN RÉCORDS</td></tr></tbody></table>
   <h3>● OBJETIVO</h3><p>Sube de nivel por las escaleras doradas, recoge las estrellas y evita los barriles. ¡La bandera está arriba!</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
 </main>
 <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> INSERT COIN TO CONTINUE ▸</footer>
+<script src="js/global-ranking-config.js?v=1"></script>
+<script src="js/global-ranking.js?v=1"></script>
 <script>
 (() => {
   'use strict';
   const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
   const scoreEl=document.getElementById('score'),livesEl=document.getElementById('lives');
   const bestEl=document.getElementById('best'),messageEl=document.getElementById('message');
-  const W=640,H=480,ground=456,gravity=.52,speed=2.8,jump=-9.5;
+  const W=640,H=480,ground=456,gravity=.52,speed=2.8,jump=-7.2;
   const floors=[
     {x:18,y:456,w:604},{x:62,y:365,w:560},{x:18,y:274,w:560},
     {x:62,y:183,w:560},{x:18,y:92,w:560}
@@ -93,10 +95,14 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function saveRecord(){
     if(!name||score<=0)return;
     const records=getRecords(),old=records.find(x=>x.game==='TorreArcade'&&x.name===name);
+    if(old&&score<old.score)return;
     if(old)old.score=Math.max(old.score,score);
     else records.push({name,game:'TorreArcade',score});
     try{localStorage.setItem('arcadeScores',JSON.stringify(records))}catch{}
     renderRecords();
+    // Al terminar, intentar publicar el mejor récord; sin bloquear la partida.
+    window.ArcadeGlobal?.submitScore('TorreArcade',name,score)
+      .catch(error=>console.warn('Ranking global no disponible:',error.message));
   }
   try{best=Number(localStorage.getItem('arcadeHubTorreBest'))||0}catch{best=0}
   bestEl.textContent=best;
