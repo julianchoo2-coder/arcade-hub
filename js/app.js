@@ -20,12 +20,13 @@ let usuarioActual = "";
     let sonidoActivo=storageGet('arcadeSound')!=='off';
     function actualizarSonidoUI() {
       const b=document.getElementById('soundToggle');
-      if(b){ b.textContent=sonidoActivo?'♫ SOUND ON':'♫ SOUND OFF'; b.setAttribute('aria-pressed',String(sonidoActivo)); }
+      if(b){ b.textContent=sonidoActivo?'♫ LO-FI ON':'♫ LO-FI OFF'; b.setAttribute('aria-pressed',String(sonidoActivo)); }
     }
     function toggleSonido() {
       sonidoActivo=!sonidoActivo;
       storageSet('arcadeSound',sonidoActivo?'on':'off');
       actualizarSonidoUI(); stopMusic();
+      window.ArcadeMusic?.setEnabled(sonidoActivo);
       if(!sonidoActivo)return;
       initAudio();
       if(document.getElementById('menuPrincipal').classList.contains('active'))startMenuMusic();
@@ -40,23 +41,25 @@ let usuarioActual = "";
     }
     // --- SINTETIZADOR DE AUDIO Y SOUNDTRACKS EXPANDIDOS ---
     let audioCtx = null;
-    let currentMusicInterval = null;
 
     function initAudio() {
       if(!sonidoActivo) return;
       if(!audioCtx){
-        const AC=window.AudioContext || window.webkitAudioContext;
-        if(!AC)return;
-        try { audioCtx=new AC(); } catch { return; }
+        // Compartir AudioContext con la radio evita duplicar motores de audio.
+        audioCtx=window.ArcadeMusic?.getContext() || null;
+        if(!audioCtx){
+          const AC=window.AudioContext || window.webkitAudioContext;
+          if(!AC)return;
+          try { audioCtx=new AC(); } catch { return; }
+        }
       }
       if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
     }
 
+    // La música se activa tras la primera interacción, respetando el autoplay del navegador.
     document.addEventListener('pointerdown', () => {
       initAudio();
-      if (!currentMusicInterval && document.getElementById('menuPrincipal').classList.contains('active')) {
-        startMenuMusic();
-      }
+      window.ArcadeMusic?.unlock();
     }, { once: true });
 
     function playTone(freq, duration, type = 'square', delay = 0) {
@@ -119,76 +122,12 @@ let usuarioActual = "";
       noise.start();
     }
 
-    function stopMusic() {
-      if (currentMusicInterval) {
-        clearInterval(currentMusicInterval);
-        currentMusicInterval = null;
-      }
-    }
-
-    function startMenuMusic() {
-      stopMusic();
-      if(!sonidoActivo)return;
-      let notes = [
-        330, 392, 523, 659, 523, 392, 330, 261,
-        293, 349, 440, 523, 440, 349, 392, 330
-      ];
-      let index = 0;
-      currentMusicInterval = setInterval(() => {
-        if (document.getElementById('menuPrincipal').classList.contains('active')) {
-          playTone(notes[index], 0.18, 'square');
-          index = (index + 1) % notes.length;
-        }
-      }, 200);
-    }
-
-    function startCulebraMusic() {
-      stopMusic();
-      if(!sonidoActivo)return;
-      let notes = [
-        164.81, 196.00, 220.00, 246.94, 220.00, 196.00, 164.81, 130.81,
-        146.83, 174.61, 196.00, 220.00, 196.00, 174.61, 146.83, 123.47
-      ];
-      let index = 0;
-      currentMusicInterval = setInterval(() => {
-        if (juegoCulebraActivo) {
-          playTone(notes[index], 0.14, 'triangle');
-          index = (index + 1) % notes.length;
-        }
-      }, 180);
-    }
-
-    function startTigerMusic() {
-      stopMusic();
-      if(!sonidoActivo)return;
-      let notes = [
-        261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23,
-        440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 329.63, 293.66
-      ];
-      let index = 0;
-      currentMusicInterval = setInterval(() => {
-        if (juegoTigreActivo) {
-          playTone(notes[index], 0.1, 'sawtooth');
-          index = (index + 1) % notes.length;
-        }
-      }, 140);
-    }
-
-    function startBomberMusic() {
-      stopMusic();
-      if(!sonidoActivo)return;
-      let notes = [
-        110.00, 110.00, 130.81, 146.83, 130.81, 110.00, 98.00, 110.00,
-        123.47, 146.83, 164.81, 146.83, 130.81, 123.47, 110.00, 92.50
-      ];
-      let index = 0;
-      currentMusicInterval = setInterval(() => {
-        if (juegoBomberActivo) {
-          playTone(notes[index], 0.12, 'square');
-          index = (index + 1) % notes.length;
-        }
-      }, 190);
-    }
+    // Radio lo-fi compartida: un tema para el menú y uno por juego.
+    function stopMusic() { window.ArcadeMusic?.stop(); }
+    function startMenuMusic() { if(sonidoActivo) window.ArcadeMusic?.start('menu'); }
+    function startCulebraMusic() { if(sonidoActivo) window.ArcadeMusic?.start('snake'); }
+    function startTigerMusic() { if(sonidoActivo) window.ArcadeMusic?.start('tiger'); }
+    function startBomberMusic() { if(sonidoActivo) window.ArcadeMusic?.start('bomber'); }
 
     function soundCulebraEat() {
       playTone(523.25, 0.08, 'square', 0);
