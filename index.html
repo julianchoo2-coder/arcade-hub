@@ -1,159 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080d20">
-  <meta name="description" content="Cuatro juegos retro con marcadores locales."><title>Arcade Hub | Press Start</title>
+  <meta name="description" content="Arcade Hub: cuatro minijuegos retro, retos y récords locales.">
+  <title>Arcade Hub | Press Start</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
-<header class="site-header">
-  <a href="index.html" class="brand-mark" aria-label="Arcade Hub inicio"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a>
-  <div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="soundToggle" class="sound-btn" onclick="toggleSonido()" aria-pressed="true">♫ SOUND ON</button></div>
-</header>
-
-  <!-- LOGIN LOCAL -->
-  <div id="vistaLogin" class="screen">
-    <div style="margin-bottom: 25px; text-align: center; width: 100%;">
-      <div class="arcade-title">ARCADE HUB</div>
-      <p style="color: #94a3b8; margin: 0; font-size: 0.7rem; line-height: 1.8;">INGRESA UN NOMBRE PARA GUARDAR RÉCORDS</p>
-    </div>
-    <div class="login-box">
-      <input type="text" id="userInput" class="login-input" placeholder="TU NOMBRE" maxlength="12">
-      <div id="loginMsg"></div>
-      <button class="login-btn" onclick="intentarLogin()">JUGAR AHORA</button>
-      <button class="guest-btn" onclick="jugarComoInvitado()">JUGAR COMO INVITADO</button>
-    </div>
-  </div>
-
-  <!-- MENÚ PRINCIPAL -->
-  <section id="menuPrincipal" class="screen menu-screen">
-    <div class="eyebrow">◈ WELCOME TO THE GAME ZONE <span>//////////////// EST. 2026</span></div>
-    <div class="hero-layout">
-      <div class="hero-copy"><span class="edition-tag">EDICIÓN RETRO / VOL. 01</span>
-      <h1 class="hero-title">PRESS<br><span>START</span><em>TO PLAY.</em></h1>
-      <p>La nostalgia tiene botón de inicio. Elige tu máquina, supera tus límites y deja tu nombre en el salón de la fama.</p>
-      <a href="#arcadeGames" class="primary-cta">▶ EXPLORAR JUEGOS</a></div>
-      <div class="hero-machine" aria-hidden="true"><div class="machine-light">● ● ● <span>ARCADE SYS-01</span></div><div class="machine-screen"><span class="pixel-star">✦</span><div class="machine-emoji">👾</div><div class="machine-screen-text">HIGH SCORE<br>999999</div></div><div class="machine-panel"><span class="machine-knob"></span><span class="machine-buttons"><i></i><i></i><i></i></span><span>1UP ▸</span></div></div>
-    </div>
-    <div class="status-cards"><div class="status-card"><small>ESTADO DEL SISTEMA</small><strong>● ONLINE</strong></div><div class="status-card"><small>JUGADOR ACTIVO</small><strong id="playerStatus">INVITADO</strong></div><div class="status-card"><small>VIDEOJUEGOS</small><strong>04 / 04</strong></div><div class="status-card"><small>RÉCORDS GUARDADOS</small><strong id="totalRecords">00</strong></div></div>
-    <div class="section-head" id="arcadeGames"><div><div class="eyebrow">◈ CHOOSE YOUR DESTINY</div><h2>SELECCIONA <span>TU JUEGO</span></h2></div><span>[ 01 - 04 ]</span></div>
-    <div class="menu-inner"><p id="welcomeUser" class="welcome-user"></p>
-      
-      <p class="hub-subtitle">ELIGE TU DESAFÍO • SUPERA TU RÉCORD • CONQUISTA LA ARCADE</p>
-      <div class="hub-status"><span>● 4 JUEGOS</span><span>★ RÉCORDS LOCALES</span><span>⚡ MODO RETRO</span></div>
-      <div class="menu-grid">
-        <button type="button" class="game-card" onclick="cambiarPantalla('vistaCulebrita')">
-          <div class="game-cover cover-snake"><span class="cover-number">01 / CLASSIC</span><span class="cover-emoji">🐍</span></div>
-          <div class="game-title">CULEBRITA</div>
-        </button>
-        <button type="button" class="game-card" onclick="cambiarPantalla('vistaTigre')">
-          <div class="game-cover cover-tiger"><span class="cover-number">02 / RUNNER</span><span class="cover-emoji">🐅</span></div>
-          <div class="game-title">TIGRE</div>
-        </button>
-        <a class="game-card" href="torre.html" >
-          <div class="game-cover cover-torre"><span class="cover-number">04 / PLATFORM</span><span class="cover-emoji">🦍</span></div>
-          <div class="game-title">TORRE ARCADE</div>
-        </a>
-        <button type="button" class="game-card" onclick="cambiarPantalla('vistaBomber')">
-          <div class="game-cover cover-bomber"><span class="cover-number">03 / ACTION</span><span class="cover-emoji">💣</span></div>
-          <div class="game-title">BOMBER</div>
-        </button>
+  <header class="site-header">
+    <a href="index.html" class="brand-mark" aria-label="Arcade Hub, inicio">
+      <span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span>
+    </a>
+    <div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="soundToggle" class="sound-btn" onclick="toggleSonido()" aria-pressed="true">♫ SOUND ON</button></div>
+  </header>
+  <main>
+    <section id="vistaLogin" class="screen login-screen" aria-label="Elegir jugador">
+      <div class="login-intro"><div class="eyebrow">◈ INSERT COIN · PLAYER SELECT</div><div class="arcade-title">ARCADE <span>HUB</span></div><p>Introduce tu nombre para guardar tus mejores puntuaciones en este navegador.</p></div>
+      <div class="login-box">
+        <label for="userInput" class="field-label">01 / NOMBRE DEL JUGADOR</label>
+        <input type="text" id="userInput" class="login-input" placeholder="TU NOMBRE" maxlength="12" autocomplete="nickname">
+        <div id="loginMsg" role="status"></div>
+        <button class="login-btn" type="button" onclick="intentarLogin()">▶ JUGAR AHORA</button>
+        <button class="guest-btn" type="button" onclick="jugarComoInvitado()">CONTINUAR COMO INVITADO</button>
       </div>
+    </section>
 
-      <p class="hub-footer">ARCADE HUB · INSERT COIN · PRESS START</p>
-      <button onclick="cerrarSesion()" class="back-btn" id="btnSalirSesion">CAMBIAR JUGADOR</button>
-    </div>
-  </section>
-
-  <!-- CULEBRITA -->
-  <div id="vistaCulebrita" class="screen">
-    <div class="main-wrapper game-layout">
-      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      
-      <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">CULEBRITA</h1>
-        <div class="score-strip"><p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreCulebra">0</span></p> <span class="hud-extra">● EN VIVO</span></div>
-        
-        <canvas id="gameCanvasCulebra" width="300" height="300"></canvas>
-        
-        <button id="respawnBtnCulebra" onclick="resetCulebra()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">REINTENTAR</button>
-        
-        <div class="mobile-controls">
-          <button class="ctrl-btn btn-up" ontouchstart="intentarMoverC(0, -20); event.preventDefault();" onclick="intentarMoverC(0, -20)">▲</button>
-          <button class="ctrl-btn btn-left" ontouchstart="intentarMoverC(-20, 0); event.preventDefault();" onclick="intentarMoverC(-20, 0)">◄</button>
-          <button class="ctrl-btn btn-down" ontouchstart="intentarMoverC(0, 20); event.preventDefault();" onclick="intentarMoverC(0, 20)">▼</button>
-          <button class="ctrl-btn btn-right" ontouchstart="intentarMoverC(20, 0); event.preventDefault();" onclick="intentarMoverC(20, 0)">►</button>
+    <section id="menuPrincipal" class="screen menu-screen" aria-label="Selección de juegos">
+      <div class="eyebrow hero-eyebrow">◈ WELCOME TO THE GAME ZONE <span>EST. 2026 / VOL. 01</span></div>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <span class="edition-tag">★ EDICIÓN RETRO · 04 MÁQUINAS</span>
+          <h1 class="hero-title">PRESS<br><span>START</span><em>TO PLAY.</em></h1>
+          <p>Tu salón arcade está encendido. Escoge un desafío, supera tu récord y conquista el marcador.</p>
+          <a href="#arcadeGames" class="primary-cta">▶ EXPLORAR JUEGOS <span>↗</span></a>
+        </div>
+        <div class="hero-machine" aria-hidden="true">
+          <div class="machine-light">● ● ● <span>ARCADE SYS-01</span></div>
+          <div class="machine-screen"><span class="pixel-star">✦</span><div class="machine-emoji">👾</div><div class="machine-screen-text">INSERT COIN<br>HIGH SCORE: 999999</div></div>
+          <div class="machine-panel"><span class="machine-knob"></span><span class="machine-buttons"><i></i><i></i><i></i></span><span>1UP ▸</span></div>
         </div>
       </div>
-
-      <div class="dashboard leaderboard">
-        <div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p class="sidebar-copy">LOS MEJORES PUNTAJES</p>
-        <table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+      <div class="status-cards" aria-label="Estado de Arcade Hub">
+        <div class="status-card"><small>ESTADO DEL SISTEMA</small><strong class="system-online">● ONLINE</strong></div>
+        <div class="status-card"><small>JUGADOR ACTIVO</small><strong id="playerStatus">INVITADO</strong></div>
+        <div class="status-card"><small>VIDEOJUEGOS</small><strong>04 / 04</strong></div>
+        <div class="status-card"><small>RÉCORDS LOCALES</small><strong id="totalRecords">00</strong></div>
       </div>
-    </div>
-  </div>
-
-  <!-- TIGRE EN LA SELVA -->
-  <div id="vistaTigre" class="screen">
-    <div class="main-wrapper game-layout">
-      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      
-      <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">TIGRE SELVA</h1>
-        <div class="score-strip"><p style="color: #38bdf8; font-size: 0.9rem; margin: 0 0 18px 0;">PTS: <span id="scoreTigre">0</span></p> <span class="hud-extra">● EN VIVO</span></div>
-        
-        <canvas id="gameCanvasTigre" width="300" height="300" style="cursor:pointer;" onclick="saltarTigre()"></canvas>
-        
-        <button id="respawnBtnTigre" onclick="resetTigre()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">SALTAR OTRA VEZ</button>
-        <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px; text-align:center;">TOCA PANTALLA O ESPACIO</p>
+      <div id="arcadeGames" class="section-head">
+        <div><div class="eyebrow">◈ CHOOSE YOUR DESTINY</div><h2>ELIGE <span>TU JUEGO</span></h2></div>
+        <span class="section-count">[ 01 - 04 ]</span>
       </div>
-
-      <div class="dashboard leaderboard">
-        <div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p class="sidebar-copy">LOS MEJORES PUNTAJES</p>
-        <table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+      <div class="menu-inner">
+        <p id="welcomeUser" class="welcome-user"></p>
+        <div class="menu-grid">
+          <button type="button" class="game-card game-snake" onclick="cambiarPantalla('vistaCulebrita')">
+            <div class="game-cover cover-snake"><span class="cover-number">01 / CLASSIC</span><span class="cover-emoji">🐍</span><span class="cover-pixels">▦ ▦ ▦</span></div>
+            <div class="game-card-body"><div class="game-title">CULEBRITA</div><p>Come, crece y esquiva tu propia cola.</p><span class="game-action">▶ JUGAR <span>↗</span></span></div>
+          </button>
+          <button type="button" class="game-card game-tiger" onclick="cambiarPantalla('vistaTigre')">
+            <div class="game-cover cover-tiger"><span class="cover-number">02 / RUNNER</span><span class="cover-emoji">🐅</span><span class="cover-pixels">✦ ✦ ✦</span></div>
+            <div class="game-card-body"><div class="game-title">TIGRE SELVA</div><p>Salta los obstáculos y llega más lejos.</p><span class="game-action">▶ JUGAR <span>↗</span></span></div>
+          </button>
+          <button type="button" class="game-card game-bomber" onclick="cambiarPantalla('vistaBomber')">
+            <div class="game-cover cover-bomber"><span class="cover-number">03 / ACTION</span><span class="cover-emoji">💣</span><span class="cover-pixels">× × ×</span></div>
+            <div class="game-card-body"><div class="game-title">BOMBER MAN</div><p>Coloca bombas, vence rivales y escapa.</p><span class="game-action">▶ JUGAR <span>↗</span></span></div>
+          </button>
+          <a class="game-card game-tower" href="torre.html">
+            <div class="game-cover cover-torre"><span class="cover-number">04 / PLATFORM</span><span class="cover-emoji">🦍</span><span class="cover-pixels">★ ★ ★</span></div>
+            <div class="game-card-body"><div class="game-title">TORRE ARCADE</div><p>Escala plataformas y esquiva barriles.</p><span class="game-action">▶ JUGAR <span>↗</span></span></div>
+          </a>
+        </div>
+        <div class="menu-bottom"><span>✦ INSERT COIN · PRESS START · BEAT THE HIGH SCORE</span><button type="button" onclick="cerrarSesion()" class="back-btn" id="btnSalirSesion">CAMBIAR JUGADOR</button></div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- BOMBER MAN -->
-  <div id="vistaBomber" class="screen">
-    <div class="main-wrapper game-layout">
-      <button class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← MENÚ</button>
-      
-      <div class="game-container">
-        <h1 style="font-size: 1.1rem; margin-bottom: 10px;">BOMBER MAN</h1>
-        <p style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 18px 0;">NIVEL <span id="nivelBomber">1</span> | PTS: <span id="scoreBomber">0</span></p>
-        
-        <canvas id="gameCanvasBomber" width="300" height="300"></canvas>
-        
-        <button id="respawnBtnBomber" onclick="resetBomber()" style="display:none; font-family:'Press Start 2P'; font-size:0.8rem; background:#38bdf8; color:#0f172a; padding:14px 28px; border:3px solid #000; margin-top:18px; cursor:pointer; box-shadow:4px 4px 0px #000;">¡JUGAR DE NUEVO!</button>
-        
-        <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-          <div class="mobile-controls" style="margin-top:15px;">
-            <button class="ctrl-btn btn-up" ontouchstart="moverBomber(0, -1); event.preventDefault();" onclick="moverBomber(0, -1)">▲</button>
-            <button class="ctrl-btn btn-left" ontouchstart="moverBomber(-1, 0); event.preventDefault();" onclick="moverBomber(-1, 0)">◄</button>
-            <button class="ctrl-btn btn-down" ontouchstart="moverBomber(0, 1); event.preventDefault();" onclick="moverBomber(0, 1)">▼</button>
-            <button class="ctrl-btn btn-right" ontouchstart="moverBomber(1, 0); event.preventDefault();" onclick="moverBomber(1, 0)">►</button>
+    <!-- Mantener los identificadores que utiliza js/app.js -->
+    <section id="vistaCulebrita" class="screen game-screen">
+      <div class="game-page-heading"><div><div class="eyebrow">◈ MACHINE 01 / CLASSIC CHALLENGE</div><h1>🐍 CULEBRITA</h1><p>Un clásico de reflejos. Consigue puntos y no choques con tu cola.</p></div><button type="button" class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← VOLVER AL ARCADE</button></div>
+      <div class="game-layout">
+        <div class="game-main">
+          <div class="game-stats">
+            <div class="game-stat">PUNTOS <b id="scoreCulebra">0</b></div>
+            <div class="game-stat">MODO <b>CLÁSICO</b></div>
+            <div class="game-stat">ESTADO <b class="stat-live">● EN VIVO</b></div>
           </div>
-          <button onclick="ponerBomba()" style="margin-top:18px; width:100%; max-width:275px; background:#ef4444; color:white; border:3px solid #000; padding:16px; font-family:'Press Start 2P'; font-size:0.8rem; cursor:pointer; box-shadow:4px 4px 0px #000;">💣 BOMBA</button>
+          <div class="game-stage"><canvas id="gameCanvasCulebra" width="300" height="300" aria-label="Juego Culebrita"></canvas></div>
+          <button id="respawnBtnCulebra" type="button" class="restart-btn" onclick="resetCulebra()" style="display:none">↻ REINTENTAR</button>
+          <div class="controls-caption">⌨️ FLECHAS / WASD · DESLIZA CON LOS BOTONES EN MÓVIL</div>
+          <div class="mobile-controls">
+            <button type="button" class="ctrl-btn btn-up" onclick="intentarMoverC(0, -20)" aria-label="Arriba">▲</button>
+            <button type="button" class="ctrl-btn btn-left" onclick="intentarMoverC(-20, 0)" aria-label="Izquierda">◀</button>
+            <button type="button" class="ctrl-btn btn-down" onclick="intentarMoverC(0, 20)" aria-label="Abajo">▼</button>
+            <button type="button" class="ctrl-btn btn-right" onclick="intentarMoverC(20, 0)" aria-label="Derecha">▶</button>
+          </div>
         </div>
+        <aside class="game-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p>Mejores puntuaciones de Culebrita en este navegador.</p><table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table><h3>● OBJETIVO</h3><p>Recoge la fruta, crece y suma puntos. Si chocas contra una pared o contra tu cuerpo, termina la partida.</p><h3>● CONTROLES</h3><p>Muévete con las flechas o WASD. No puedes girar 180° de golpe.</p></aside>
       </div>
+    </section>
 
-      <div class="dashboard leaderboard">
-        <div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p class="sidebar-copy">LOS MEJORES PUNTAJES</p>
-        <table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table>
+    <section id="vistaTigre" class="screen game-screen">
+      <div class="game-page-heading"><div><div class="eyebrow">◈ MACHINE 02 / ENDLESS RUNNER</div><h1>🐅 TIGRE SELVA</h1><p>Velocidad, reflejos y saltos. ¿Hasta dónde puedes llegar?</p></div><button type="button" class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← VOLVER AL ARCADE</button></div>
+      <div class="game-layout">
+        <div class="game-main">
+          <div class="game-stats">
+            <div class="game-stat">PUNTOS <b id="scoreTigre">0</b></div>
+            <div class="game-stat">MODO <b>RUNNER</b></div>
+            <div class="game-stat">ESTADO <b class="stat-live">● EN VIVO</b></div>
+          </div>
+          <div class="game-stage"><canvas id="gameCanvasTigre" width="300" height="300" onclick="saltarTigre()" aria-label="Juego Tigre Selva: toca para saltar"></canvas></div>
+          <button id="respawnBtnTigre" type="button" class="restart-btn" onclick="resetTigre()" style="display:none">↻ SALTAR OTRA VEZ</button>
+          <div class="controls-caption">⌨️ ESPACIO / ↑ / W · TOCA EL ÁREA DE JUEGO PARA SALTAR</div>
+          <button type="button" class="jump-btn" onclick="saltarTigre()">▲ SALTAR</button>
+        </div>
+        <aside class="game-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p>Las carreras más largas de Tigre Selva.</p><table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table><h3>● OBJETIVO</h3><p>Corre por la selva y salta los obstáculos. Cuanto más lejos llegues, mayor será tu puntuación.</p><h3>● CONTROLES</h3><p>Presiona Espacio, flecha arriba o W. En móvil puedes tocar la pantalla o el botón SALTAR.</p></aside>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> PRESS START ▸</footer>
-  <script src="js/app.js"></script>
-<script src="js/games/culebrita.js"></script>
-<script src="js/games/tigre.js"></script>
-<script src="js/games/bomberman.js"></script>
+    <section id="vistaBomber" class="screen game-screen">
+      <div class="game-page-heading"><div><div class="eyebrow">◈ MACHINE 03 / ACTION PUZZLE</div><h1>💣 BOMBER MAN</h1><p>Explora el laberinto, despeja el camino y encuentra la salida.</p></div><button type="button" class="back-btn" onclick="cambiarPantalla('menuPrincipal')">← VOLVER AL ARCADE</button></div>
+      <div class="game-layout">
+        <div class="game-main">
+          <div class="game-stats">
+            <div class="game-stat">PUNTOS <b id="scoreBomber">0</b></div>
+            <div class="game-stat">NIVEL <b id="nivelBomber">1</b></div>
+            <div class="game-stat">MODO <b>ACCIÓN</b></div>
+          </div>
+          <div class="game-stage"><canvas id="gameCanvasBomber" width="300" height="300" aria-label="Juego Bomber Man"></canvas></div>
+          <button id="respawnBtnBomber" type="button" class="restart-btn" onclick="resetBomber()" style="display:none">↻ JUGAR DE NUEVO</button>
+          <div class="controls-caption">⌨️ FLECHAS / WASD · ESPACIO PARA PONER BOMBA</div>
+          <div class="mobile-controls">
+            <button type="button" class="ctrl-btn btn-up" onclick="moverBomber(0,-1)" aria-label="Arriba">▲</button>
+            <button type="button" class="ctrl-btn btn-left" onclick="moverBomber(-1,0)" aria-label="Izquierda">◀</button>
+            <button type="button" class="ctrl-btn btn-down" onclick="moverBomber(0,1)" aria-label="Abajo">▼</button>
+            <button type="button" class="ctrl-btn btn-right" onclick="moverBomber(1,0)" aria-label="Derecha">▶</button>
+          </div>
+          <button type="button" class="bomb-btn" onclick="ponerBomba()">💣 PONER BOMBA</button>
+        </div>
+        <aside class="game-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>TOP LOCAL</h2><p>Las mejores puntuaciones de Bomber Man.</p><table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table><h3>● OBJETIVO</h3><p>Destruye obstáculos, evita enemigos y tus propias explosiones. Encuentra la puerta para avanzar de nivel.</p><h3>● CONTROLES</h3><p>Muévete con flechas o WASD. Presiona Espacio o el botón rojo para colocar una bomba.</p></aside>
+      </div>
+    </section>
+  </main>
+  <footer class="arcade-footer"><span>© 2026 ARCADE HUB</span><span>BUILT FOR PLAYERS, BY PLAYERS. <b>INSERT COIN ▸</b></span></footer>
+  <script src="js/app.js?v=3"></script>
+  <script src="js/games/tigre.js?v=3"></script>
+  <script src="js/games/bomberman.js?v=3"></script>
 </body>
 </html>
