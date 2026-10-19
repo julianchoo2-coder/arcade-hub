@@ -35,3 +35,23 @@ Los récords globales no necesitan registro de email: usan cuentas anónimas del
 ## Desarrollo
 
 Trabajamos en ramas y revisamos cambios por Pull Request antes de incorporarlos a `main`.
+
+## 🎧 Banda sonora lo-fi
+
+Arcade Hub genera música original con **Web Audio API**, sin archivos MP3 ni dependencias de audio:
+acordes suaves, bajo, percusión relajada, pequeños delays y swing. Cada juego
+cuenta con un tempo y una progresión distinta.
+
+- **Menú:** 78 BPM, ambiente chill.
+- **Culebrita:** 90 BPM, beat ligero que evoluciona cuando comes frutas.
+- **Tigre Selva:** 105 BPM, ritmo con más movimiento al avanzar.
+- **Bomber Man:** 96 BPM, atmósfera misteriosa que crece al superar niveles.
+- **Torre Arcade:** 86 BPM, groove que acompaña la subida.
+
+La música comienza **después de la primera interacción**, porque los navegadores
+no permiten reproducir audio automáticamente al abrir una página. Los botones
+**♫ LO-FI ON/OFF** en el menú y en Torre Arcade guardan la preferencia entre
+páginas. Se detiene al cambiar de juego, silenciar y ocultar la pestaña; la
+de Torre Arcade también se detiene al pausar la partida.
+
+La música y los efectos de juego comparten un AudioContext para ahorrar recursos.
