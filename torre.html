@@ -128,11 +128,12 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function reset(){
     score=0;lives=3;barrels=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;status='playing';freshHero();
     messageEl.textContent='¡Sube las escaleras y alcanza la bandera!';sync();
-    towerMusic?.start('tower');
+    towerMusic?.start('tower'); towerMusic?.setIntensity(0);
   }
   function sync(){scoreEl.textContent=score;livesEl.textContent=lives;bestEl.textContent=best}
   function addScore(value){
     score+=value;
+    towerMusic?.setIntensity(Math.min(1,score/850 + (456-hero.y)/1700));
     if(score>best){best=score;try{localStorage.setItem('arcadeHubTorreBest',String(best))}catch{}}
     sync()
   }
@@ -169,6 +170,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       }
     }
     hero.x=Math.max(0,Math.min(W-hero.w,hero.x+hero.vx));
+    towerMusic?.setIntensity(Math.min(1,score/850 + (456-hero.y)/1700));
     for(const coin of items){
       if(!coin.taken && overlap(hero,coin)){coin.taken=true;addScore(50);messageEl.textContent='★ +50 PUNTOS · ¡SIGUE SUBIENDO!'}
     }
