@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080d20">
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
   <meta name="description" content="Arcade Hub: cuatro minijuegos retro, retos y récords locales.">
@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
   <header class="site-header">
@@ -93,12 +93,12 @@
           <div class="game-stage"><canvas id="gameCanvasCulebra" width="300" height="300" aria-label="Juego Culebrita"></canvas></div>
           <button id="respawnBtnCulebra" type="button" class="restart-btn" onclick="resetCulebra()" style="display:none">↻ REINTENTAR</button>
           <div class="controls-caption">⌨️ FLECHAS / WASD · DESLIZA CON LOS BOTONES EN MÓVIL</div>
-          <div class="mobile-controls">
+          <div class="mobile-game-dock"><div class="mobile-controls">
             <button type="button" class="ctrl-btn btn-up" onclick="intentarMoverC(0, -20)" aria-label="Arriba">▲</button>
             <button type="button" class="ctrl-btn btn-left" onclick="intentarMoverC(-20, 0)" aria-label="Izquierda">◀</button>
             <button type="button" class="ctrl-btn btn-down" onclick="intentarMoverC(0, 20)" aria-label="Abajo">▼</button>
             <button type="button" class="ctrl-btn btn-right" onclick="intentarMoverC(20, 0)" aria-label="Derecha">▶</button>
-          </div>
+          </div></div>
         </div>
         <aside class="game-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Mejores puntuaciones de Culebrita en este navegador.</p><table id="scoreTableCulebra"><tr><th>JUGADOR</th><th>PTS</th></tr></table><h3>● OBJETIVO</h3><p>Recoge la fruta, crece y suma puntos. Si chocas contra una pared o contra tu cuerpo, termina la partida.</p><h3>● CONTROLES</h3><p>Muévete con las flechas o WASD. No puedes girar 180° de golpe.</p></aside>
       </div>
@@ -116,7 +116,7 @@
           <div class="game-stage"><canvas id="gameCanvasTigre" width="300" height="300" onclick="saltarTigre()" aria-label="Juego Tigre Selva: toca para saltar"></canvas></div>
           <button id="respawnBtnTigre" type="button" class="restart-btn" onclick="resetTigre()" style="display:none">↻ SALTAR OTRA VEZ</button>
           <div class="controls-caption">⌨️ ESPACIO / ↑ / W · TOCA EL ÁREA DE JUEGO PARA SALTAR</div>
-          <button type="button" class="jump-btn" onclick="saltarTigre()">▲ SALTAR</button>
+          <div class="mobile-game-dock"><button type="button" class="jump-btn" onclick="saltarTigre()">▲ SALTAR</button></div>
         </div>
         <aside class="game-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Las carreras más largas de Tigre Selva.</p><table id="scoreTableTigre"><tr><th>JUGADOR</th><th>PTS</th></tr></table><h3>● OBJETIVO</h3><p>Corre por la selva y salta los obstáculos. Cuanto más lejos llegues, mayor será tu puntuación.</p><h3>● CONTROLES</h3><p>Presiona Espacio, flecha arriba o W. En móvil puedes tocar la pantalla o el botón SALTAR.</p></aside>
       </div>
@@ -134,13 +134,13 @@
           <div class="game-stage"><canvas id="gameCanvasBomber" width="300" height="300" aria-label="Juego Bomber Man"></canvas></div>
           <button id="respawnBtnBomber" type="button" class="restart-btn" onclick="resetBomber()" style="display:none">↻ JUGAR DE NUEVO</button>
           <div class="controls-caption">⌨️ FLECHAS / WASD · ESPACIO PARA PONER BOMBA</div>
-          <div class="mobile-controls">
+          <div class="mobile-game-dock"><div class="mobile-controls">
             <button type="button" class="ctrl-btn btn-up" onclick="moverBomber(0,-1)" aria-label="Arriba">▲</button>
             <button type="button" class="ctrl-btn btn-left" onclick="moverBomber(-1,0)" aria-label="Izquierda">◀</button>
             <button type="button" class="ctrl-btn btn-down" onclick="moverBomber(0,1)" aria-label="Abajo">▼</button>
             <button type="button" class="ctrl-btn btn-right" onclick="moverBomber(1,0)" aria-label="Derecha">▶</button>
           </div>
-          <button type="button" class="bomb-btn" onclick="ponerBomba()">💣 PONER BOMBA</button>
+          <button type="button" class="bomb-btn" onclick="ponerBomba()">💣 PONER BOMBA</button></div>
         </div>
         <aside class="game-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Las mejores puntuaciones de Bomber Man.</p><table id="scoreTableBomber"><tr><th>JUGADOR</th><th>PTS</th></tr></table><h3>● OBJETIVO</h3><p>Destruye obstáculos, evita enemigos y tus propias explosiones. Encuentra la puerta para avanzar de nivel.</p><h3>● CONTROLES</h3><p>Muévete con flechas o WASD. Presiona Espacio o el botón rojo para colocar una bomba.</p></aside>
       </div>
@@ -150,8 +150,8 @@
   <script src="js/global-ranking-config.js?v=1"></script>
   <script src="js/global-ranking.js?v=1"></script>
   <script src="js/lofi-audio.js?v=1"></script>
-  <script src="js/app.js?v=5"></script>
-  <script src="js/games/tigre.js?v=3"></script>
+  <script src="js/app.js?v=6"></script>
+  <script src="js/games/tigre.js?v=4"></script>
   <script src="js/games/bomberman.js?v=3"></script>
 </body>
 </html>

@@ -12,7 +12,7 @@
     }
 
     function saltarTigre() {
-      if (tigre.grounded && juegoTigreActivo && !gameOverT) {
+      if (tigre.grounded && juegoTigreActivo && !gameOverT && !mobileCountdownBlocking('vistaTigre')) {
         tigre.vy = tigre.jump; 
         tigre.grounded = false;
         soundTigreJump();
