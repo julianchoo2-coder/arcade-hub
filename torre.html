@@ -5,7 +5,7 @@
 <title>Torre Arcade · Arcade Hub</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 <style>
 :root{color-scheme:dark}
 body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#080d20}
@@ -78,7 +78,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 <body class="tower-page">
 <header class="site-header"><a href="index.html" class="brand-mark"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a><div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="towerSound" class="sound-btn" aria-pressed="true" title="Música lo-fi">♫ LO-FI ON</button></div></header>
 <main>
-  <div class="tower-heading"><div><div class="tower-kicker">◈ MACHINE 04 / PLATFORM CHALLENGE</div><h1>🦍 TORRE ARCADE</h1><p>Cuatro pisos de adrenalina. Recoge estrellas, esquiva barriles y alcanza la bandera.</p></div><a class="tower-back" href="index.html">← VOLVER AL ARCADE</a></div>
+  <div class="tower-heading"><div><div class="tower-kicker">◈ MACHINE 04 / PLATFORM CHALLENGE</div><h1>🦇 TORRE ARCADE</h1><p>Una torre embrujada bajo la luna roja. Sube las escaleras, esquiva los barriles y desafía al demonio.</p></div><a class="tower-back" href="index.html">← VOLVER AL ARCADE</a></div>
   <div class="tower-layout"><div class="tower-main">
     <div class="tower-stats"><div class="tower-stat">PUNTOS <b id="score">0</b></div><div class="tower-stat">VIDAS <b id="lives">3</b></div><div class="tower-stat">RÉCORD <b id="best">0</b></div></div>
     <canvas id="game" width="640" height="480" aria-label="Juego de plataformas Torre Arcade"></canvas>
@@ -107,6 +107,77 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const HERO_TILE_W=40,HERO_TILE_H=52;
   const heroSprite=new Image();
   heroSprite.src='assets/torre-hero.png?v=1';
+  // Atlas optimizado de las imágenes facilitadas para Torre Arcade.
+  // Fondo: 160x120. Jefe: 4 sprites de 54x51. Decoración: pisos/escaleras/barriles.
+  const castleArt=new Image();
+  castleArt.src='assets/torre-castillo.png?v=1';
+  function hasCastleArt(){return castleArt.complete&&castleArt.naturalWidth>=224}
+  let castleAnimTick=0;
+  function drawCastleBackground(){
+    if(hasCastleArt()){
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(castleArt,0,0,160,120,0,0,W,H);
+      ctx.fillStyle='#06091c3b';ctx.fillRect(0,0,W,H);
+    }else{
+      ctx.fillStyle='#10142e';ctx.fillRect(0,0,W,H);
+      for(let i=0;i<42;i++){
+        ctx.fillStyle=i%3?'#3d305b':'#b75469';
+        ctx.fillRect((i*149)%W,(i*91)%H,2,2);
+      }
+      ctx.fillStyle='#a6344b';ctx.beginPath();ctx.arc(510,62,40,0,Math.PI*2);ctx.fill();
+    }
+  }
+  function drawCastleFloor(f,index){
+    if(!hasCastleArt()){
+      ctx.fillStyle='#564362';ctx.fillRect(f.x,f.y,f.w,15);
+      ctx.fillStyle='#9d7892';ctx.fillRect(f.x,f.y,f.w,4);
+      return;
+    }
+    ctx.imageSmoothingEnabled=false;
+    for(let x=f.x;x<f.x+f.w;x+=72){
+      const amount=Math.min(72,f.x+f.w-x);
+      ctx.drawImage(castleArt,0,176,84*amount/72,19,x,f.y-3,amount,22);
+    }
+    // Unas marcas discretas señalan los huecos por donde bajan los barriles.
+    if(index>0){
+      const hatch=index%2===0?90:540;
+      ctx.fillStyle='#f4bb6288';ctx.fillRect(hatch-13,f.y-4,26,3);
+    }
+  }
+  function drawWoodLadder(l,index){
+    if(hasCastleArt()){
+      ctx.imageSmoothingEnabled=false;
+      const sourceX=88+(index%3)*13;
+      ctx.drawImage(castleArt,sourceX,176,13,43,l.x-3,l.top-1,26,l.bottom-l.top+11);
+      return;
+    }
+    ctx.strokeStyle='#a86a35';ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(l.x,l.top);ctx.lineTo(l.x,l.bottom);
+    ctx.moveTo(l.x+20,l.top);ctx.lineTo(l.x+20,l.bottom);ctx.stroke();
+    ctx.lineWidth=3;
+    for(let y=l.top+8;y<l.bottom;y+=13){ctx.beginPath();ctx.moveTo(l.x,y);ctx.lineTo(l.x+20,y);ctx.stroke()}
+  }
+  function drawDemonBoss(){
+    if(hasCastleArt()){
+      const frame=Math.floor(castleAnimTick/28)%4;
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(castleArt,frame*54,120,54,51,25,5,90,88);
+    }else{
+      ctx.fillStyle='#382637';ctx.fillRect(44,26,48,61);
+      ctx.fillStyle='#e9b7b0';ctx.fillRect(48,48,10,7);ctx.fillRect(71,48,10,7);
+      ctx.fillStyle='#d85a77';ctx.fillRect(34,14,13,13);ctx.fillRect(87,14,13,13);
+    }
+  }
+  function drawWoodenBarrel(b){
+    if(hasCastleArt()){
+      ctx.imageSmoothingEnabled=false;
+      const frame=Math.abs(Math.floor(b.x/12))%4;
+      ctx.drawImage(castleArt,134+frame*15,179,15,14,b.x-12,b.y-12,24,24);
+    }else{
+      ctx.fillStyle='#7a4d37';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#d1a179';ctx.lineWidth=3;ctx.stroke();
+    }
+  }
   const HERO_ANIMATIONS={
     idle:[0],
     walk:[1,2,3,4],
@@ -309,35 +380,19 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0c1531';ctx.fillRect(0,0,W,H);
-    for(let i=0;i<30;i++){ctx.fillStyle=i%2?'#253a70':'#40568e';ctx.fillRect((i*173)%W,(i*83)%H,2,2)}
-    floors.forEach((f,i)=>{
-      ctx.fillStyle=i%2?'#f97316':'#ef4444';ctx.fillRect(f.x,f.y,f.w,12);
-      ctx.fillStyle='#7c2d12';for(let x=f.x+14;x<f.x+f.w;x+=36)ctx.fillRect(x,f.y+3,14,3);
-      // Señal de las bajadas para que el recorrido del barril sea claro.
-      if(i>0){
-        const hatch=i%2===0?90:540;
-        ctx.fillStyle='#facc15';ctx.fillRect(hatch-16,f.y-3,32,4);
-        ctx.fillStyle='#fb923c';ctx.font='bold 14px monospace';ctx.textAlign='center';
-        ctx.fillText('▼',hatch,f.y+26);
-      }
-    });
-    ladders.forEach(l=>{
-      ctx.strokeStyle='#facc15';ctx.lineWidth=5;ctx.beginPath();
-      ctx.moveTo(l.x,l.top);ctx.lineTo(l.x,l.bottom);ctx.moveTo(l.x+20,l.top);ctx.lineTo(l.x+20,l.bottom);ctx.stroke();
-      ctx.lineWidth=3;for(let y=l.top+8;y<l.bottom;y+=13){ctx.beginPath();ctx.moveTo(l.x,y);ctx.lineTo(l.x+20,y);ctx.stroke()}
-    });
-    ctx.fillStyle='#22c55e';ctx.fillRect(550,45,5,46);
-    ctx.fillStyle='#facc15';ctx.beginPath();ctx.moveTo(555,45);ctx.lineTo(597,55);ctx.lineTo(555,66);ctx.fill();
-    ctx.fillStyle='#7042a4';ctx.fillRect(34,40,36,40);
-    ctx.fillStyle='#e5e7eb';ctx.fillRect(40,47,10,8);ctx.fillRect(55,47,10,8);
+    castleAnimTick++;
+    drawCastleBackground();
+    floors.forEach((f,i)=>drawCastleFloor(f,i));
+    ladders.forEach((l,i)=>drawWoodLadder(l,i));
+    // La bandera sigue visible como meta, ahora con colores del castillo.
+    ctx.fillStyle='#b48e59';ctx.fillRect(551,44,5,48);
+    ctx.fillStyle='#d24761';ctx.beginPath();
+    ctx.moveTo(556,44);ctx.lineTo(597,55);ctx.lineTo(556,67);ctx.fill();
+    drawDemonBoss();
     items.filter(c=>!c.taken).forEach(c=>{
       ctx.fillStyle='#facc15';ctx.font='bold 21px monospace';ctx.textAlign='left';ctx.fillText('★',c.x-3,c.y+14)
     });
-    barrels.forEach(b=>{
-      ctx.fillStyle='#a16207';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.stroke()
-    });
+    barrels.forEach(b=>drawWoodenBarrel(b));
     drawHero();
     if(status==='ready'){
       ctx.fillStyle='#030712cc';ctx.fillRect(95,175,450,100);
