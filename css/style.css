@@ -248,3 +248,61 @@ h1,h2,h3,p{margin-top:0}
 .ranking-global-table{width:100%;table-layout:fixed;border-collapse:collapse}
 .ranking-global-table td,.ranking-global-table th{overflow-wrap:anywhere}
 @media(max-width:540px){.ranking-tab{font-size:7px;padding:11px 2px}}
+
+/* Arcade Hub touch edition | tablero arriba, controles accesibles sin scroll */
+@media(max-width:700px){
+  .game-screen{gap:8px;padding:9px 10px 182px}
+  .game-page-heading{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;gap:8px;margin:0 0 2px
+  }
+  .game-page-heading .eyebrow,.game-page-heading p{display:none}
+  .game-page-heading h1{font-size:clamp(12px,3.9vw,17px);line-height:1.55;margin:0;text-shadow:2px 2px #61365d}
+  .game-page-heading .back-btn{
+    padding:9px 7px;font-size:7px;line-height:1.6;white-space:normal;max-width:100px
+  }
+  .game-layout{gap:10px}
+  .game-stats{margin-bottom:7px;gap:5px}
+  .game-stat{padding:7px 7px;gap:3px;font-size:7px}
+  .game-stat b{font-size:11px;line-height:1.4}
+  .game-stat .stat-live{font-size:8px}
+  .game-stage{min-height:0;padding:5px;border-width:3px;box-shadow:3px 3px 0 #020615;position:relative}
+  .game-stage canvas{width:min(100%,40svh,340px);max-height:40svh;height:auto;aspect-ratio:1;touch-action:manipulation}
+  .controls-caption{display:none}
+  .mobile-game-dock{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    display:flex;flex-direction:row;align-items:center;justify-content:center;gap:15px;
+    border-top:2px solid #46688d;
+    background:rgba(8,16,35,.96);
+    box-shadow:0 -5px 30px #0008;
+    padding:9px 14px calc(10px + env(safe-area-inset-bottom,0px));
+    touch-action:manipulation
+  }
+  .mobile-game-dock .mobile-controls{
+    margin:0;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(2,51px);gap:6px
+  }
+  .mobile-game-dock .ctrl-btn{border-radius:8px;min-height:51px;font-size:24px;box-shadow:none}
+  .mobile-game-dock .jump-btn{margin:0;min-height:68px;width:min(100%,320px);font-size:12px;border-radius:9px}
+  .mobile-game-dock .bomb-btn{
+    flex:1;margin:0;min-height:75px;max-width:140px;
+    width:auto;font-size:9px;line-height:1.8;border-radius:8px
+  }
+  .game-countdown{
+    position:absolute;inset:5px;display:grid;place-items:center;
+    z-index:3;background:#091329c9;color:#ffcf5c;text-align:center;
+    font:clamp(22px,7vw,36px)/1.5 var(--pixel);text-shadow:3px 3px #162848;
+    pointer-events:none
+  }
+  .game-countdown[hidden]{display:none}
+}
+@media(max-width:370px){
+ .mobile-game-dock .mobile-controls{grid-template-columns:repeat(3,54px);grid-template-rows:repeat(2,49px)}
+ .mobile-game-dock .ctrl-btn{min-height:49px}
+ .mobile-game-dock .bomb-btn{font-size:8px}
+}
+@media(max-width:700px) and (max-height:660px){
+ .game-stage canvas{width:min(100%,34svh,300px);max-height:34svh}
+ .mobile-game-dock .mobile-controls{grid-template-rows:repeat(2,44px)}
+ .mobile-game-dock .ctrl-btn{min-height:44px}
+ .game-screen{padding-bottom:165px}
+}
