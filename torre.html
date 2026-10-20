@@ -38,6 +38,41 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 .tower-note{color:#93a8c6;font:13px/1.8 system-ui,sans-serif}
 @media(max-width:850px){.tower-layout{grid-template-columns:1fr}.tower-side{order:2}}
 @media(max-width:480px){.tower-page main{padding:25px 12px 40px}.tower-stat{padding:12px 8px;font-size:7px}.tower-stat b{font-size:13px}.tower-controls button{font-size:10px}.tower-controls button[data-key="Space"]{font-size:7px}.tower-heading h1{font-size:19px}}
+
+/* Controles táctiles: tablero primero y cruceta siempre a mano. */
+@media(max-width:800px){
+  .tower-page main{padding:12px 12px 35px}
+  .tower-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;margin:0 0 12px}
+  .tower-heading h1{font-size:clamp(15px,4vw,20px);margin:3px 0;line-height:1.6;text-shadow:2px 2px #612b5b}
+  .tower-heading p,.tower-kicker{display:none}
+  .tower-back{padding:9px 8px;font-size:7px;max-width:111px;text-align:center;white-space:normal}
+  .tower-layout{gap:16px}
+  .tower-stats{gap:6px;margin:0 0 9px}
+  .tower-stat{padding:9px 7px;gap:4px;font-size:7px}
+  .tower-stat b{font-size:12px}
+  .tower-page canvas{width:100%;height:auto;border-width:3px;box-shadow:3px 3px #010510}
+  .tower-controls{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(78px,1.3fr);
+    grid-template-rows:repeat(2,55px);gap:7px;margin:12px 0 6px;touch-action:none
+  }
+  .tower-controls button{padding:0;font:23px/1.1 system-ui,sans-serif;min-height:55px;border-radius:9px;touch-action:none;user-select:none}
+  .tower-controls button[data-key="ArrowUp"]{grid-column:2;grid-row:1}
+  .tower-controls button[data-key="ArrowLeft"]{grid-column:1;grid-row:2}
+  .tower-controls button[data-key="ArrowDown"]{grid-column:2;grid-row:2}
+  .tower-controls button[data-key="ArrowRight"]{grid-column:3;grid-row:2}
+  .tower-controls button[data-key="Space"]{
+    grid-column:4;grid-row:1/span 2;min-height:117px;
+    background:#80562f;border-color:#ffcf5c;font:10px/1.5 'Press Start 2P',monospace
+  }
+  #message{margin:8px 0;min-height:27px;font-size:8px;line-height:1.7;text-align:center}
+  #pause,#restart{min-height:44px;margin-top:8px}
+  .tower-note{font-size:10px;line-height:1.7;margin-top:12px}
+}
+@media(max-width:390px){
+  .tower-controls{grid-template-rows:repeat(2,50px);gap:6px}
+  .tower-controls button{min-height:50px}
+  .tower-controls button[data-key="Space"]{min-height:106px;font-size:9px}
+}
 </style>
 </head>
 <body class="tower-page">
@@ -47,8 +82,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   <div class="tower-layout"><div class="tower-main">
     <div class="tower-stats"><div class="tower-stat">PUNTOS <b id="score">0</b></div><div class="tower-stat">VIDAS <b id="lives">3</b></div><div class="tower-stat">RÉCORD <b id="best">0</b></div></div>
     <canvas id="game" width="640" height="480" aria-label="Juego de plataformas Torre Arcade"></canvas>
-    <p id="message" role="status">¡Sube las escaleras y alcanza la bandera!</p>
     <div class="tower-controls" aria-label="Controles del juego"><button data-key="ArrowLeft" aria-label="Izquierda">◀</button><button data-key="ArrowDown" aria-label="Abajo">▼</button><button data-key="ArrowUp" aria-label="Arriba">▲</button><button data-key="ArrowRight" aria-label="Derecha">▶</button><button data-key="Space" aria-label="Saltar">SALTAR</button></div>
+    <p id="message" role="status">¡Sube las escaleras y alcanza la bandera!</p>
     <button id="pause">⏸ PAUSAR (P)</button>
     <button id="restart">↻ REINICIAR PARTIDA</button>
     <p class="tower-note">⌨️ ← → / A D: moverte · ↑ ↓ / W S: escaleras · ESPACIO: saltar · P: pausa</p>
@@ -94,6 +129,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const itemPositions=[{x:330,y:430},{x:190,y:339},{x:390,y:248},{x:310,y:157},{x:400,y:65}];
   let items=[];
   let hero,barrels,score,lives,best,spawnClock,status,invuln,last=0;
+  let readyFrames=0;
+  const isMobile=window.matchMedia('(max-width:800px)').matches;
   const name=(()=>{try{return(localStorage.getItem('arcadeUser')||'').trim().slice(0,12)}catch{return''}})();
   function getRecords(){
     try{
@@ -126,8 +163,9 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 
   function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false};invuln=80}
   function reset(){
-    score=0;lives=3;barrels=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;status='playing';freshHero();
-    messageEl.textContent='¡Sube las escaleras y alcanza la bandera!';sync();
+    score=0;lives=3;barrels=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;
+    readyFrames=isMobile?180:0;status=isMobile?'ready':'playing';keys.clear();freshHero();
+    messageEl.textContent=isMobile?'¡PREPÁRATE! COMIENZA EN 3...':'¡Sube las escaleras y alcanza la bandera!';sync();
     towerMusic?.start('tower'); towerMusic?.setIntensity(0);
   }
   function sync(){scoreEl.textContent=score;livesEl.textContent=lives;bestEl.textContent=best}
@@ -145,6 +183,15 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     else messageEl.textContent='¡Cuidado con los barriles!'
   }
   function update(){
+    if(status==='ready'){
+      readyFrames--;
+      if(readyFrames<=0){
+        status='playing';messageEl.textContent='¡YA! ESQUIVA LOS BARRILES';
+      }else if(readyFrames%60===0){
+        messageEl.textContent='¡PREPÁRATE! COMIENZA EN '+Math.ceil(readyFrames/60)+'...';
+      }
+      return;
+    }
     if(status!=='playing')return;
     if(invuln>0)invuln--;
     hero.vx=(keys.has('ArrowRight')||keys.has('KeyD')?speed:0)-(keys.has('ArrowLeft')||keys.has('KeyA')?speed:0);
@@ -247,7 +294,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       ctx.fillStyle='#fcd34d';ctx.fillRect(hero.x+3,hero.y+2,14,12);
       ctx.fillStyle='#1e3a8a';ctx.fillRect(hero.x+2,hero.y,16,5);
     }
-    if(status!=='playing'){
+    if(status==='ready'){
+      ctx.fillStyle='#030712cc';ctx.fillRect(95,175,450,100);
+      ctx.fillStyle='#facc15';ctx.font='bold 22px monospace';ctx.textAlign='center';
+      ctx.fillText('PREPÁRATE',320,209);
+      ctx.fillStyle='#fff';ctx.font='bold 40px monospace';
+      ctx.fillText(String(Math.max(1,Math.ceil(readyFrames/60))),320,255);
+    }else if(status!=='playing'){
       ctx.fillStyle='#030712bb';ctx.fillRect(95,180,450,90);
       ctx.fillStyle='#fff';ctx.font='bold 24px monospace';ctx.textAlign='center';
       ctx.fillText(status==='won'?'¡GANASTE!':status==='paused'?'PAUSA':'FIN DEL JUEGO',320,234)
