@@ -89,7 +89,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     <p class="tower-note">⌨️ ← → / A D: moverte · ↑ ↓ / W S: escaleras · ESPACIO: saltar · P: pausa</p>
   </div>
   <aside class="tower-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Puntuaciones locales y globales de Torre Arcade.</p><table><thead><tr><th>JUGADOR</th><th>PUNTOS</th></tr></thead><tbody id="towerRecords"><tr><td colspan="2">SIN RÉCORDS</td></tr></tbody></table>
-  <h3>● OBJETIVO</h3><p>Sube de nivel por las escaleras doradas, recoge las estrellas y evita los barriles. ¡La bandera está arriba!</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
+  <h3>● OBJETIVO</h3><p>Sube por las escaleras de madera y alcanza la bandera. Cada estrella suma 50 puntos y cada barril que saltes, 5 puntos. ¡Evita que te golpeen!</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
 </main>
 <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> INSERT COIN TO CONTINUE ▸</footer>
 <script src="js/global-ranking-config.js?v=1"></script>
@@ -113,11 +113,23 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   castleArt.src='assets/torre-castillo.png?v=1';
   function hasCastleArt(){return castleArt.complete&&castleArt.naturalWidth>=224}
   let castleAnimTick=0;
+  let stoneTile=null;
+  function getStoneTile(){
+    if(stoneTile)return stoneTile;
+    // Aclarar solo la piedra una vez; conservar los píxeles y la transparencia.
+    const tile=document.createElement('canvas');tile.width=84;tile.height=19;
+    const tileCtx=tile.getContext('2d');
+    tileCtx.drawImage(castleArt,0,176,84,19,0,0,84,19);
+    tileCtx.globalCompositeOperation='source-atop';
+    tileCtx.fillStyle='rgba(169,191,211,.45)';tileCtx.fillRect(0,0,84,19);
+    stoneTile=tile;
+    return stoneTile;
+  }
   function drawCastleBackground(){
     if(hasCastleArt()){
       ctx.imageSmoothingEnabled=false;
+      ctx.fillStyle='#10142b';ctx.fillRect(0,0,W,H);
       ctx.drawImage(castleArt,0,0,160,120,0,0,W,H);
-      ctx.fillStyle='#06091c3b';ctx.fillRect(0,0,W,H);
     }else{
       ctx.fillStyle='#10142e';ctx.fillRect(0,0,W,H);
       for(let i=0;i<42;i++){
@@ -128,20 +140,29 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     }
   }
   function drawCastleFloor(f,index){
-    if(!hasCastleArt()){
-      ctx.fillStyle='#564362';ctx.fillRect(f.x,f.y,f.w,15);
-      ctx.fillStyle='#9d7892';ctx.fillRect(f.x,f.y,f.w,4);
-      return;
+    // Silueta oscura, piedra clara y borde al nivel exacto donde apoyan los pies.
+    ctx.fillStyle='#050917';ctx.fillRect(f.x-2,f.y-1,f.w+4,22);
+    ctx.fillStyle='#4f5d70';ctx.fillRect(f.x,f.y,f.w,17);
+    if(hasCastleArt()){
+      const tile=getStoneTile();
+      ctx.imageSmoothingEnabled=false;
+      for(let x=f.x;x<f.x+f.w;x+=72){
+        const amount=Math.min(72,f.x+f.w-x);
+        ctx.drawImage(tile,0,0,84*amount/72,19,x,f.y,amount,22);
+      }
     }
-    ctx.imageSmoothingEnabled=false;
-    for(let x=f.x;x<f.x+f.w;x+=72){
-      const amount=Math.min(72,f.x+f.w-x);
-      ctx.drawImage(castleArt,0,176,84*amount/72,19,x,f.y-3,amount,22);
+    ctx.fillStyle='#26324c';ctx.fillRect(f.x,f.y+15,f.w,3);
+    ctx.fillStyle='#c8bea6';ctx.fillRect(f.x,f.y,f.w,3);
+    ctx.fillStyle='#828e9d';ctx.fillRect(f.x,f.y+3,f.w,2);
+    // Juntas de los bloques: mantienen el aspecto de un castillo viejo.
+    for(let x=f.x+24;x<f.x+f.w;x+=36){
+      ctx.fillStyle='#303c53';ctx.fillRect(x,f.y+5,2,10);
+      ctx.fillStyle='#626d7b';ctx.fillRect(x,f.y,2,3);
     }
-    // Unas marcas discretas señalan los huecos por donde bajan los barriles.
+    // Marcas doradas en las trampillas por donde bajan los barriles.
     if(index>0){
       const hatch=index%2===0?90:540;
-      ctx.fillStyle='#f4bb6288';ctx.fillRect(hatch-13,f.y-4,26,3);
+      ctx.fillStyle='#f4bb62';ctx.fillRect(hatch-13,f.y,26,3);
     }
   }
   function drawWoodLadder(l,index){
@@ -245,7 +266,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   ];
   const keys=new Set();
   const itemPositions=[{x:330,y:430},{x:190,y:339},{x:390,y:248},{x:310,y:157},{x:400,y:65}];
-  let items=[];
+  let items=[],scorePopups=[];
   let hero,barrels,score,lives,best,spawnClock,status,invuln,last=0;
   let readyFrames=0;
   const isMobile=window.matchMedia('(max-width:800px)').matches;
@@ -279,9 +300,9 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   try{best=Number(localStorage.getItem('arcadeHubTorreBest'))||0}catch{best=0}
   bestEl.textContent=best;
 
-  function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0};invuln=80}
+  function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0,jumpState:null};invuln=80}
   function reset(){
-    score=0;lives=3;barrels=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;
+    score=0;lives=3;barrels=[];scorePopups=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;
     readyFrames=isMobile?180:0;status=isMobile?'ready':'playing';keys.clear();freshHero();
     messageEl.textContent=isMobile?'¡PREPÁRATE! COMIENZA EN 3...':'¡Sube las escaleras y alcanza la bandera!';sync();
     towerMusic?.start('tower'); towerMusic?.setIntensity(0);
@@ -294,6 +315,32 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     sync()
   }
   function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+  function beginBarrelJump(){
+    const level=floors.findIndex(f=>Math.abs(hero.y+hero.h-f.y)<1&&hero.x+hero.w>f.x&&hero.x<f.x+f.w);
+    const attempts=new Map();
+    for(const b of barrels){
+      if(b.phase!=='roll'||b.level!==level)continue;
+      const side=hero.x+hero.w<=b.x-b.r?-1:hero.x>=b.x+b.r?1:0;
+      if(side)attempts.set(b,{side,above:false});
+    }
+    hero.jumpState={level,attempts};
+  }
+  function checkBarrelJump(b){
+    const jumpState=hero.jumpState,attempt=jumpState?.attempts.get(b);
+    if(!attempt)return;
+    if(hero.climbing||b.phase!=='roll'||b.level!==jumpState.level){
+      jumpState.attempts.delete(b);return;
+    }
+    const left=b.x-b.r,right=b.x+b.r;
+    if(hero.x<right&&hero.x+hero.w>left&&hero.y+hero.h<=b.y-b.r)attempt.above=true;
+    const cleared=attempt.side<0?hero.x>=right:hero.x+hero.w<=left;
+    if(attempt.above&&cleared){
+      // Eliminar el intento evita sumar cada fotograma; otro salto puede volver a puntuar.
+      jumpState.attempts.delete(b);
+      addScore(5);scorePopups.push({x:hero.x+hero.w/2,y:hero.y-10,life:45});
+      messageEl.textContent='¡BARRIL SALTADO! +5 PUNTOS';
+    }
+  }
   function takeHit(){
     if(invuln>0||status!=='playing')return;
     lives--;barrels=[];freshHero();sync();
@@ -311,6 +358,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       return;
     }
     if(status!=='playing')return;
+    scorePopups=scorePopups.filter(p=>{p.y-=.6;return --p.life>0});
     if(invuln>0)invuln--;
     hero.vx=(keys.has('ArrowRight')||keys.has('KeyD')?speed:0)-(keys.has('ArrowLeft')||keys.has('KeyA')?speed:0);
     if(hero.vx!==0)hero.facing=hero.vx>0?1:-1;
@@ -319,6 +367,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     const up=keys.has('ArrowUp')||keys.has('KeyW'),down=keys.has('ArrowDown')||keys.has('KeyS');
     if(near&&(up||down))hero.climbing=true;
     if(hero.climbing&&near){
+      hero.jumpState=null;
       hero.vy=up?-2.4:down?2.4:0;
       hero.x+=(near.x-hero.x)*.18;
       hero.y+=hero.vy;
@@ -370,8 +419,12 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
           b.y=landingY;b.level=nextLevel;b.vy=0;b.phase='roll';
         }
       }
-      if(overlap(hero,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2}))takeHit();
+      if(overlap(hero,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2})){
+        hero.jumpState?.attempts.delete(b);
+        takeHit();
+      }else checkBarrelJump(b);
     }
+    if(hero.onGround)hero.jumpState=null;
     // Solo salen del escenario después de recorrer el suelo.
     barrels=barrels.filter(b=>b.y<H+25&&b.x>-25&&b.x<W+25);
     if(hero.y<65&&hero.x>495){
@@ -394,6 +447,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     });
     barrels.forEach(b=>drawWoodenBarrel(b));
     drawHero();
+    ctx.save();ctx.textAlign='center';ctx.font='bold 18px monospace';ctx.lineWidth=4;
+    for(const p of scorePopups){
+      ctx.globalAlpha=Math.min(1,p.life/12);
+      ctx.strokeStyle='#070b19';ctx.strokeText('+5',Math.round(p.x),Math.round(p.y));
+      ctx.fillStyle='#ffe08a';ctx.fillText('+5',Math.round(p.x),Math.round(p.y));
+    }
+    ctx.restore();
     if(status==='ready'){
       ctx.fillStyle='#030712cc';ctx.fillRect(95,175,450,100);
       ctx.fillStyle='#facc15';ctx.font='bold 22px monospace';ctx.textAlign='center';
@@ -421,6 +481,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function down(key){
     if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space','KeyA','KeyD','KeyW','KeyS'].includes(key))keys.add(key);
     if(key==='Space'&&status==='playing'&&hero.onGround){
+      beginBarrelJump();
       hero.vy=jump;hero.onGround=false;hero.climbing=false;
     }
   }
