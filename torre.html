@@ -102,6 +102,53 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const scoreEl=document.getElementById('score'),livesEl=document.getElementById('lives');
   const bestEl=document.getElementById('best'),messageEl=document.getElementById('message');
   const W=640,H=480,ground=456,gravity=.52,speed=2.8,jump=-7.2;
+  // Compact 3x3 spritesheet generated from the player's supplied artwork.
+  // Visual sprite is larger than the hitbox; physics and collision stay unchanged.
+  const HERO_TILE_W=40,HERO_TILE_H=52;
+  const heroSprite=new Image();
+  heroSprite.src='assets/torre-hero.png?v=1';
+  const HERO_ANIMATIONS={
+    idle:[0],
+    walk:[1,2,3,4],
+    climb:[5,6],
+    jump:[6],
+    fall:[7],
+    hurt:[8]
+  };
+  function heroFrame(){
+    if(hero.climbing) return HERO_ANIMATIONS.climb[Math.floor(hero.animTick/10)%2];
+    if(!hero.onGround) return hero.vy<0?HERO_ANIMATIONS.jump[0]:HERO_ANIMATIONS.fall[0];
+    if(Math.abs(hero.vx)>0.2)return HERO_ANIMATIONS.walk[Math.floor(hero.animTick/8)%4];
+    return HERO_ANIMATIONS.idle[0];
+  }
+  function drawHero(){
+    // Retain the original invulnerability blink, including after taking a hit.
+    if(invuln>0&&Math.floor(invuln/6)%2!==0)return;
+    if(heroSprite.complete&&heroSprite.naturalWidth>=120){
+      const frame=heroFrame();
+      const sx=(frame%3)*HERO_TILE_W;
+      const sy=Math.floor(frame/3)*HERO_TILE_H;
+      // Anchor feet to the bottom of the original collider.
+      const width=35,height=45;
+      const left=Math.round(hero.x+hero.w/2-width/2);
+      const top=Math.round(hero.y+hero.h-height);
+      ctx.save();
+      ctx.imageSmoothingEnabled=false;
+      if(hero.facing<0){
+        ctx.translate(left+width,0);
+        ctx.scale(-1,1);
+        ctx.drawImage(heroSprite,sx,sy,HERO_TILE_W,HERO_TILE_H,0,top,width,height);
+      }else{
+        ctx.drawImage(heroSprite,sx,sy,HERO_TILE_W,HERO_TILE_H,left,top,width,height);
+      }
+      ctx.restore();
+      return;
+    }
+    // Fallback keeps gameplay visible if the asset has not loaded yet.
+    ctx.fillStyle='#38bdf8';ctx.fillRect(hero.x,hero.y+9,hero.w,hero.h-9);
+    ctx.fillStyle='#fcd34d';ctx.fillRect(hero.x+3,hero.y+2,14,12);
+    ctx.fillStyle='#1e3a8a';ctx.fillRect(hero.x+2,hero.y,16,5);
+  }
   const towerMusic=window.ArcadeMusic;
   const towerSoundBtn=document.getElementById('towerSound');
   function updateTowerSoundUI(){
@@ -161,7 +208,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   try{best=Number(localStorage.getItem('arcadeHubTorreBest'))||0}catch{best=0}
   bestEl.textContent=best;
 
-  function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false};invuln=80}
+  function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0};invuln=80}
   function reset(){
     score=0;lives=3;barrels=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;
     readyFrames=isMobile?180:0;status=isMobile?'ready':'playing';keys.clear();freshHero();
@@ -195,6 +242,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(status!=='playing')return;
     if(invuln>0)invuln--;
     hero.vx=(keys.has('ArrowRight')||keys.has('KeyD')?speed:0)-(keys.has('ArrowLeft')||keys.has('KeyA')?speed:0);
+    if(hero.vx!==0)hero.facing=hero.vx>0?1:-1;
+    hero.animTick++;
     const near=ladders.find(l=>hero.x+hero.w>l.x-8&&hero.x<l.x+28&&hero.y+hero.h>l.top-6&&hero.y<l.bottom+6);
     const up=keys.has('ArrowUp')||keys.has('KeyW'),down=keys.has('ArrowDown')||keys.has('KeyS');
     if(near&&(up||down))hero.climbing=true;
@@ -289,11 +338,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       ctx.fillStyle='#a16207';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
       ctx.strokeStyle='#facc15';ctx.lineWidth=3;ctx.stroke()
     });
-    if(invuln===0||Math.floor(invuln/6)%2===0){
-      ctx.fillStyle='#38bdf8';ctx.fillRect(hero.x,hero.y+9,hero.w,hero.h-9);
-      ctx.fillStyle='#fcd34d';ctx.fillRect(hero.x+3,hero.y+2,14,12);
-      ctx.fillStyle='#1e3a8a';ctx.fillRect(hero.x+2,hero.y,16,5);
-    }
+    drawHero();
     if(status==='ready'){
       ctx.fillStyle='#030712cc';ctx.fillRect(95,175,450,100);
       ctx.fillStyle='#facc15';ctx.font='bold 22px monospace';ctx.textAlign='center';
