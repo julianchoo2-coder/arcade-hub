@@ -204,7 +204,38 @@ let usuarioActual = "";
       cambiarPantalla('vistaLogin');
     }
 
+    // Preparación táctil: el tablero aparece antes de que se muevan enemigos.
+    let mobileCountdown={id:null,until:0,overlay:null};
+    function clearMobileCountdown(){
+      mobileCountdown.overlay?.remove();
+      mobileCountdown={id:null,until:0,overlay:null};
+    }
+    function beginMobileCountdown(id){
+      clearMobileCountdown();
+      if(!window.matchMedia('(max-width:700px)').matches)return;
+      const stage=document.getElementById(id)?.querySelector('.game-stage');
+      if(!stage)return;
+      const overlay=document.createElement('div');
+      overlay.className='game-countdown';
+      overlay.setAttribute('role','status');
+      overlay.textContent='3';
+      stage.appendChild(overlay);
+      mobileCountdown={id,until:Date.now()+2700,overlay};
+    }
+    function mobileCountdownBlocking(id){
+      if(mobileCountdown.id!==id || !mobileCountdown.overlay)return false;
+      const remaining=mobileCountdown.until-Date.now();
+      if(remaining>0){
+        const text=String(Math.ceil(remaining/900));
+        if(mobileCountdown.overlay.textContent!==text)mobileCountdown.overlay.textContent=text;
+        return true;
+      }
+      clearMobileCountdown();
+      return false;
+    }
+
     function cambiarPantalla(id) {
+      clearMobileCountdown();
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       
@@ -217,9 +248,9 @@ let usuarioActual = "";
 
       stopMusic();
       if(id === 'menuPrincipal') { startMenuMusic(); actualizarResumenMenu(); }
-      if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); iniciarCulebra(); }
-      if(id === 'vistaTigre') { ultimaMarcaT=0; cargarTablaRécordsGenerica("TigreSelva"); iniciarTigre(); }
-      if(id === 'vistaBomber') { ultimaMarcaBomber=0; cargarTablaRécordsGenerica("BomberMan"); iniciarBomber(); }
+      if(id === 'vistaCulebrita') { cargarTablaRécordsGenerica("Culebrita"); beginMobileCountdown(id); iniciarCulebra(); }
+      if(id === 'vistaTigre') { ultimaMarcaT=0; cargarTablaRécordsGenerica("TigreSelva"); beginMobileCountdown(id); iniciarTigre(); }
+      if(id === 'vistaBomber') { ultimaMarcaBomber=0; cargarTablaRécordsGenerica("BomberMan"); beginMobileCountdown(id); iniciarBomber(); }
       window.scrollTo(0, 0);
     }
 
@@ -284,6 +315,7 @@ let usuarioActual = "";
     function updateCulebra(time) {
       if (!juegoCulebraActivo || gameOverC) return;
       animIdCulebra = requestAnimationFrame(updateCulebra);
+      if(mobileCountdownBlocking('vistaCulebrita')){lastTimeC=time;acumuladorC=0;return;}
 
       if (!lastTimeC) lastTimeC = time;
       acumuladorC += (time - lastTimeC);
@@ -361,7 +393,7 @@ let usuarioActual = "";
       if (ny !== 0 && dyC === 0) { dxC = 0; dyC = ny; cambiandoDirC = true; }
       else if (nx !== 0 && dxC === 0) { dxC = nx; dyC = 0; cambiandoDirC = true; }
     }
-    function resetCulebra() { iniciarCulebra(); }
+    function resetCulebra() { beginMobileCountdown('vistaCulebrita'); iniciarCulebra(); }
 
     // --- TIGRE EN LA SELVA ---
     const canvasT = document.getElementById('gameCanvasTigre');
@@ -372,6 +404,7 @@ let usuarioActual = "";
     function updateTigre(t) {
       if (!juegoTigreActivo || gameOverT) return;
       animIdTigre = requestAnimationFrame(updateTigre);
+      if(mobileCountdownBlocking('vistaTigre')){ultimaMarcaT=t;return;}
       const dt=ultimaMarcaT?Math.min(2.2,Math.max(0,(t-ultimaMarcaT)/(1000/60))):1;
       ultimaMarcaT=t;
 
@@ -478,7 +511,7 @@ let usuarioActual = "";
       ctxT.fillStyle = '#c2410c';
       ctxT.fillRect(tigre.x + 6 + legBack, tigre.y + 20, 4, 4); ctxT.fillRect(tigre.x + 18 + legFront, tigre.y + 20, 4, 4);
     }
-    function resetTigre() { iniciarTigre(); }
+    function resetTigre() { beginMobileCountdown('vistaTigre'); iniciarTigre(); }
 
     // --- BOMBER MAN ---
     const canvasB = document.getElementById('gameCanvasBomber');
@@ -489,7 +522,7 @@ let usuarioActual = "";
     let scoreBomber = 0, nivelBomber = 1, gameOverBomber = false, tiempoRecargaBomba = 0, ultimaMarcaBomber = 0;
 
     function moverBomber(dx, dy) {
-      if (!juegoBomberActivo || gameOverBomber) return;
+      if (!juegoBomberActivo || gameOverBomber || mobileCountdownBlocking('vistaBomber')) return;
       if (dx === 1) playerB.dir = 'right';
       if (dx === -1) playerB.dir = 'left';
       if (dy === 1) playerB.dir = 'down';
@@ -508,7 +541,7 @@ let usuarioActual = "";
     }
 
     function ponerBomba() {
-      if (!juegoBomberActivo || gameOverBomber || tiempoRecargaBomba > 0) return;
+      if (!juegoBomberActivo || gameOverBomber || tiempoRecargaBomba > 0 || mobileCountdownBlocking('vistaBomber')) return;
       let existe = bombasB.some(b => b.x === playerB.x && b.y === playerB.y);
       if (!existe) {
         bombasB.push({ x: playerB.x, y: playerB.y, timer: 120, alcance: 2 });
@@ -519,6 +552,7 @@ let usuarioActual = "";
     function updateBomber(t) {
       if (!juegoBomberActivo || gameOverBomber) return;
       animIdBomber = requestAnimationFrame(updateBomber);
+      if(mobileCountdownBlocking('vistaBomber')){ultimaMarcaBomber=t;return;}
       const dt=ultimaMarcaBomber?Math.min(2.2,Math.max(0,(t-ultimaMarcaBomber)/(1000/60))):1;
       ultimaMarcaBomber=t;
 
@@ -674,7 +708,7 @@ let usuarioActual = "";
       ctxB.beginPath(); ctxB.arc(px + cellW - 8, py + cellH, 4, Math.PI, 0); ctxB.fill();
     }
 
-    function resetBomber() { iniciarBomber(false); }
+    function resetBomber() { beginMobileCountdown('vistaBomber'); iniciarBomber(false); }
 
     document.addEventListener('keydown', (e) => {
       if(e.target.closest('input,textarea,[contenteditable="true"]')) {
