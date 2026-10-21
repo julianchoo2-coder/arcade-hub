@@ -334,7 +334,41 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       jump(){beep(185,610,.16,'square',.045);beep(415,760,.09,'triangle',.026,.06)},
       hammer(){const now=globalThis.performance?.now?.()??Date.now();if(now-lastHammer<255)return;lastHammer=now;beep(220,82,.09,'square',.045);beep(510,310,.05,'triangle',.022,.04)},
       destroy(){beep(180,55,.18,'sawtooth',.06);beep(740,160,.10,'square',.032,.02)},
-      roar(){beep(170,58,.38,'sawtooth',.10);beep(118,42,.30,'square',.07,.045);beep(250,78,.18,'triangle',.052,.12)},
+      roar(){
+        if(!enabled())return;
+        const ac=context();if(!ac)return;
+        if(ac.state==='suspended')ac.resume();
+        const now=ac.currentTime,duration=1.08;
+        const master=ac.createGain();
+        master.gain.setValueAtTime(.0001,now);
+        master.gain.exponentialRampToValueAtTime(.42,now+.055);
+        master.gain.exponentialRampToValueAtTime(.18,now+.68);
+        master.gain.exponentialRampToValueAtTime(.0001,now+duration);
+        const growl=ac.createOscillator(),wobble=ac.createOscillator(),wobbleGain=ac.createGain();
+        growl.type='sawtooth';
+        growl.frequency.setValueAtTime(146,now);
+        growl.frequency.exponentialRampToValueAtTime(61,now+.58);
+        growl.frequency.exponentialRampToValueAtTime(82,now+.93);
+        wobble.type='sine';wobble.frequency.setValueAtTime(18,now);
+        wobbleGain.gain.setValueAtTime(26,now);wobbleGain.gain.exponentialRampToValueAtTime(7,now+duration);
+        wobble.connect(wobbleGain);wobbleGain.connect(growl.frequency);
+        const buffer=ac.createBuffer(1,Math.ceil(ac.sampleRate*duration),ac.sampleRate);
+        const samples=buffer.getChannelData(0);
+        for(let i=0;i<samples.length;i++){
+          const fade=1-i/samples.length;
+          samples[i]=(Math.random()*2-1)*(.45+.55*fade);
+        }
+        const breath=ac.createBufferSource(),filter=ac.createBiquadFilter(),noiseGain=ac.createGain();
+        breath.buffer=buffer;filter.type='bandpass';filter.frequency.setValueAtTime(530,now);
+        filter.frequency.exponentialRampToValueAtTime(210,now+duration);filter.Q.value=.85;
+        noiseGain.gain.setValueAtTime(.0001,now);
+        noiseGain.gain.linearRampToValueAtTime(.46,now+.09);
+        noiseGain.gain.exponentialRampToValueAtTime(.06,now+.77);
+        noiseGain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+        growl.connect(master);breath.connect(filter);filter.connect(noiseGain);noiseGain.connect(master);master.connect(ac.destination);
+        growl.start(now);wobble.start(now);breath.start(now);
+        growl.stop(now+duration);wobble.stop(now+duration);breath.stop(now+duration);
+      },
       cannon(){beep(95,34,.20,'sawtooth',.075);beep(490,115,.10,'square',.03)},
       explode(){beep(210,30,.40,'sawtooth',.085);beep(780,70,.25,'square',.04,.05)}
     };
