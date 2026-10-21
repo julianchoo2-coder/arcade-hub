@@ -334,7 +334,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       jump(){beep(185,610,.16,'square',.045);beep(415,760,.09,'triangle',.026,.06)},
       hammer(){const now=globalThis.performance?.now?.()??Date.now();if(now-lastHammer<255)return;lastHammer=now;beep(220,82,.09,'square',.045);beep(510,310,.05,'triangle',.022,.04)},
       destroy(){beep(180,55,.18,'sawtooth',.06);beep(740,160,.10,'square',.032,.02)},
-      roar(){beep(130,68,.30,'sawtooth',.055);beep(96,49,.24,'square',.035,.08)},
+      roar(){beep(170,58,.38,'sawtooth',.10);beep(118,42,.30,'square',.07,.045);beep(250,78,.18,'triangle',.052,.12)},
       cannon(){beep(95,34,.20,'sawtooth',.075);beep(490,115,.10,'square',.03)},
       explode(){beep(210,30,.40,'sawtooth',.085);beep(780,70,.25,'square',.04,.05)}
     };
