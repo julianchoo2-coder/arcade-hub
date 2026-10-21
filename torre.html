@@ -120,11 +120,15 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   demonSprites.roar.src='assets/torre-demon-roar.png?v=1';
   demonSprites.throw.src='assets/torre-demon-throw.png?v=1';
   let demonAnimTick=0,demonState='idle',demonStateTimer=0,throwQueued=false;
-  // La hoja trae cañón quieto, disparo y bala en cuadros de 64×64.
-  const cannonSheet=new Image();
-  cannonSheet.src='assets/torre-canon-spritesheet.png?v=1';
+  // Sprites del cañón, disparo y bala aportados para esta versión.
+  const cannonSprites={idle:new Image(),fire:new Image()};
+  cannonSprites.idle.src='assets/torre-cannon-idle-v2.png?v=1';
+  cannonSprites.fire.src='assets/torre-cannon-fire-v2.png?v=1';
   const cannonBallSprite=new Image();
-  cannonBallSprite.src='assets/torre-canon-ball.png?v=1';
+  cannonBallSprite.src='assets/torre-cannonball-v2.png?v=1';
+  const barrelSprites=[1,2,3,4].map(frame=>{const image=new Image();image.src=`assets/torre-barrel-roll-0${frame}.png?v=1`;return image});
+  const hammerSprite=new Image();hammerSprite.src='assets/torre-hammer.png?v=1';
+  const hammerHeroSprites=[1,2,3,4].map(frame=>{const image=new Image();image.src=`assets/torre-hero-hammer-0${frame}.png?v=1`;return image});
   const DEMON={x:256,y:-28,size:128,targetX:320,targetY:36,barrelX:354,barrelY:62};
   const CANNON={x:505,y:20,size:76,triggerX:580};
   let ending=null;
@@ -212,7 +216,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     }
   }
   function drawWoodenBarrel(b){
-    if(hasCastleArt()){
+    const sprite=barrelSprites[Math.abs(Math.floor(b.x/8))%barrelSprites.length];
+    if(sprite.complete&&sprite.naturalWidth>=32){
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(sprite,b.x-16,b.y-16,32,32);
+    }else if(hasCastleArt()){
       ctx.imageSmoothingEnabled=false;
       const frame=Math.abs(Math.floor(b.x/12))%4;
       ctx.drawImage(castleArt,134+frame*15,179,15,14,b.x-12,b.y-12,24,24);
@@ -238,6 +246,16 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function drawHero(){
     // Retain the original invulnerability blink, including after taking a hit.
     if(invuln>0&&Math.floor(invuln/6)%2!==0)return;
+    if(hero.hammerFrames>0){
+      const sprite=hammerHeroSprites[Math.floor(hero.animTick/7)%hammerHeroSprites.length];
+      if(sprite.complete&&sprite.naturalWidth>=48){
+        const width=42,height=42,left=Math.round(hero.x+hero.w/2-width/2),top=Math.round(hero.y+hero.h-height);
+        ctx.save();ctx.imageSmoothingEnabled=false;
+        if(hero.facing<0){ctx.translate(left+width,0);ctx.scale(-1,1);ctx.drawImage(sprite,0,0,48,48,0,top,width,height)}
+        else ctx.drawImage(sprite,0,0,48,48,left,top,width,height);
+        ctx.restore();return;
+      }
+    }
     if(heroSprite.complete&&heroSprite.naturalWidth>=120){
       const frame=heroFrame();
       const sx=(frame%3)*HERO_TILE_W;
@@ -282,19 +300,19 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     {name:'Murallas',wash:'rgba(10,28,55,.08)',edge:'#c8bea6',
       floors:[[18,604],[62,560],[18,560],[62,560],[18,604]],ladders:[540,90,540,90],
       stars:[[330,430],[190,339],[390,248],[310,157],[400,65]],
-      attack:{delays:[170,190,175],counts:[1,1,1],windup:30,gap:0,speed:1.55}},
+      attack:{delays:[170,190,175],counts:[1],windup:30,gap:0,speed:1.55}},
     {name:'Cripta ardiente',wash:'rgba(169,54,28,.22)',edge:'#e7a568',
       floors:[[18,604],[40,580],[18,584],[34,588],[18,604]],ladders:[500,135,505,135],
       stars:[[445,430],[235,339],[430,248],[220,157],[410,65]],
-      attack:{delays:[135,115,155],counts:[1,2,1],windup:30,gap:34,speed:1.8}},
+      attack:{delays:[150,180,135],counts:[1],windup:30,gap:0,speed:1.72}},
     {name:'Torre sombría',wash:'rgba(102,43,153,.24)',edge:'#a8b8f3',
       floors:[[18,604],[18,604],[46,553],[18,604],[18,604]],ladders:[565,74,555,74],
       stars:[[360,430],[450,339],[260,248],[400,157],[470,65]],
-      attack:{delays:[105,90,125],counts:[2,1,2,2],windup:24,gap:28,speed:2.05}}
+      attack:{delays:[125,150,110,140],counts:[1],windup:26,gap:0,speed:1.88}}
   ];
   let levelIndex=0,floors=[],ladders=[],itemPositions=[];
   const keys=new Set();
-  let items=[],scorePopups=[];
+  let items=[],hammerItems=[],scorePopups=[];
   let hero,barrels,score,lives,best,spawnClock,status,invuln,last=0;
   let readyFrames=0,intermissionFrames=0,attackIndex=0,burstRemaining=0,burstGap=0;
   const isMobile=window.matchMedia('(max-width:800px)').matches;
@@ -328,7 +346,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   try{best=Number(localStorage.getItem('arcadeHubTorreBest'))||0}catch{best=0}
   bestEl.textContent=best;
 
-  function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0,jumpState:null};invuln=80}
+  function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0,jumpState:null,hammerFrames:0};invuln=80}
   function loadLevel(index,transition=false){
     levelIndex=index;
     const stage=LEVELS[index],heights=[456,365,274,183,92];
@@ -336,6 +354,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     ladders=stage.ladders.map((x,i)=>({x,top:heights[i+1],bottom:heights[i]}));
     itemPositions=stage.stars.map(([x,y])=>({x,y}));
     items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));
+    // Martillos en las esquinas del segundo y tercer piso para abrir paso entre barriles.
+    hammerItems=[
+      {x:floors[1].x+22,y:floors[1].y-38,w:24,h:24,taken:false},
+      {x:floors[2].x+floors[2].w-46,y:floors[2].y-38,w:24,h:24,taken:false}
+    ];
     barrels=[];scorePopups=[];spawnClock=0;attackIndex=0;burstRemaining=0;burstGap=0;
     demonAnimTick=0;demonState='idle';demonStateTimer=0;throwQueued=false;ending=null;
     keys.clear();freshHero();readyFrames=transition?100:isMobile?180:0;
@@ -497,6 +520,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     for(const coin of items){
       if(!coin.taken && overlap(hero,coin)){coin.taken=true;addScore(50);messageEl.textContent='★ +50 PUNTOS · ¡SIGUE SUBIENDO!'}
     }
+    for(const hammer of hammerItems){
+      if(!hammer.taken&&overlap(hero,hammer)){
+        hammer.taken=true;hero.hammerFrames=480;hero.animTick=0;
+        messageEl.textContent='🔨 ¡MARTILLO TOMADO! DESTRUYE LOS BARRILES';
+      }
+    }
+    if(hero.hammerFrames>0)hero.hammerFrames--;
     if(hero.y>H+30)takeHit();
     updateAttack();
     for(const b of barrels){
@@ -527,21 +557,26 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
           b.y=landingY;b.level=nextLevel;b.vy=0;b.phase='roll';
         }
       }
-      if(overlap(hero,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2})){
+      const hammerReach={x:hero.facing<0?hero.x-28:hero.x+hero.w-4,y:hero.y-15,w:32,h:44};
+      if(hero.hammerFrames>0&&b.phase==='roll'&&overlap(hammerReach,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2})){
+        b.destroyed=true;addScore(15);
+        scorePopups.push({x:b.x,y:b.y-15,life:38,label:'+15',color:'#8ff7b0'});
+        messageEl.textContent='🔨 ¡BARRIL DESTRUIDO! +15 PUNTOS';
+      }else if(overlap(hero,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2})){
         hero.jumpState?.attempts.delete(b);
         takeHit();
       }else checkBarrelJump(b);
     }
     if(hero.onGround)hero.jumpState=null;
     // Solo salen del escenario después de recorrer el suelo.
-    barrels=barrels.filter(b=>b.y<H+25&&b.x>-25&&b.x<W+25);
+    barrels=barrels.filter(b=>!b.destroyed&&b.y<H+25&&b.x>-25&&b.x<W+25);
     if(hero.onGround&&Math.abs(hero.y+hero.h-floors[4].y)<1&&hero.x>=CANNON.triggerX)startEnding();
   }
   function drawCannon(){
-    if(cannonSheet.complete&&cannonSheet.naturalWidth>=192){
-      const frame=ending?.phase==='fire'?1:0;
+    const sprite=ending?.phase==='fire'?cannonSprites.fire:cannonSprites.idle;
+    if(sprite.complete&&sprite.naturalWidth>=64){
       ctx.imageSmoothingEnabled=false;
-      ctx.drawImage(cannonSheet,frame*64,0,64,64,CANNON.x,CANNON.y,CANNON.size,CANNON.size);
+      ctx.drawImage(sprite,0,0,64,48,CANNON.x,CANNON.y,CANNON.size,CANNON.size*.75);
     }else{
       ctx.fillStyle='#74472f';ctx.fillRect(523,66,50,20);
       ctx.fillStyle='#b88b57';ctx.fillRect(515,55,38,9);
@@ -553,8 +588,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   }
   function drawCannonball(){
     const p=cannonballPosition();ctx.imageSmoothingEnabled=false;
-    if(cannonBallSprite.complete&&cannonBallSprite.naturalWidth>=64){
-      ctx.drawImage(cannonBallSprite,p.x-24,p.y-24,48,48);
+    if(cannonBallSprite.complete&&cannonBallSprite.naturalWidth>=16){
+      ctx.drawImage(cannonBallSprite,p.x-12,p.y-12,24,24);
     }else{
       ctx.fillStyle='#ffe4a1';ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();
     }
@@ -594,6 +629,12 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(ending?.phase!=='explode'&&ending?.phase!=='won'&&ending?.phase!=='cleared')drawDemonBoss();
     items.filter(c=>!c.taken).forEach(c=>{
       ctx.fillStyle='#facc15';ctx.font='bold 21px monospace';ctx.textAlign='left';ctx.fillText('★',c.x-3,c.y+14)
+    });
+    hammerItems.filter(h=>!h.taken).forEach(h=>{
+      const bob=Math.round(Math.sin((castleAnimTick+h.x)/10)*2);
+      ctx.imageSmoothingEnabled=false;
+      if(hammerSprite.complete&&hammerSprite.naturalWidth>=32)ctx.drawImage(hammerSprite,h.x,h.y+bob,32,32);
+      else{ctx.fillStyle='#d6a466';ctx.fillRect(h.x+10,h.y+bob+3,6,25);ctx.fillStyle='#94a3b8';ctx.fillRect(h.x+4,h.y+bob,18,8)}
     });
     barrels.forEach(b=>drawWoodenBarrel(b));
     if(ending?.phase==='projectile')drawCannonball();
