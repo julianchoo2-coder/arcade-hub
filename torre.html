@@ -130,7 +130,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const hammerSprite=new Image();hammerSprite.src='assets/torre-hammer.png?v=1';
   const hammerHeroSprites=[1,2,3,4].map(frame=>{const image=new Image();image.src=`assets/torre-hero-hammer-0${frame}.png?v=1`;return image});
   const DEMON={x:256,y:-28,size:128,targetX:320,targetY:36,barrelX:354,barrelY:62};
-  const CANNON={x:505,y:30,size:76,triggerX:580};
+  // El cañón se apoya dinámicamente en la viga superior, incluso cuando ésta está inclinada.
+  const CANNON={x:505,size:76,triggerX:580};
   let ending=null;
   let stoneTile=null;
   function getStoneTile(){
@@ -158,31 +159,40 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       ctx.fillStyle='#a6344b';ctx.beginPath();ctx.arc(510,62,40,0,Math.PI*2);ctx.fill();
     }
   }
+  function floorYAt(f,x){return f.y+(x-f.x)*(f.slope||0)}
+  function floorAtFeet(x,y){return floors.find(f=>x>=f.x&&x<=f.x+f.w&&Math.abs(y-floorYAt(f,x))<8)}
+  function cannonY(){
+    const top=floors[floors.length-1];
+    return floorYAt(top,CANNON.x+CANNON.size*.7)-CANNON.size*.75;
+  }
   function drawCastleFloor(f,index){
-    // Silueta oscura, piedra clara y borde al nivel exacto donde apoyan los pies.
-    ctx.fillStyle='#050917';ctx.fillRect(f.x-2,f.y-1,f.w+4,22);
-    ctx.fillStyle='#4f5d70';ctx.fillRect(f.x,f.y,f.w,17);
+    // La geometría es inclinada como el primer nivel de Donkey Kong, sin alterar el arte base.
+    const rise=(f.slope||0)*f.w,angle=Math.atan2(rise,f.w),length=Math.hypot(f.w,rise);
+    ctx.save();ctx.translate(f.x,f.y);ctx.rotate(angle);ctx.scale(length/f.w,1);
+    ctx.fillStyle='#050917';ctx.fillRect(-2,-1,f.w+4,22);
+    ctx.fillStyle='#4f5d70';ctx.fillRect(0,0,f.w,17);
     if(hasCastleArt()){
       const tile=getStoneTile();
       ctx.imageSmoothingEnabled=false;
-      for(let x=f.x;x<f.x+f.w;x+=72){
-        const amount=Math.min(72,f.x+f.w-x);
-        ctx.drawImage(tile,0,0,84*amount/72,19,x,f.y,amount,22);
+      for(let x=0;x<f.w;x+=72){
+        const amount=Math.min(72,f.w-x);
+        ctx.drawImage(tile,0,0,84*amount/72,19,x,0,amount,22);
       }
     }
-    ctx.fillStyle='#26324c';ctx.fillRect(f.x,f.y+15,f.w,3);
-    ctx.fillStyle=LEVELS[levelIndex].edge;ctx.fillRect(f.x,f.y,f.w,3);
-    ctx.fillStyle='#828e9d';ctx.fillRect(f.x,f.y+3,f.w,2);
+    ctx.fillStyle='#26324c';ctx.fillRect(0,15,f.w,3);
+    ctx.fillStyle=LEVELS[levelIndex].edge;ctx.fillRect(0,0,f.w,3);
+    ctx.fillStyle='#828e9d';ctx.fillRect(0,3,f.w,2);
     // Juntas de los bloques: mantienen el aspecto de un castillo viejo.
-    for(let x=f.x+24;x<f.x+f.w;x+=36){
-      ctx.fillStyle='#303c53';ctx.fillRect(x,f.y+5,2,10);
-      ctx.fillStyle='#626d7b';ctx.fillRect(x,f.y,2,3);
+    for(let x=24;x<f.w;x+=36){
+      ctx.fillStyle='#303c53';ctx.fillRect(x,5,2,10);
+      ctx.fillStyle='#626d7b';ctx.fillRect(x,0,2,3);
     }
     // Marcas doradas en las trampillas por donde bajan los barriles.
     if(index>0){
       const hatch=ladders[index-1].x;
-      ctx.fillStyle='#f4bb62';ctx.fillRect(hatch-13,f.y,26,3);
+      ctx.fillStyle='#f4bb62';ctx.fillRect(hatch-f.x-13,0,26,3);
     }
+    ctx.restore();
   }
   function drawWoodLadder(l,index){
     if(hasCastleArt()){
@@ -296,17 +306,45 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     updateTowerSoundUI();
   });
   updateTowerSoundUI();
+  // Efectos 8-bit sintetizados: no introducen archivos ni cambian el arte del juego.
+  const towerSfx=(()=>{
+    let audio,lastRun=0,lastHammer=0;
+    function enabled(){return towerMusic?.isEnabled()??true}
+    function context(){
+      if(audio)return audio;
+      const AC=window.AudioContext||window.webkitAudioContext;
+      try{audio=AC?new AC():null}catch{audio=null}return audio;
+    }
+    function beep(from,to,duration=.08,type='square',volume=.035,delay=0){
+      if(!enabled())return;const ac=context();if(!ac||ac.state!=='running')return;
+      const at=ac.currentTime+delay,osc=ac.createOscillator(),gain=ac.createGain();
+      osc.type=type;osc.frequency.setValueAtTime(from,at);osc.frequency.exponentialRampToValueAtTime(Math.max(24,to),at+duration);
+      gain.gain.setValueAtTime(.0001,at);gain.gain.linearRampToValueAtTime(volume,at+.006);
+      gain.gain.exponentialRampToValueAtTime(.0001,at+duration);
+      osc.connect(gain);gain.connect(ac.destination);osc.start(at);osc.stop(at+duration+.02);
+    }
+    return {
+      unlock(){const ac=context();if(ac?.state==='suspended')ac.resume()},
+      run(){const now=globalThis.performance?.now?.()??Date.now();if(now-lastRun<115)return;lastRun=now;beep(155,112,.045,'square',.018)},
+      jump(){beep(185,610,.16,'square',.045);beep(415,760,.09,'triangle',.026,.06)},
+      hammer(){const now=globalThis.performance?.now?.()??Date.now();if(now-lastHammer<255)return;lastHammer=now;beep(220,82,.09,'square',.045);beep(510,310,.05,'triangle',.022,.04)},
+      destroy(){beep(180,55,.18,'sawtooth',.06);beep(740,160,.10,'square',.032,.02)},
+      roar(){beep(130,68,.30,'sawtooth',.055);beep(96,49,.24,'square',.035,.08)},
+      cannon(){beep(95,34,.20,'sawtooth',.075);beep(490,115,.10,'square',.03)},
+      explode(){beep(210,30,.40,'sawtooth',.085);beep(780,70,.25,'square',.04,.05)}
+    };
+  })();
   const LEVELS=[
     {name:'Murallas',wash:'rgba(10,28,55,.08)',edge:'#c8bea6',
-      floors:[[18,604],[62,560],[18,560],[62,560],[18,604]],ladders:[540,90,540,90],
+      floors:[[18,604,0],[62,560,-.045],[18,560,.045],[62,560,-.045],[18,604,.045]],ladders:[540,90,540,90],
       stars:[[330,430],[190,339],[390,248],[310,157],[400,65]],
       attack:{delays:[170,190,175],counts:[1],windup:30,gap:0,speed:1.55}},
     {name:'Cripta ardiente',wash:'rgba(169,54,28,.22)',edge:'#e7a568',
-      floors:[[18,604],[40,580],[18,584],[34,588],[18,604]],ladders:[500,135,505,135],
+      floors:[[18,604,0],[40,580,-.045],[18,584,.045],[34,588,-.045],[18,604,.045]],ladders:[500,135,505,135],
       stars:[[445,430],[235,339],[430,248],[220,157],[410,65]],
       attack:{delays:[150,180,135],counts:[1],windup:30,gap:0,speed:1.72}},
     {name:'Torre sombría',wash:'rgba(102,43,153,.24)',edge:'#a8b8f3',
-      floors:[[18,604],[18,604],[46,553],[18,604],[18,604]],ladders:[565,74,555,74],
+      floors:[[18,604,0],[18,604,-.045],[46,553,.045],[18,604,-.045],[18,604,.045]],ladders:[565,74,555,74],
       stars:[[360,430],[450,339],[260,248],[400,157],[470,65]],
       attack:{delays:[125,150,110,140],counts:[1],windup:26,gap:0,speed:1.88}}
   ];
@@ -350,13 +388,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function loadLevel(index,transition=false){
     levelIndex=index;
     const stage=LEVELS[index],heights=[456,365,274,183,92];
-    floors=stage.floors.map(([x,w],i)=>({x,y:heights[i],w}));
-    ladders=stage.ladders.map((x,i)=>({x,top:heights[i+1],bottom:heights[i]}));
+    floors=stage.floors.map(([x,w,slope],i)=>({x,y:heights[i],w,slope}));
+    ladders=stage.ladders.map((x,i)=>({x,top:floorYAt(floors[i+1],x),bottom:floorYAt(floors[i],x)}));
     items=[];
     // Fuera de las escaleras: el primero queda en el cuarto piso y el segundo en el tercero.
     hammerItems=[
-      {x:floors[3].x+180,y:floors[3].y-38,w:24,h:24,taken:false},
-      {x:floors[2].x+Math.round(floors[2].w*.55),y:floors[2].y-38,w:24,h:24,taken:false}
+      {x:floors[3].x+180,y:floorYAt(floors[3],floors[3].x+180)-38,w:24,h:24,taken:false},
+      {x:floors[2].x+Math.round(floors[2].w*.55),y:floorYAt(floors[2],floors[2].x+Math.round(floors[2].w*.55))-38,w:24,h:24,taken:false}
     ];
     barrels=[];scorePopups=[];spawnClock=0;attackIndex=0;burstRemaining=0;burstGap=0;
     demonAnimTick=0;demonState='idle';demonStateTimer=0;throwQueued=false;ending=null;
@@ -378,7 +416,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   }
   function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
   function beginBarrelJump(){
-    const level=floors.findIndex(f=>Math.abs(hero.y+hero.h-f.y)<1&&hero.x+hero.w>f.x&&hero.x<f.x+f.w);
+    const feetX=hero.x+hero.w/2;
+    const level=floors.findIndex(f=>Math.abs(hero.y+hero.h-floorYAt(f,feetX))<2&&feetX>f.x&&feetX<f.x+f.w);
     const attempts=new Map();
     for(const b of barrels){
       if(b.phase!=='roll'||b.level!==level)continue;
@@ -411,7 +450,10 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(lives===0){status='lost';saveRecord();towerMusic?.stop();messageEl.textContent='¡SIN VIDAS! -50 PUNTOS · REINICIA PARA JUGAR.'}
     else messageEl.textContent='¡VIDA PERDIDA! -50 PUNTOS · SIGUE EN EL NIVEL '+(levelIndex+1)
   }
-  function setDemonState(state,frames){demonState=state;demonStateTimer=frames}
+  function setDemonState(state,frames){
+    demonState=state;demonStateTimer=frames;
+    if(state==='roar')towerSfx.roar();
+  }
   function throwBarrel(){
     // El barril parte de la mano y recorre un pequeño arco hasta la plataforma superior.
     const attack=LEVELS[levelIndex].attack;
@@ -441,7 +483,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function startEnding(){
     status='ending';keys.clear();barrels=[];
     hero.x=Math.max(hero.x,CANNON.triggerX);hero.vx=0;hero.vy=0;hero.climbing=false;hero.onGround=true;
-    hero.y=floors[4].y-hero.h;hero.facing=-1;hero.animTick=0;hero.jumpState=null;
+    const top=floors[floors.length-1];
+    hero.y=floorYAt(top,hero.x+hero.w/2)-hero.h;hero.facing=-1;hero.animTick=0;hero.jumpState=null;
     ending={phase:'aim',timer:0,flight:0,explosion:0};
     messageEl.textContent='¡APUNTA AL DEMONIO!';
   }
@@ -458,12 +501,12 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(!ending)return;
     demonAnimTick++;ending.timer++;
     if(ending.phase==='aim'&&ending.timer>=28){
-      ending.phase='fire';ending.timer=0;demonState='roar';demonStateTimer=65;messageEl.textContent='¡FUEGO!';
+      ending.phase='fire';ending.timer=0;demonState='roar';demonStateTimer=65;towerSfx.cannon();messageEl.textContent='¡FUEGO!';
     }else if(ending.phase==='fire'&&ending.timer>=12){
       ending.phase='projectile';ending.timer=0;ending.flight=0;
     }else if(ending.phase==='projectile'){
       ending.flight=Math.min(1,ending.flight+1/42);
-      if(ending.flight>=1){ending.phase='explode';ending.timer=0;ending.explosion=0;demonState='idle';}
+      if(ending.flight>=1){ending.phase='explode';ending.timer=0;ending.explosion=0;demonState='idle';towerSfx.explode();}
     }else if(ending.phase==='explode'){
       ending.explosion++;
       if(ending.explosion>=54)finishEnding();
@@ -490,7 +533,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     scorePopups=scorePopups.filter(p=>{p.y-=.6;return --p.life>0});
     if(invuln>0)invuln--;
     hero.vx=(keys.has('ArrowRight')||keys.has('KeyD')?speed:0)-(keys.has('ArrowLeft')||keys.has('KeyA')?speed:0);
-    if(hero.vx!==0)hero.facing=hero.vx>0?1:-1;
+    if(hero.vx!==0){hero.facing=hero.vx>0?1:-1;if(hero.onGround)towerSfx.run()}
     hero.animTick++;
     if(hero.hammerFrames>0)hero.climbing=false;
     const near=hero.hammerFrames>0?null:ladders.find(l=>hero.x+hero.w>l.x-8&&hero.x<l.x+28&&hero.y+hero.h>l.top-6&&hero.y<l.bottom+6);
@@ -510,12 +553,18 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       hero.y+=hero.vy;
       hero.onGround=false;
       if(hero.vy>=0)for(const f of floors){
-        if(hero.x+hero.w>f.x&&hero.x<f.x+f.w&&previousBottom<=f.y+7&&hero.y+hero.h>=f.y){
-          hero.y=f.y-hero.h;hero.vy=0;hero.onGround=true;break;
+        const landingY=floorYAt(f,hero.x+hero.w/2);
+        if(hero.x+hero.w>f.x&&hero.x<f.x+f.w&&previousBottom<=landingY+7&&hero.y+hero.h>=landingY){
+          hero.y=landingY-hero.h;hero.vy=0;hero.onGround=true;break;
         }
       }
     }
     hero.x=Math.max(0,Math.min(W-hero.w,hero.x+hero.vx));
+    // Al caminar, los pies continúan pegados a la pendiente de la viga.
+    if(hero.onGround&&!hero.climbing){
+      const floor=floorAtFeet(hero.x+hero.w/2,hero.y+hero.h);
+      if(floor)hero.y=floorYAt(floor,hero.x+hero.w/2)-hero.h;
+    }
     towerMusic?.setIntensity(Math.min(1,score/850 + (456-hero.y)/1700));
     for(const hammer of hammerItems){
       if(!hammer.taken&&overlap(hero,hammer)){
@@ -523,13 +572,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
         messageEl.textContent='🔨 ¡MARTILLO TOMADO! 10 SEGUNDOS · DESTRUYE LOS BARRILES';
       }
     }
-    if(hero.hammerFrames>0)hero.hammerFrames--;
+    if(hero.hammerFrames>0){hero.hammerFrames--;towerSfx.hammer()}
     if(hero.y>H+30)takeHit();
     updateAttack();
     for(const b of barrels){
       if(b.phase==='toss'){
         b.x+=b.vx;b.y+=b.vy;b.vy=Math.min(b.vy+0.7,9);
-        const landingY=floors[b.level].y-b.r;
+        const landingY=floorYAt(floors[b.level],b.x)-b.r;
         if(b.y>=landingY){
           b.y=landingY;b.phase='roll';b.vx=0;b.vy=0;
         }
@@ -537,7 +586,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
         // El sentido alterna en cada plataforma.
         const direction=b.level%2===0?-1:1;
         b.x+=direction*(b.speed||1.75);
-        b.y=floors[b.level].y-b.r;
+        b.y=floorYAt(floors[b.level],b.x)-b.r;
         if(b.level>0){
           // Las trampillas conectan físicamente con el siguiente piso.
           const hatch=ladders[b.level-1].x;
@@ -549,14 +598,14 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
         b.vy=Math.min(b.vy+0.7,9);
         b.y+=b.vy;
         const nextLevel=b.level-1;
-        const landingY=floors[nextLevel].y-b.r;
+        const landingY=floorYAt(floors[nextLevel],b.x)-b.r;
         if(b.y>=landingY){
           b.y=landingY;b.level=nextLevel;b.vy=0;b.phase='roll';
         }
       }
       const hammerReach={x:hero.facing<0?hero.x-28:hero.x+hero.w-4,y:hero.y-15,w:32,h:44};
       if(hero.hammerFrames>0&&b.phase==='roll'&&overlap(hammerReach,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2})){
-        b.destroyed=true;addScore(15);
+        b.destroyed=true;addScore(15);towerSfx.destroy();
         scorePopups.push({x:b.x,y:b.y-15,life:38,label:'+15',color:'#8ff7b0'});
         messageEl.textContent='🔨 ¡BARRIL DESTRUIDO! +15 PUNTOS';
       }else if(overlap(hero,{x:b.x-b.r,y:b.y-b.r,w:b.r*2,h:b.r*2})){
@@ -567,13 +616,14 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(hero.onGround)hero.jumpState=null;
     // Solo salen del escenario después de recorrer el suelo.
     barrels=barrels.filter(b=>!b.destroyed&&b.y<H+25&&b.x>-25&&b.x<W+25);
-    if(hero.onGround&&Math.abs(hero.y+hero.h-floors[4].y)<1&&hero.x>=CANNON.triggerX)startEnding();
+    const top=floors[floors.length-1];
+    if(hero.onGround&&Math.abs(hero.y+hero.h-floorYAt(top,hero.x+hero.w/2))<2&&hero.x>=CANNON.triggerX)startEnding();
   }
   function drawCannon(){
     const sprite=ending?.phase==='fire'?cannonSprites.fire:cannonSprites.idle;
     if(sprite.complete&&sprite.naturalWidth>=64){
       ctx.imageSmoothingEnabled=false;
-      ctx.drawImage(sprite,0,0,64,48,CANNON.x,CANNON.y,CANNON.size,CANNON.size*.75);
+      ctx.drawImage(sprite,0,0,64,48,CANNON.x,cannonY(),CANNON.size,CANNON.size*.75);
     }else{
       ctx.fillStyle='#74472f';ctx.fillRect(523,66,50,20);
       ctx.fillStyle='#b88b57';ctx.fillRect(515,55,38,9);
@@ -581,7 +631,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   }
   function cannonballPosition(){
     const t=ending?.flight||0;
-    return{x:514+(DEMON.targetX-514)*t,y:29+(DEMON.targetY-29)*t-Math.sin(Math.PI*t)*13};
+    const launchY=cannonY()+10;
+    return{x:514+(DEMON.targetX-514)*t,y:launchY+(DEMON.targetY-launchY)*t-Math.sin(Math.PI*t)*13};
   }
   function drawCannonball(){
     const p=cannonballPosition();ctx.imageSmoothingEnabled=false;
@@ -671,10 +722,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     document.getElementById('pause').textContent=status==='paused'?'▶ CONTINUAR (P)':'⏸ PAUSAR (P)';
   }
   function down(key){
+    towerSfx.unlock();
     if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space','KeyA','KeyD','KeyW','KeyS'].includes(key))keys.add(key);
     if(key==='Space'&&status==='playing'&&hero.onGround){
       beginBarrelJump();
-      hero.vy=jump;hero.onGround=false;hero.climbing=false;
+      hero.vy=jump;hero.onGround=false;hero.climbing=false;towerSfx.jump();
     }
   }
   addEventListener('keydown',e=>{
