@@ -97,6 +97,16 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 <script src="js/global-ranking.js?v=1"></script>
 <script src="js/lofi-audio.js?v=1"></script>
 <script>
+window.addEventListener('error', event => {
+  const message = document.getElementById('message');
+  if (message) message.textContent = 'ERROR DE CARGA: ' + (event.error?.message || event.message);
+});
+window.addEventListener('unhandledrejection', event => {
+  const message = document.getElementById('message');
+  if (message) message.textContent = 'ERROR DE CARGA: ' + (event.reason?.message || event.reason || 'promesa rechazada');
+});
+</script>
+<script>
 (() => {
   'use strict';
   const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
