@@ -89,7 +89,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     <p class="tower-note">⌨️ ← → / A D: moverte · ↑ ↓ / W S: escaleras · ESPACIO: saltar · P: pausa</p>
   </div>
   <aside class="tower-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Puntuaciones locales y globales de Torre Arcade.</p><table><thead><tr><th>JUGADOR</th><th>PUNTOS</th></tr></thead><tbody id="towerRecords"><tr><td colspan="2">SIN RÉCORDS</td></tr></tbody></table>
-  <h3>● OBJETIVO</h3><p>Sube por las escaleras de madera y alcanza la bandera. Cada estrella suma 50 puntos y cada barril que saltes, 5 puntos. El demonio ruge antes de arrojar los barriles desde arriba: ¡alista el salto!</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
+  <h3>● OBJETIVO</h3><p>Sube por las escaleras, recoge estrellas y esquiva los barriles que lanza el demonio. Cada estrella suma 50 puntos y cada barril que saltes, 5. Llega al cañón del centro para apuntar y derrotarlo.</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
 </main>
 <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> INSERT COIN TO CONTINUE ▸</footer>
 <script src="js/global-ranking-config.js?v=1"></script>
@@ -119,6 +119,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   demonSprites.roar.src='assets/torre-demon-roar.png?v=1';
   demonSprites.throw.src='assets/torre-demon-throw.png?v=1';
   let demonAnimTick=0,demonState='idle',demonStateTimer=0,throwQueued=false;
+  // La hoja trae cañón quieto, disparo y bala en cuadros de 64×64.
+  const cannonSheet=new Image();
+  cannonSheet.src='assets/torre-canon-spritesheet.png?v=1';
+  const cannonBallSprite=new Image();
+  cannonBallSprite.src='assets/torre-canon-ball.png?v=1';
+  const CANNON={x:264,y:-5,size:112,triggerX:382};
+  let ending=null;
   let stoneTile=null;
   function getStoneTile(){
     if(stoneTile)return stoneTile;
@@ -316,9 +323,9 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0,jumpState:null};invuln=80}
   function reset(){
     score=0;lives=3;barrels=[];scorePopups=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;
-    demonAnimTick=0;demonState='idle';demonStateTimer=0;throwQueued=false;
+    demonAnimTick=0;demonState='idle';demonStateTimer=0;throwQueued=false;ending=null;
     readyFrames=isMobile?180:0;status=isMobile?'ready':'playing';keys.clear();freshHero();
-    messageEl.textContent=isMobile?'¡PREPÁRATE! COMIENZA EN 3...':'¡Sube las escaleras y alcanza la bandera!';sync();
+    messageEl.textContent=isMobile?'¡PREPÁRATE! COMIENZA EN 3...':'¡Sube, esquiva barriles y llega al cañón!';sync();
     towerMusic?.start('tower'); towerMusic?.setIntensity(0);
   }
   function sync(){scoreEl.textContent=score;livesEl.textContent=lives;bestEl.textContent=best}
@@ -366,6 +373,32 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     // El barril parte de la mano y recorre un pequeño arco hasta la plataforma superior.
     barrels.push({x:134,y:62,r:10,level:4,phase:'toss',vx:-2.1,vy:-3.2});
   }
+  function startEnding(){
+    status='ending';keys.clear();barrels=[];
+    hero.x=Math.max(hero.x,CANNON.triggerX);hero.vx=0;hero.vy=0;hero.climbing=false;hero.onGround=true;
+    hero.y=floors[4].y-hero.h;hero.facing=-1;hero.animTick=0;hero.jumpState=null;
+    ending={phase:'aim',timer:0,flight:0,explosion:0};
+    messageEl.textContent='¡APUNTA AL DEMONIO!';
+  }
+  function finishEnding(){
+    ending.phase='won';status='won';addScore(500);saveRecord();towerMusic?.stop();
+    messageEl.textContent='💥 ¡DEMONIO DERROTADO! +500 PUNTOS';
+  }
+  function updateEnding(){
+    if(!ending)return;
+    demonAnimTick++;ending.timer++;
+    if(ending.phase==='aim'&&ending.timer>=28){
+      ending.phase='fire';ending.timer=0;demonState='roar';demonStateTimer=65;messageEl.textContent='¡FUEGO!';
+    }else if(ending.phase==='fire'&&ending.timer>=12){
+      ending.phase='projectile';ending.timer=0;ending.flight=0;
+    }else if(ending.phase==='projectile'){
+      ending.flight=Math.min(1,ending.flight+1/42);
+      if(ending.flight>=1){ending.phase='explode';ending.timer=0;ending.explosion=0;demonState='idle';}
+    }else if(ending.phase==='explode'){
+      ending.explosion++;
+      if(ending.explosion>=54)finishEnding();
+    }
+  }
   function update(){
     if(status==='ready'){
       readyFrames--;
@@ -376,6 +409,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       }
       return;
     }
+    if(status==='ending'){updateEnding();return}
     if(status!=='playing')return;
     demonAnimTick++;
     if(demonStateTimer>0&&--demonStateTimer===0)demonState='idle';
@@ -458,9 +492,53 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(hero.onGround)hero.jumpState=null;
     // Solo salen del escenario después de recorrer el suelo.
     barrels=barrels.filter(b=>b.y<H+25&&b.x>-25&&b.x<W+25);
-    if(hero.y<65&&hero.x>495){
-      status='won';addScore(500);saveRecord();towerMusic?.stop();messageEl.textContent='🏆 ¡TORRE CONQUISTADA! +500 puntos. ¡Ganaste!'
+    if(hero.onGround&&Math.abs(hero.y+hero.h-floors[4].y)<1&&hero.x>=CANNON.triggerX)startEnding();
+  }
+  function drawCannon(){
+    if(cannonSheet.complete&&cannonSheet.naturalWidth>=192){
+      const frame=ending?.phase==='fire'?1:0;
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(cannonSheet,frame*64,0,64,64,CANNON.x,CANNON.y,CANNON.size,CANNON.size);
+    }else{
+      ctx.fillStyle='#74472f';ctx.fillRect(296,61,66,26);
+      ctx.fillStyle='#b88b57';ctx.fillRect(288,51,53,12);
     }
+  }
+  function cannonballPosition(){
+    const t=ending?.flight||0;
+    return{x:281+(76-281)*t,y:15+(35-15)*t-Math.sin(Math.PI*t)*14};
+  }
+  function drawCannonball(){
+    const p=cannonballPosition();ctx.imageSmoothingEnabled=false;
+    if(cannonBallSprite.complete&&cannonBallSprite.naturalWidth>=64){
+      ctx.drawImage(cannonBallSprite,p.x-24,p.y-24,48,48);
+    }else{
+      ctx.fillStyle='#ffe4a1';ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();
+    }
+    ctx.fillStyle='rgba(255,184,82,.65)';ctx.fillRect(Math.round(p.x+6),Math.round(p.y-2),10,4);
+  }
+  function drawDemonExplosion(){
+    if(ending?.phase!=='explode')return;
+    const t=Math.min(1,ending.explosion/54),x=76,y=37;
+    const radius=10+58*Math.sin(Math.min(1,t*1.45)*Math.PI/2);
+    const colors=['#fff2a6','#ffba55','#f05c55'];
+    ctx.save();ctx.globalAlpha=Math.max(0,1-t*.9);ctx.translate(x,y);
+    for(let layer=2;layer>=0;layer--){
+      const r=radius*(1-layer*.22),points=14;
+      ctx.fillStyle=colors[layer];ctx.beginPath();
+      for(let i=0;i<points;i++){
+        const a=-Math.PI/2+i*Math.PI*2/points;
+        const rr=r*(i%2?.57:1);const px=Math.round(Math.cos(a)*rr),py=Math.round(Math.sin(a)*rr);
+        if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+      }
+      ctx.closePath();ctx.fill();
+    }
+    // Pixeles y chispas salen disparados y se apagan al final de la explosión.
+    for(let i=0;i<12;i++){
+      const a=i*Math.PI/6,dist=radius*(.65+(i%3)*.12),size=3+(i%3);
+      ctx.fillStyle=colors[i%3];ctx.fillRect(Math.round(Math.cos(a)*dist),Math.round(Math.sin(a)*dist),size,size);
+    }
+    ctx.restore();
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
@@ -468,15 +546,14 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     drawCastleBackground();
     floors.forEach((f,i)=>drawCastleFloor(f,i));
     ladders.forEach((l,i)=>drawWoodLadder(l,i));
-    // La bandera sigue visible como meta, ahora con colores del castillo.
-    ctx.fillStyle='#b48e59';ctx.fillRect(551,44,5,48);
-    ctx.fillStyle='#d24761';ctx.beginPath();
-    ctx.moveTo(556,44);ctx.lineTo(597,55);ctx.lineTo(556,67);ctx.fill();
-    drawDemonBoss();
+    drawCannon();
+    if(ending?.phase!=='explode'&&ending?.phase!=='won')drawDemonBoss();
     items.filter(c=>!c.taken).forEach(c=>{
       ctx.fillStyle='#facc15';ctx.font='bold 21px monospace';ctx.textAlign='left';ctx.fillText('★',c.x-3,c.y+14)
     });
     barrels.forEach(b=>drawWoodenBarrel(b));
+    if(ending?.phase==='projectile')drawCannonball();
+    drawDemonExplosion();
     drawHero();
     ctx.save();ctx.textAlign='center';ctx.font='bold 18px monospace';ctx.lineWidth=4;
     for(const p of scorePopups){
@@ -491,10 +568,10 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       ctx.fillText('PREPÁRATE',320,209);
       ctx.fillStyle='#fff';ctx.font='bold 40px monospace';
       ctx.fillText(String(Math.max(1,Math.ceil(readyFrames/60))),320,255);
-    }else if(status!=='playing'){
+    }else if(status!=='playing'&&status!=='ending'){
       ctx.fillStyle='#030712bb';ctx.fillRect(95,180,450,90);
       ctx.fillStyle='#fff';ctx.font='bold 24px monospace';ctx.textAlign='center';
-      ctx.fillText(status==='won'?'¡GANASTE!':status==='paused'?'PAUSA':'FIN DEL JUEGO',320,234)
+      ctx.fillText(status==='won'?'¡DEMONIO DERROTADO!':status==='paused'?'PAUSA':'FIN DEL JUEGO',320,234)
     }
   }
   function frame(t){
