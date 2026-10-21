@@ -103,6 +103,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const scoreEl=document.getElementById('score'),livesEl=document.getElementById('lives');
   const bestEl=document.getElementById('best'),levelEl=document.getElementById('level'),messageEl=document.getElementById('message');
   const W=640,H=480,ground=456,gravity=.52,speed=2.8,jump=-7.2;
+  // Tablero más compacto: deja aire alrededor de cada escalera.
+  const BEAM_DEPTH=17,LADDER_WIDTH=20,LADDER_MARGIN=7;
   // Compact 3x3 spritesheet generated from the player's supplied artwork.
   // Visual sprite is larger than the hitbox; physics and collision stay unchanged.
   const HERO_TILE_W=40,HERO_TILE_H=52;
@@ -169,17 +171,17 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     // La geometría es inclinada como el primer nivel de Donkey Kong, sin alterar el arte base.
     const rise=(f.slope||0)*f.w,angle=Math.atan2(rise,f.w),length=Math.hypot(f.w,rise);
     ctx.save();ctx.translate(f.x,f.y);ctx.rotate(angle);ctx.scale(length/f.w,1);
-    ctx.fillStyle='#050917';ctx.fillRect(-2,-1,f.w+4,22);
-    ctx.fillStyle='#4f5d70';ctx.fillRect(0,0,f.w,17);
+    ctx.fillStyle='#050917';ctx.fillRect(-2,-1,f.w+4,BEAM_DEPTH+2);
+    ctx.fillStyle='#4f5d70';ctx.fillRect(0,0,f.w,BEAM_DEPTH-2);
     if(hasCastleArt()){
       const tile=getStoneTile();
       ctx.imageSmoothingEnabled=false;
       for(let x=0;x<f.w;x+=72){
         const amount=Math.min(72,f.w-x);
-        ctx.drawImage(tile,0,0,84*amount/72,19,x,0,amount,22);
+        ctx.drawImage(tile,0,0,84*amount/72,19,x,0,amount,BEAM_DEPTH);
       }
     }
-    ctx.fillStyle='#26324c';ctx.fillRect(0,15,f.w,3);
+    ctx.fillStyle='#26324c';ctx.fillRect(0,BEAM_DEPTH-4,f.w,3);
     ctx.fillStyle=LEVELS[levelIndex].edge;ctx.fillRect(0,0,f.w,3);
     ctx.fillStyle='#828e9d';ctx.fillRect(0,3,f.w,2);
     // Juntas de los bloques: mantienen el aspecto de un castillo viejo.
@@ -198,14 +200,14 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(hasCastleArt()){
       ctx.imageSmoothingEnabled=false;
       const sourceX=88+(index%3)*13;
-      ctx.drawImage(castleArt,sourceX,176,13,43,l.x-3,l.top-1,26,l.bottom-l.top+11);
+      ctx.drawImage(castleArt,sourceX,176,13,43,l.x-2,l.top+LADDER_MARGIN,LADDER_WIDTH,l.bottom-l.top-LADDER_MARGIN*2);
       return;
     }
     ctx.strokeStyle='#a86a35';ctx.lineWidth=4;
-    ctx.beginPath();ctx.moveTo(l.x,l.top);ctx.lineTo(l.x,l.bottom);
-    ctx.moveTo(l.x+20,l.top);ctx.lineTo(l.x+20,l.bottom);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(l.x,l.top+LADDER_MARGIN);ctx.lineTo(l.x,l.bottom-LADDER_MARGIN);
+    ctx.moveTo(l.x+LADDER_WIDTH,l.top+LADDER_MARGIN);ctx.lineTo(l.x+LADDER_WIDTH,l.bottom-LADDER_MARGIN);ctx.stroke();
     ctx.lineWidth=3;
-    for(let y=l.top+8;y<l.bottom;y+=13){ctx.beginPath();ctx.moveTo(l.x,y);ctx.lineTo(l.x+20,y);ctx.stroke()}
+    for(let y=l.top+LADDER_MARGIN+8;y<l.bottom-LADDER_MARGIN;y+=13){ctx.beginPath();ctx.moveTo(l.x,y);ctx.lineTo(l.x+LADDER_WIDTH,y);ctx.stroke()}
   }
   function drawDemonBoss(){
     const sprite=demonSprites[demonState];
@@ -316,10 +318,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       try{audio=AC?new AC():null}catch{audio=null}return audio;
     }
     function beep(from,to,duration=.08,type='square',volume=.035,delay=0){
-      if(!enabled())return;const ac=context();if(!ac||ac.state!=='running')return;
+      if(!enabled())return;const ac=context();if(!ac)return;
+      // Programar también justo después del primer toque: el contexto se reanuda en paralelo.
+      if(ac.state==='suspended')ac.resume();
       const at=ac.currentTime+delay,osc=ac.createOscillator(),gain=ac.createGain();
       osc.type=type;osc.frequency.setValueAtTime(from,at);osc.frequency.exponentialRampToValueAtTime(Math.max(24,to),at+duration);
-      gain.gain.setValueAtTime(.0001,at);gain.gain.linearRampToValueAtTime(volume,at+.006);
+      const loudness=Math.min(.24,volume*2.35);
+      gain.gain.setValueAtTime(.0001,at);gain.gain.linearRampToValueAtTime(loudness,at+.006);
       gain.gain.exponentialRampToValueAtTime(.0001,at+duration);
       osc.connect(gain);gain.connect(ac.destination);osc.start(at);osc.stop(at+duration+.02);
     }
@@ -336,15 +341,15 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   })();
   const LEVELS=[
     {name:'Murallas',wash:'rgba(10,28,55,.08)',edge:'#c8bea6',
-      floors:[[18,604,0],[62,560,-.045],[18,560,.045],[62,560,-.045],[18,604,.045]],ladders:[540,90,540,90],
+      floors:[[18,604,0],[62,560,-.045],[18,560,.045],[62,560,-.045],[18,604,.045]],ladders:[500,140,500,140],
       stars:[[330,430],[190,339],[390,248],[310,157],[400,65]],
       attack:{delays:[170,190,175],counts:[1],windup:30,gap:0,speed:1.55}},
     {name:'Cripta ardiente',wash:'rgba(169,54,28,.22)',edge:'#e7a568',
-      floors:[[18,604,0],[40,580,-.045],[18,584,.045],[34,588,-.045],[18,604,.045]],ladders:[500,135,505,135],
+      floors:[[18,604,0],[40,580,-.045],[18,584,.045],[34,588,-.045],[18,604,.045]],ladders:[470,165,470,165],
       stars:[[445,430],[235,339],[430,248],[220,157],[410,65]],
       attack:{delays:[150,180,135],counts:[1],windup:30,gap:0,speed:1.72}},
     {name:'Torre sombría',wash:'rgba(102,43,153,.24)',edge:'#a8b8f3',
-      floors:[[18,604,0],[18,604,-.045],[46,553,.045],[18,604,-.045],[18,604,.045]],ladders:[565,74,555,74],
+      floors:[[18,604,0],[18,604,-.045],[46,553,.045],[18,604,-.045],[18,604,.045]],ladders:[510,120,510,120],
       stars:[[360,430],[450,339],[260,248],[400,157],[470,65]],
       attack:{delays:[125,150,110,140],counts:[1],windup:26,gap:0,speed:1.88}}
   ];
@@ -536,7 +541,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(hero.vx!==0){hero.facing=hero.vx>0?1:-1;if(hero.onGround)towerSfx.run()}
     hero.animTick++;
     if(hero.hammerFrames>0)hero.climbing=false;
-    const near=hero.hammerFrames>0?null:ladders.find(l=>hero.x+hero.w>l.x-8&&hero.x<l.x+28&&hero.y+hero.h>l.top-6&&hero.y<l.bottom+6);
+    const near=hero.hammerFrames>0?null:ladders.find(l=>hero.x+hero.w>l.x-5&&hero.x<l.x+LADDER_WIDTH+5&&hero.y+hero.h>l.top+LADDER_MARGIN&&hero.y<l.bottom-LADDER_MARGIN);
     const up=keys.has('ArrowUp')||keys.has('KeyW'),down=keys.has('ArrowDown')||keys.has('KeyS');
     if(near&&(up||down))hero.climbing=true;
     if(hero.climbing&&near){
