@@ -16,10 +16,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 .tower-heading p{font:15px/1.65 system-ui,sans-serif;color:#aebedb;max-width:500px}
 .tower-back{text-decoration:none;display:inline-flex;background:#152443;color:#59e7fa;border:2px solid #3f6585;padding:12px 14px;font:9px/1.7 'Press Start 2P',monospace}
 .tower-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:25px}
-.tower-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:17px}
+.tower-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:17px}
 .tower-stat{display:flex;flex-direction:column;gap:10px;background:#15213b;border:1px solid #405377;padding:16px 12px;font:9px/1.6 'Press Start 2P',monospace;color:#97aecd}
 .tower-stat b{font:clamp(15px,2vw,24px)/1.4 'Press Start 2P',monospace;color:#f8fafc}
 .tower-stat:nth-child(1){border-top:3px solid #59e7fa}.tower-stat:nth-child(2){border-top:3px solid #ff64b8}.tower-stat:nth-child(3){border-top:3px solid #ffcf5c}
+.tower-stat:nth-child(4){border-top:3px solid #b394ff}
 .tower-page canvas{width:100%;max-width:100%;height:auto;aspect-ratio:4/3;border:5px solid #415e8e;background:#0b1631;image-rendering:pixelated;box-shadow:9px 9px 0 #010510;display:block}
 .tower-controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:16px 0;touch-action:none}
 .tower-controls button,#restart,#pause{min-width:0;background:#193153;color:#eff6ff;border:2px solid #5573a0;padding:13px 5px;font:12px/1.4 'Press Start 2P',monospace;cursor:pointer;touch-action:none}
@@ -80,16 +81,16 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
 <main>
   <div class="tower-heading"><div><div class="tower-kicker">◈ MACHINE 04 / PLATFORM CHALLENGE</div><h1>🦇 TORRE ARCADE</h1><p>Una torre embrujada bajo la luna roja. Sube las escaleras, esquiva los barriles y desafía al demonio.</p></div><a class="tower-back" href="index.html">← VOLVER AL ARCADE</a></div>
   <div class="tower-layout"><div class="tower-main">
-    <div class="tower-stats"><div class="tower-stat">PUNTOS <b id="score">0</b></div><div class="tower-stat">VIDAS <b id="lives">3</b></div><div class="tower-stat">RÉCORD <b id="best">0</b></div></div>
+    <div class="tower-stats"><div class="tower-stat">PUNTOS <b id="score">0</b></div><div class="tower-stat">VIDAS <b id="lives">3</b></div><div class="tower-stat">RÉCORD <b id="best">0</b></div><div class="tower-stat">NIVEL <b id="level">1/3</b></div></div>
     <canvas id="game" width="640" height="480" aria-label="Juego de plataformas Torre Arcade"></canvas>
     <div class="tower-controls" aria-label="Controles del juego"><button data-key="ArrowLeft" aria-label="Izquierda">◀</button><button data-key="ArrowDown" aria-label="Abajo">▼</button><button data-key="ArrowUp" aria-label="Arriba">▲</button><button data-key="ArrowRight" aria-label="Derecha">▶</button><button data-key="Space" aria-label="Saltar">SALTAR</button></div>
-    <p id="message" role="status">¡Sube las escaleras y alcanza la bandera!</p>
+    <p id="message" role="status">¡Sube las escaleras y alcanza el cañón!</p>
     <button id="pause">⏸ PAUSAR (P)</button>
     <button id="restart">↻ REINICIAR PARTIDA</button>
     <p class="tower-note">⌨️ ← → / A D: moverte · ↑ ↓ / W S: escaleras · ESPACIO: saltar · P: pausa</p>
   </div>
   <aside class="tower-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Puntuaciones locales y globales de Torre Arcade.</p><table><thead><tr><th>JUGADOR</th><th>PUNTOS</th></tr></thead><tbody id="towerRecords"><tr><td colspan="2">SIN RÉCORDS</td></tr></tbody></table>
-  <h3>● OBJETIVO</h3><p>Sube por las escaleras, recoge estrellas y esquiva los barriles que lanza el demonio. Cada estrella suma 50 puntos y cada barril que saltes, 5. Llega al cañón de la esquina derecha para apuntar y derrotarlo.</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
+  <h3>● OBJETIVO</h3><p>Supera 3 niveles con rutas y patrones de barriles diferentes. Cada estrella suma 50 puntos, cada barril que saltes suma 5 y perder una vida resta 50. Llega al cañón de la derecha para derrotar al demonio y pasar al siguiente nivel.</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
 </main>
 <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> INSERT COIN TO CONTINUE ▸</footer>
 <script src="js/global-ranking-config.js?v=1"></script>
@@ -100,7 +101,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   'use strict';
   const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
   const scoreEl=document.getElementById('score'),livesEl=document.getElementById('lives');
-  const bestEl=document.getElementById('best'),messageEl=document.getElementById('message');
+  const bestEl=document.getElementById('best'),levelEl=document.getElementById('level'),messageEl=document.getElementById('message');
   const W=640,H=480,ground=456,gravity=.52,speed=2.8,jump=-7.2;
   // Compact 3x3 spritesheet generated from the player's supplied artwork.
   // Visual sprite is larger than the hitbox; physics and collision stay unchanged.
@@ -125,7 +126,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const cannonBallSprite=new Image();
   cannonBallSprite.src='assets/torre-canon-ball.png?v=1';
   const DEMON={x:256,y:-28,size:128,targetX:320,targetY:36,barrelX:354,barrelY:62};
-  const CANNON={x:480,y:-5,size:112,triggerX:595};
+  const CANNON={x:505,y:20,size:76,triggerX:580};
   let ending=null;
   let stoneTile=null;
   function getStoneTile(){
@@ -166,7 +167,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       }
     }
     ctx.fillStyle='#26324c';ctx.fillRect(f.x,f.y+15,f.w,3);
-    ctx.fillStyle='#c8bea6';ctx.fillRect(f.x,f.y,f.w,3);
+    ctx.fillStyle=LEVELS[levelIndex].edge;ctx.fillRect(f.x,f.y,f.w,3);
     ctx.fillStyle='#828e9d';ctx.fillRect(f.x,f.y+3,f.w,2);
     // Juntas de los bloques: mantienen el aspecto de un castillo viejo.
     for(let x=f.x+24;x<f.x+f.w;x+=36){
@@ -175,7 +176,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     }
     // Marcas doradas en las trampillas por donde bajan los barriles.
     if(index>0){
-      const hatch=index%2===0?90:540;
+      const hatch=ladders[index-1].x;
       ctx.fillStyle='#f4bb62';ctx.fillRect(hatch-13,f.y,26,3);
     }
   }
@@ -277,19 +278,25 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     updateTowerSoundUI();
   });
   updateTowerSoundUI();
-  const floors=[
-    {x:18,y:456,w:604},{x:62,y:365,w:560},{x:18,y:274,w:560},
-    {x:62,y:183,w:560},{x:18,y:92,w:604}
+  const LEVELS=[
+    {name:'Murallas',wash:'rgba(10,28,55,.08)',edge:'#c8bea6',
+      floors:[[18,604],[62,560],[18,560],[62,560],[18,604]],ladders:[540,90,540,90],
+      stars:[[330,430],[190,339],[390,248],[310,157],[400,65]],
+      attack:{delays:[170,190,175],counts:[1,1,1],windup:30,gap:0,speed:1.55}},
+    {name:'Cripta ardiente',wash:'rgba(169,54,28,.22)',edge:'#e7a568',
+      floors:[[18,604],[40,580],[18,584],[34,588],[18,604]],ladders:[500,135,505,135],
+      stars:[[445,430],[235,339],[430,248],[220,157],[410,65]],
+      attack:{delays:[135,115,155],counts:[1,2,1],windup:30,gap:34,speed:1.8}},
+    {name:'Torre sombría',wash:'rgba(102,43,153,.24)',edge:'#a8b8f3',
+      floors:[[18,604],[18,604],[46,553],[18,604],[18,604]],ladders:[565,74,555,74],
+      stars:[[360,430],[450,339],[260,248],[400,157],[470,65]],
+      attack:{delays:[105,90,125],counts:[2,1,2,2],windup:24,gap:28,speed:2.05}}
   ];
-  const ladders=[
-    {x:540,top:365,bottom:456},{x:90,top:274,bottom:365},
-    {x:540,top:183,bottom:274},{x:90,top:92,bottom:183}
-  ];
+  let levelIndex=0,floors=[],ladders=[],itemPositions=[];
   const keys=new Set();
-  const itemPositions=[{x:330,y:430},{x:190,y:339},{x:390,y:248},{x:310,y:157},{x:400,y:65}];
   let items=[],scorePopups=[];
   let hero,barrels,score,lives,best,spawnClock,status,invuln,last=0;
-  let readyFrames=0;
+  let readyFrames=0,intermissionFrames=0,attackIndex=0,burstRemaining=0,burstGap=0;
   const isMobile=window.matchMedia('(max-width:800px)').matches;
   const name=(()=>{try{return(localStorage.getItem('arcadeUser')||'').trim().slice(0,12)}catch{return''}})();
   function getRecords(){
@@ -322,16 +329,27 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   bestEl.textContent=best;
 
   function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0,jumpState:null};invuln=80}
-  function reset(){
-    score=0;lives=3;barrels=[];scorePopups=[];items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));spawnClock=0;
+  function loadLevel(index,transition=false){
+    levelIndex=index;
+    const stage=LEVELS[index],heights=[456,365,274,183,92];
+    floors=stage.floors.map(([x,w],i)=>({x,y:heights[i],w}));
+    ladders=stage.ladders.map((x,i)=>({x,top:heights[i+1],bottom:heights[i]}));
+    itemPositions=stage.stars.map(([x,y])=>({x,y}));
+    items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));
+    barrels=[];scorePopups=[];spawnClock=0;attackIndex=0;burstRemaining=0;burstGap=0;
     demonAnimTick=0;demonState='idle';demonStateTimer=0;throwQueued=false;ending=null;
-    readyFrames=isMobile?180:0;status=isMobile?'ready':'playing';keys.clear();freshHero();
-    messageEl.textContent=isMobile?'¡PREPÁRATE! COMIENZA EN 3...':'¡Sube, esquiva barriles y llega al cañón!';sync();
+    keys.clear();freshHero();readyFrames=transition?100:isMobile?180:0;
+    status=readyFrames?'ready':'playing';
+    levelEl.textContent=`${index+1}/${LEVELS.length}`;
+    messageEl.textContent=`NIVEL ${index+1}: ${stage.name.toUpperCase()} · ¡LLEGA AL CAÑÓN!`;
+  }
+  function reset(){
+    score=0;lives=3;intermissionFrames=0;loadLevel(0);sync();
     towerMusic?.start('tower'); towerMusic?.setIntensity(0);
   }
   function sync(){scoreEl.textContent=score;livesEl.textContent=lives;bestEl.textContent=best}
   function addScore(value){
-    score+=value;
+    score=Math.max(0,score+value);
     towerMusic?.setIntensity(Math.min(1,score/850 + (456-hero.y)/1700));
     if(score>best){best=score;try{localStorage.setItem('arcadeHubTorreBest',String(best))}catch{}}
     sync()
@@ -359,20 +377,44 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(attempt.above&&cleared){
       // Eliminar el intento evita sumar cada fotograma; otro salto puede volver a puntuar.
       jumpState.attempts.delete(b);
-      addScore(5);scorePopups.push({x:hero.x+hero.w/2,y:hero.y-10,life:45});
+      addScore(5);scorePopups.push({x:hero.x+hero.w/2,y:hero.y-10,life:45,label:'+5',color:'#ffe08a'});
       messageEl.textContent='¡BARRIL SALTADO! +5 PUNTOS';
     }
   }
   function takeHit(){
     if(invuln>0||status!=='playing')return;
-    lives--;barrels=[];freshHero();sync();
-    if(lives===0){status='lost';saveRecord();towerMusic?.stop();messageEl.textContent='¡Sin vidas! Reinicia para volver a jugar.'}
-    else messageEl.textContent='¡Cuidado con los barriles!'
+    lives--;barrels=[];freshHero();addScore(-50);
+    scorePopups.push({x:hero.x+hero.w/2,y:hero.y-12,life:50,label:'-50',color:'#ff748c'});
+    sync();
+    if(lives===0){status='lost';saveRecord();towerMusic?.stop();messageEl.textContent='¡SIN VIDAS! -50 PUNTOS · REINICIA PARA JUGAR.'}
+    else messageEl.textContent='¡VIDA PERDIDA! -50 PUNTOS · SIGUE EN EL NIVEL '+(levelIndex+1)
   }
   function setDemonState(state,frames){demonState=state;demonStateTimer=frames}
   function throwBarrel(){
     // El barril parte de la mano y recorre un pequeño arco hasta la plataforma superior.
-    barrels.push({x:DEMON.barrelX,y:DEMON.barrelY,r:10,level:4,phase:'toss',vx:-2.1,vy:-3.2});
+    const attack=LEVELS[levelIndex].attack;
+    barrels.push({x:DEMON.barrelX,y:DEMON.barrelY,r:10,level:4,phase:'toss',vx:-2.1,vy:-3.2,speed:attack.speed});
+  }
+  function updateAttack(){
+    const attack=LEVELS[levelIndex].attack;
+    if(burstRemaining>0){
+      if(--burstGap<=0){
+        setDemonState('throw',18);throwBarrel();burstRemaining--;
+        burstGap=attack.gap;
+      }
+      return;
+    }
+    if(throwQueued){
+      if(demonState==='idle'){
+        setDemonState('throw',22);throwBarrel();
+        burstRemaining=attack.counts[attackIndex%attack.counts.length]-1;
+        burstGap=attack.gap;attackIndex++;spawnClock=0;throwQueued=false;
+      }
+      return;
+    }
+    if(++spawnClock>=attack.delays[attackIndex%attack.delays.length]){
+      setDemonState('roar',attack.windup);throwQueued=true;
+    }
   }
   function startEnding(){
     status='ending';keys.clear();barrels=[];
@@ -382,8 +424,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     messageEl.textContent='¡APUNTA AL DEMONIO!';
   }
   function finishEnding(){
-    ending.phase='won';status='won';addScore(500);saveRecord();towerMusic?.stop();
-    messageEl.textContent='💥 ¡DEMONIO DERROTADO! +500 PUNTOS';
+    if(levelIndex<LEVELS.length-1){
+      ending.phase='cleared';status='intermission';intermissionFrames=90;addScore(200);
+      messageEl.textContent=`💥 ¡NIVEL ${levelIndex+1} SUPERADO! +200 · PREPÁRATE PARA EL SIGUIENTE`;
+    }else{
+      ending.phase='won';status='won';addScore(500);saveRecord();towerMusic?.stop();
+      messageEl.textContent='💥 ¡3 NIVELES SUPERADOS! +500 PUNTOS · ¡GANASTE!';
+    }
   }
   function updateEnding(){
     if(!ending)return;
@@ -401,12 +448,16 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     }
   }
   function update(){
+    if(status==='intermission'){
+      if(--intermissionFrames<=0)loadLevel(levelIndex+1,true);
+      return;
+    }
     if(status==='ready'){
       readyFrames--;
       if(readyFrames<=0){
-        status='playing';messageEl.textContent='¡YA! ESQUIVA LOS BARRILES';
+        status='playing';messageEl.textContent=`¡NIVEL ${levelIndex+1}! ${LEVELS[levelIndex].name.toUpperCase()} · ESQUIVA LOS BARRILES`;
       }else if(readyFrames%60===0){
-        messageEl.textContent='¡PREPÁRATE! COMIENZA EN '+Math.ceil(readyFrames/60)+'...';
+        messageEl.textContent=`NIVEL ${levelIndex+1} · COMIENZA EN ${Math.ceil(readyFrames/60)}...`;
       }
       return;
     }
@@ -447,16 +498,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       if(!coin.taken && overlap(hero,coin)){coin.taken=true;addScore(50);messageEl.textContent='★ +50 PUNTOS · ¡SIGUE SUBIENDO!'}
     }
     if(hero.y>H+30)takeHit();
-    spawnClock++;
-    if(spawnClock>=115&&!throwQueued){
-      setDemonState('roar',30);throwQueued=true;
-    }
-    if(throwQueued&&demonState==='idle'){
-      setDemonState('throw',22);
-      throwQueued=false;
-      throwBarrel();
-      spawnClock=0;
-    }
+    updateAttack();
     for(const b of barrels){
       if(b.phase==='toss'){
         b.x+=b.vx;b.y+=b.vy;b.vy=Math.min(b.vy+0.7,9);
@@ -467,11 +509,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       }else if(b.phase==='roll'){
         // El sentido alterna en cada plataforma.
         const direction=b.level%2===0?-1:1;
-        b.x+=direction*1.75;
+        b.x+=direction*(b.speed||1.75);
         b.y=floors[b.level].y-b.r;
         if(b.level>0){
           // Las trampillas conectan físicamente con el siguiente piso.
-          const hatch=direction<0?90:540;
+          const hatch=ladders[b.level-1].x;
           if((direction<0&&b.x<=hatch)||(direction>0&&b.x>=hatch)){
             b.x=hatch;b.phase='fall';b.vy=0;
           }
@@ -501,13 +543,13 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       ctx.imageSmoothingEnabled=false;
       ctx.drawImage(cannonSheet,frame*64,0,64,64,CANNON.x,CANNON.y,CANNON.size,CANNON.size);
     }else{
-      ctx.fillStyle='#74472f';ctx.fillRect(296,61,66,26);
-      ctx.fillStyle='#b88b57';ctx.fillRect(288,51,53,12);
+      ctx.fillStyle='#74472f';ctx.fillRect(523,66,50,20);
+      ctx.fillStyle='#b88b57';ctx.fillRect(515,55,38,9);
     }
   }
   function cannonballPosition(){
     const t=ending?.flight||0;
-    return{x:490+(DEMON.targetX-490)*t,y:15+(DEMON.targetY-15)*t-Math.sin(Math.PI*t)*14};
+    return{x:514+(DEMON.targetX-514)*t,y:29+(DEMON.targetY-29)*t-Math.sin(Math.PI*t)*13};
   }
   function drawCannonball(){
     const p=cannonballPosition();ctx.imageSmoothingEnabled=false;
@@ -545,10 +587,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     ctx.clearRect(0,0,W,H);
     castleAnimTick++;
     drawCastleBackground();
+    ctx.fillStyle=LEVELS[levelIndex].wash;ctx.fillRect(0,0,W,H);
     floors.forEach((f,i)=>drawCastleFloor(f,i));
     ladders.forEach((l,i)=>drawWoodLadder(l,i));
     drawCannon();
-    if(ending?.phase!=='explode'&&ending?.phase!=='won')drawDemonBoss();
+    if(ending?.phase!=='explode'&&ending?.phase!=='won'&&ending?.phase!=='cleared')drawDemonBoss();
     items.filter(c=>!c.taken).forEach(c=>{
       ctx.fillStyle='#facc15';ctx.font='bold 21px monospace';ctx.textAlign='left';ctx.fillText('★',c.x-3,c.y+14)
     });
@@ -556,23 +599,28 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     if(ending?.phase==='projectile')drawCannonball();
     drawDemonExplosion();
     drawHero();
+    ctx.save();ctx.textAlign='left';ctx.font='bold 11px monospace';
+    ctx.lineWidth=3;ctx.strokeStyle='#070b19';
+    ctx.strokeText(`NIVEL ${levelIndex+1} · ${LEVELS[levelIndex].name.toUpperCase()}`,15,21);
+    ctx.fillStyle='#ffe6a0';ctx.fillText(`NIVEL ${levelIndex+1} · ${LEVELS[levelIndex].name.toUpperCase()}`,15,21);
+    ctx.restore();
     ctx.save();ctx.textAlign='center';ctx.font='bold 18px monospace';ctx.lineWidth=4;
     for(const p of scorePopups){
       ctx.globalAlpha=Math.min(1,p.life/12);
-      ctx.strokeStyle='#070b19';ctx.strokeText('+5',Math.round(p.x),Math.round(p.y));
-      ctx.fillStyle='#ffe08a';ctx.fillText('+5',Math.round(p.x),Math.round(p.y));
+      ctx.strokeStyle='#070b19';ctx.strokeText(p.label||'+5',Math.round(p.x),Math.round(p.y));
+      ctx.fillStyle=p.color||'#ffe08a';ctx.fillText(p.label||'+5',Math.round(p.x),Math.round(p.y));
     }
     ctx.restore();
     if(status==='ready'){
       ctx.fillStyle='#030712cc';ctx.fillRect(95,175,450,100);
       ctx.fillStyle='#facc15';ctx.font='bold 22px monospace';ctx.textAlign='center';
-      ctx.fillText('PREPÁRATE',320,209);
+      ctx.fillText(`NIVEL ${levelIndex+1}`,320,209);
       ctx.fillStyle='#fff';ctx.font='bold 40px monospace';
       ctx.fillText(String(Math.max(1,Math.ceil(readyFrames/60))),320,255);
     }else if(status!=='playing'&&status!=='ending'){
       ctx.fillStyle='#030712bb';ctx.fillRect(95,180,450,90);
       ctx.fillStyle='#fff';ctx.font='bold 24px monospace';ctx.textAlign='center';
-      ctx.fillText(status==='won'?'¡DEMONIO DERROTADO!':status==='paused'?'PAUSA':'FIN DEL JUEGO',320,234)
+      ctx.fillText(status==='won'?'¡DEMONIO DERROTADO!':status==='intermission'?'¡NIVEL SUPERADO!':status==='paused'?'PAUSA':'FIN DEL JUEGO',320,234)
     }
   }
   function frame(t){
