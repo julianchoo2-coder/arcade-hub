@@ -90,7 +90,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     <p class="tower-note">⌨️ ← → / A D: moverte · ↑ ↓ / W S: escaleras · ESPACIO: saltar · P: pausa</p>
   </div>
   <aside class="tower-side"><div class="sidebar-badge">★ HALL OF FAME</div><h2>RANKING ARCADE</h2><p>Puntuaciones locales y globales de Torre Arcade.</p><table><thead><tr><th>JUGADOR</th><th>PUNTOS</th></tr></thead><tbody id="towerRecords"><tr><td colspan="2">SIN RÉCORDS</td></tr></tbody></table>
-  <h3>● OBJETIVO</h3><p>Supera 3 niveles con rutas y patrones de barriles diferentes. Cada estrella suma 50 puntos, cada barril que saltes suma 5 y perder una vida resta 50. Llega al cañón de la derecha para derrotar al demonio y pasar al siguiente nivel.</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
+  <h3>● OBJETIVO</h3><p>Supera 3 niveles con rutas y patrones de barriles diferentes. Saltar un barril suma 5, destruirlo con el martillo suma 15 y perder una vida resta 50. Llega al cañón de la derecha para derrotar al demonio y pasar al siguiente nivel.</p><h3>● ¿SABÍAS QUE...?</h3><p>Tu récord se guarda para el jugador con el que entraste a Arcade Hub.</p></aside></div>
 </main>
 <footer class="arcade-footer">© 2026 ARCADE HUB <span>BUILT FOR PLAYERS, BY PLAYERS.</span> INSERT COIN TO CONTINUE ▸</footer>
 <script src="js/global-ranking-config.js?v=1"></script>
@@ -130,7 +130,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   const hammerSprite=new Image();hammerSprite.src='assets/torre-hammer.png?v=1';
   const hammerHeroSprites=[1,2,3,4].map(frame=>{const image=new Image();image.src=`assets/torre-hero-hammer-0${frame}.png?v=1`;return image});
   const DEMON={x:256,y:-28,size:128,targetX:320,targetY:36,barrelX:354,barrelY:62};
-  const CANNON={x:505,y:20,size:76,triggerX:580};
+  const CANNON={x:505,y:30,size:76,triggerX:580};
   let ending=null;
   let stoneTile=null;
   function getStoneTile(){
@@ -310,7 +310,7 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
       stars:[[360,430],[450,339],[260,248],[400,157],[470,65]],
       attack:{delays:[125,150,110,140],counts:[1],windup:26,gap:0,speed:1.88}}
   ];
-  let levelIndex=0,floors=[],ladders=[],itemPositions=[];
+  let levelIndex=0,floors=[],ladders=[];
   const keys=new Set();
   let items=[],hammerItems=[],scorePopups=[];
   let hero,barrels,score,lives,best,spawnClock,status,invuln,last=0;
@@ -352,12 +352,11 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     const stage=LEVELS[index],heights=[456,365,274,183,92];
     floors=stage.floors.map(([x,w],i)=>({x,y:heights[i],w}));
     ladders=stage.ladders.map((x,i)=>({x,top:heights[i+1],bottom:heights[i]}));
-    itemPositions=stage.stars.map(([x,y])=>({x,y}));
-    items=itemPositions.map(x=>({...x,w:15,h:15,taken:false}));
-    // Martillos en las esquinas del segundo y tercer piso para abrir paso entre barriles.
+    items=[];
+    // Fuera de las escaleras: el primero queda en el cuarto piso y el segundo en el tercero.
     hammerItems=[
-      {x:floors[1].x+22,y:floors[1].y-38,w:24,h:24,taken:false},
-      {x:floors[2].x+floors[2].w-46,y:floors[2].y-38,w:24,h:24,taken:false}
+      {x:floors[3].x+180,y:floors[3].y-38,w:24,h:24,taken:false},
+      {x:floors[2].x+Math.round(floors[2].w*.55),y:floors[2].y-38,w:24,h:24,taken:false}
     ];
     barrels=[];scorePopups=[];spawnClock=0;attackIndex=0;burstRemaining=0;burstGap=0;
     demonAnimTick=0;demonState='idle';demonStateTimer=0;throwQueued=false;ending=null;
@@ -493,7 +492,8 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     hero.vx=(keys.has('ArrowRight')||keys.has('KeyD')?speed:0)-(keys.has('ArrowLeft')||keys.has('KeyA')?speed:0);
     if(hero.vx!==0)hero.facing=hero.vx>0?1:-1;
     hero.animTick++;
-    const near=ladders.find(l=>hero.x+hero.w>l.x-8&&hero.x<l.x+28&&hero.y+hero.h>l.top-6&&hero.y<l.bottom+6);
+    if(hero.hammerFrames>0)hero.climbing=false;
+    const near=hero.hammerFrames>0?null:ladders.find(l=>hero.x+hero.w>l.x-8&&hero.x<l.x+28&&hero.y+hero.h>l.top-6&&hero.y<l.bottom+6);
     const up=keys.has('ArrowUp')||keys.has('KeyW'),down=keys.has('ArrowDown')||keys.has('KeyS');
     if(near&&(up||down))hero.climbing=true;
     if(hero.climbing&&near){
@@ -517,13 +517,10 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     }
     hero.x=Math.max(0,Math.min(W-hero.w,hero.x+hero.vx));
     towerMusic?.setIntensity(Math.min(1,score/850 + (456-hero.y)/1700));
-    for(const coin of items){
-      if(!coin.taken && overlap(hero,coin)){coin.taken=true;addScore(50);messageEl.textContent='★ +50 PUNTOS · ¡SIGUE SUBIENDO!'}
-    }
     for(const hammer of hammerItems){
       if(!hammer.taken&&overlap(hero,hammer)){
-        hammer.taken=true;hero.hammerFrames=480;hero.animTick=0;
-        messageEl.textContent='🔨 ¡MARTILLO TOMADO! DESTRUYE LOS BARRILES';
+        hammer.taken=true;hero.hammerFrames=600;hero.animTick=0;hero.climbing=false;
+        messageEl.textContent='🔨 ¡MARTILLO TOMADO! 10 SEGUNDOS · DESTRUYE LOS BARRILES';
       }
     }
     if(hero.hammerFrames>0)hero.hammerFrames--;
@@ -627,9 +624,6 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
     ladders.forEach((l,i)=>drawWoodLadder(l,i));
     drawCannon();
     if(ending?.phase!=='explode'&&ending?.phase!=='won'&&ending?.phase!=='cleared')drawDemonBoss();
-    items.filter(c=>!c.taken).forEach(c=>{
-      ctx.fillStyle='#facc15';ctx.font='bold 21px monospace';ctx.textAlign='left';ctx.fillText('★',c.x-3,c.y+14)
-    });
     hammerItems.filter(h=>!h.taken).forEach(h=>{
       const bob=Math.round(Math.sin((castleAnimTick+h.x)/10)*2);
       ctx.imageSmoothingEnabled=false;
