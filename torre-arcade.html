@@ -402,7 +402,8 @@ window.addEventListener('unhandledrejection', event => {
   function freshHero(){hero={x:40,y:ground-28,w:20,h:28,vx:0,vy:0,onGround:true,climbing:false,facing:1,animTick:0,jumpState:null,hammerFrames:0};invuln=80}
   function loadLevel(index,transition=false){
     levelIndex=index;
-    // Cada separación conserva más de 60 px incluso en la punta de las pendientes.\n    const stage=LEVELS[index],heights=[456,354,252,150,84];
+    // Cada separación conserva más de 60 px incluso en la punta de las pendientes.
+    const stage=LEVELS[index],heights=[456,354,252,150,84];
     floors=stage.floors.map(([x,w,slope],i)=>({x,y:heights[i],w,slope}));
     ladders=stage.ladders.map((x,i)=>({x,top:floorYAt(floors[i+1],x),bottom:floorYAt(floors[i],x)}));
     items=[];
