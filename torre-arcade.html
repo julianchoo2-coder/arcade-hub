@@ -74,9 +74,73 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   .tower-controls button{min-height:50px}
   .tower-controls button[data-key="Space"]{min-height:106px;font-size:9px}
 }
+
+/* Pantalla de inicio y selección: preparada para integrar los sprites definitivos. */
+.tower-intro{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 22%,rgba(134,37,72,.5),transparent 29%),linear-gradient(145deg,#080d20 0%,#151034 48%,#060914 100%);overflow:auto}
+.tower-intro.is-hidden{display:none}
+body.intro-open{overflow:hidden}
+.tower-intro__frame{width:min(580px,100%);border:4px solid #5d76a7;background:rgba(10,16,38,.94);box-shadow:0 0 0 6px #101b39,12px 12px 0 #02040c;padding:clamp(24px,6vw,48px);text-align:center;position:relative}
+.tower-intro__eyebrow{color:#62eaf4;font:9px/1.7 'Press Start 2P',monospace;margin:0 0 20px}
+.tower-intro h1{margin:0;color:#ffd15e;font:clamp(28px,8vw,52px)/1.2 'Press Start 2P',monospace;text-shadow:5px 5px 0 #682f68;letter-spacing:-2px}
+.tower-intro__subtitle{color:#bac9e8;font:14px/1.6 system-ui,sans-serif;max-width:370px;margin:22px auto 28px}
+.tower-intro__buttons{display:grid;gap:12px;margin:auto;max-width:355px}
+.tower-intro button{font:10px/1.6 'Press Start 2P',monospace;border:3px solid #6685b6;box-shadow:4px 4px 0 #050817;background:#17284b;color:#f4f7ff;padding:16px 12px;cursor:pointer;touch-action:manipulation}
+.tower-intro button:hover,.tower-intro button:focus-visible{background:#224674;border-color:#62eaf4;outline:none}
+.tower-intro button.primary{background:#d79548;color:#151126;border-color:#ffe4a5}
+.tower-intro button.primary:hover,.tower-intro button.primary:focus-visible{background:#ffc75e}
+.tower-intro__hint{margin:26px 0 0;color:#8295bd;font:8px/1.8 'Press Start 2P',monospace}
+.character-panel[hidden],.start-panel[hidden]{display:none}
+.character-panel h2{margin:0 0 12px;color:#62eaf4;font:16px/1.6 'Press Start 2P',monospace}
+.character-panel>p{color:#b8c6df;font:13px/1.55 system-ui,sans-serif;margin:0 auto 22px}
+.character-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.character-card{appearance:none;min-height:170px!important;padding:10px!important;display:flex!important;flex-direction:column;align-items:center;justify-content:space-between}
+.character-card[aria-pressed="true"]{border-color:#ffcf5c!important;background:#513c45!important;box-shadow:0 0 0 2px #ffcf5c,4px 4px 0 #050817!important}
+.character-card:disabled{opacity:.48;cursor:not-allowed}
+.character-card img{width:74px;height:86px;object-fit:contain;image-rendering:pixelated}
+.character-card__ghost{width:64px;height:78px;display:grid;place-items:center;border:2px dashed #667aa3;color:#7889aa;font:24px/1 system-ui}
+.character-card small{font:7px/1.55 'Press Start 2P',monospace;color:#dbe5fa}
+.character-card em{font:7px/1.4 'Press Start 2P',monospace;color:#ffcf5c;font-style:normal}
+@media(max-width:480px){.tower-intro{padding:12px}.tower-intro__frame{padding:25px 18px}.tower-intro h1{font-size:29px}.character-grid{gap:7px}.character-card{min-height:150px!important}.character-card img{width:61px;height:70px}.tower-intro button{font-size:8px}}
+
 </style>
 </head>
 <body class="tower-page">
+<div id="towerIntro" class="tower-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+  <section class="tower-intro__frame">
+    <div id="startPanel" class="start-panel">
+      <p class="tower-intro__eyebrow">◈ ARCADE HUB PRESENTA ◈</p>
+      <h1 id="introTitle">TORRE<br>ARCADE</h1>
+      <p class="tower-intro__subtitle">Escala la torre, esquiva los barriles y derrota al demonio antes de que sea demasiado tarde.</p>
+      <div class="tower-intro__buttons">
+        <button type="button" id="introPlay" class="primary">▶ EMPEZAR JUEGO</button>
+        <button type="button" id="introCharacters">♙ SELECCIÓN DE PERSONAJE</button>
+      </div>
+      <p class="tower-intro__hint">USA LOS CONTROLES TÁCTILES O EL TECLADO</p>
+    </div>
+    <div id="characterPanel" class="character-panel" hidden>
+      <h2>ELIGE TU HÉROE</h2>
+      <p>Por ahora está disponible el héroe base. Las demás ranuras están listas para tus próximos sprites.</p>
+      <div class="character-grid" role="group" aria-label="Selección de personaje">
+        <button type="button" class="character-card" data-hero="guardian" aria-pressed="true">
+          <img src="assets/torre-hero.png?v=1" alt="Héroe guardián">
+          <small>GUARDIÁN</small>
+          <em>SELECCIONADO</em>
+        </button>
+        <button type="button" class="character-card" disabled aria-label="Personaje próximamente">
+          <span class="character-card__ghost">?</span><small>HÉROE 02</small><em>PRÓXIMAMENTE</em>
+        </button>
+        <button type="button" class="character-card" disabled aria-label="Personaje próximamente">
+          <span class="character-card__ghost">?</span><small>HÉROE 03</small><em>PRÓXIMAMENTE</em>
+        </button>
+      </div>
+      <div class="tower-intro__buttons">
+        <button type="button" id="characterBack">← VOLVER</button>
+        <button type="button" id="characterPlay" class="primary">▶ JUGAR COMO GUARDIÁN</button>
+      </div>
+    </div>
+  </section>
+</div>
+
 <header class="site-header"><a href="index.html" class="brand-mark"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a><div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="towerSound" class="sound-btn" aria-pressed="true" title="Música lo-fi">♫ LO-FI ON</button></div></header>
 <main>
   <div class="tower-heading"><div><div class="tower-kicker">◈ MACHINE 04 / PLATFORM CHALLENGE</div><h1>🦇 TORRE ARCADE</h1><p>Una torre embrujada bajo la luna roja. Sube las escaleras, esquiva los barriles y desafía al demonio.</p></div><a class="tower-back" href="index.html">← VOLVER AL ARCADE</a></div>
@@ -787,6 +851,35 @@ body.tower-page{display:block;padding:0;margin:0;min-height:100vh;background:#08
   document.getElementById('restart').addEventListener('click',()=>{reset();document.getElementById('pause').textContent='⏸ PAUSAR (P)'});
   document.getElementById('pause').addEventListener('click',togglePause);
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&status==='playing')togglePause()});
+
+  const intro=document.getElementById('towerIntro');
+  const startPanel=document.getElementById('startPanel');
+  const characterPanel=document.getElementById('characterPanel');
+  let selectedHero='guardian';
+  try{selectedHero=localStorage.getItem('torreSelectedHero')||'guardian'}catch{}
+  function showCharacters(){
+    startPanel.hidden=true;characterPanel.hidden=false;
+    document.getElementById('characterBack').focus();
+  }
+  function showStart(){characterPanel.hidden=true;startPanel.hidden=false;document.getElementById('introPlay').focus()}
+  function startTower(){
+    try{localStorage.setItem('torreSelectedHero',selectedHero)}catch{}
+    towerSfx.unlock();
+    intro.classList.add('is-hidden');
+    document.body.classList.remove('intro-open');
+    reset();
+    canvas.focus?.();
+  }
+  document.getElementById('introPlay').addEventListener('click',startTower);
+  document.getElementById('characterPlay').addEventListener('click',startTower);
+  document.getElementById('introCharacters').addEventListener('click',showCharacters);
+  document.getElementById('characterBack').addEventListener('click',showStart);
+  document.querySelectorAll('.character-card[data-hero]').forEach(card=>card.addEventListener('click',()=>{
+    selectedHero=card.dataset.hero;
+    document.querySelectorAll('.character-card[data-hero]').forEach(item=>item.setAttribute('aria-pressed',String(item===card)));
+    document.getElementById('characterPlay').textContent='▶ JUGAR COMO '+card.querySelector('small').textContent;
+  }));
+  document.body.classList.add('intro-open');
   renderRecords();reset();draw();requestAnimationFrame(frame);
 })();
 </script>
