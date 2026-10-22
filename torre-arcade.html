@@ -111,7 +111,7 @@ body.intro-open{overflow:hidden}
 }
 /* Modo móvil horizontal: el canvas conserva 4:3 y los controles se ubican fuera de él. */
 #exitMobileGame,.rotate-notice{display:none}
-@media(max-width:800px){
+@media(max-width:800px), (hover:none) and (pointer:coarse){
   body.game-fullscreen{overflow:hidden;background:#060914}
   body.game-fullscreen .site-header,
   body.game-fullscreen .tower-heading,
@@ -497,7 +497,7 @@ body.intro-open{overflow:hidden}
   let items=[],hammerItems=[],scorePopups=[];
   let hero,barrels,score,lives,best,spawnClock,status,invuln,last=0;
   let readyFrames=0,intermissionFrames=0,attackIndex=0,burstRemaining=0,burstGap=0;
-  const isMobile=window.matchMedia('(max-width:800px)').matches;
+  const isMobile=window.matchMedia('(max-width:800px), (hover:none) and (pointer:coarse)').matches;
   const name=(()=>{try{return(localStorage.getItem('arcadeUser')||'').trim().slice(0,12)}catch{return''}})();
   function getRecords(){
     try{
