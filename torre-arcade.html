@@ -102,6 +102,47 @@ body.intro-open{overflow:hidden}
 .character-card em{font:7px/1.4 'Press Start 2P',monospace;color:#ffcf5c;font-style:normal}
 @media(max-width:480px){.tower-intro{padding:12px}.tower-intro__frame{padding:25px 18px}.tower-intro h1{font-size:29px}.character-grid{gap:7px}.character-card{min-height:150px!important}.character-card img{width:61px;height:70px}.tower-intro button{font-size:8px}}
 
+
+/* Cabina centrada: el tablero es el foco, y el ranking queda debajo sin desplazarlo. */
+@media(min-width:851px){
+  .tower-layout{grid-template-columns:minmax(0,800px);justify-content:center}
+  .tower-main{width:min(800px,100%)}
+  .tower-side{width:100%;justify-self:center}
+}
+/* Modo móvil horizontal: el canvas conserva 4:3 y los controles se ubican fuera de él. */
+#exitMobileGame,.rotate-notice{display:none}
+@media(max-width:800px){
+  body.game-fullscreen{overflow:hidden;background:#060914}
+  body.game-fullscreen .site-header,
+  body.game-fullscreen .tower-heading,
+  body.game-fullscreen .tower-side,
+  body.game-fullscreen .arcade-footer,
+  body.game-fullscreen #message,
+  body.game-fullscreen #pause,
+  body.game-fullscreen #restart,
+  body.game-fullscreen .tower-note{display:none}
+  body.game-fullscreen main{width:100%;height:100dvh;margin:0;padding:0;max-width:none}
+  body.game-fullscreen .tower-layout{display:block;height:100%}
+  body.game-fullscreen .tower-main{width:100%;height:100%;display:grid;place-items:center;position:relative}
+  body.game-fullscreen .tower-stats{position:fixed;z-index:8;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(48vw,430px);margin:0;gap:4px}
+  body.game-fullscreen .tower-stat{padding:5px 4px;font-size:6px;gap:2px;background:rgba(15,28,57,.92)}
+  body.game-fullscreen .tower-stat b{font-size:10px}
+  body.game-fullscreen canvas{width:min(70vw,calc(74dvh * 4 / 3));max-width:none;height:auto;max-height:74dvh;aspect-ratio:4/3;border-width:3px;box-shadow:5px 5px 0 #010510}
+  body.game-fullscreen .tower-controls{position:fixed;z-index:9;inset:0;margin:0;display:block;pointer-events:none}
+  body.game-fullscreen .tower-controls button{position:absolute;pointer-events:auto;margin:0;width:clamp(42px,10vw,68px);height:clamp(42px,10vw,68px);padding:0;border-radius:13px;background:rgba(28,55,85,.9);border:3px solid #4e8dab;font-size:clamp(15px,4vw,24px);box-shadow:3px 3px 0 rgba(0,0,0,.55)}
+  body.game-fullscreen .tower-controls button[data-key="ArrowLeft"]{left:max(12px,env(safe-area-inset-left));top:calc(50% - clamp(21px,5vw,34px))}
+  body.game-fullscreen .tower-controls button[data-key="ArrowRight"]{left:calc(max(12px,env(safe-area-inset-left)) + clamp(88px,20vw,136px));top:calc(50% - clamp(21px,5vw,34px))}
+  body.game-fullscreen .tower-controls button[data-key="ArrowUp"]{left:calc(max(12px,env(safe-area-inset-left)) + clamp(44px,10vw,68px));top:calc(50% - clamp(68px,15vw,102px))}
+  body.game-fullscreen .tower-controls button[data-key="ArrowDown"]{left:calc(max(12px,env(safe-area-inset-left)) + clamp(44px,10vw,68px));top:calc(50% + clamp(26px,6vw,40px))}
+  body.game-fullscreen .tower-controls button[data-key="Space"]{right:max(18px,env(safe-area-inset-right));top:calc(50% - clamp(28px,6vw,40px));width:clamp(62px,14vw,94px);height:clamp(62px,14vw,94px);border-radius:50%;background:rgba(205,126,57,.94);border-color:#ffd675;color:#16101d;font-size:clamp(8px,1.8vw,12px)}
+  body.game-fullscreen #exitMobileGame{display:block;position:fixed;z-index:10;right:max(8px,env(safe-area-inset-right));top:max(7px,env(safe-area-inset-top));padding:6px 8px;background:rgba(7,12,28,.75);border:1px solid #6e89b2;color:#cfe5ff;font:6px/1.4 'Press Start 2P',monospace}
+  @media(orientation:portrait){
+    body.game-fullscreen .tower-main{visibility:hidden}
+    body.game-fullscreen .rotate-notice{position:fixed;z-index:12;inset:0;display:grid;place-items:center;padding:28px;text-align:center;background:#080d20;color:#dbeafe;font:12px/1.9 'Press Start 2P',monospace}
+    body.game-fullscreen .rotate-notice b{display:block;color:#62eaf4;font-size:22px;margin-bottom:16px}
+  }
+}
+
 </style>
 </head>
 <body class="tower-page">
@@ -142,7 +183,7 @@ body.intro-open{overflow:hidden}
 </div>
 
 <header class="site-header"><a href="index.html" class="brand-mark"><span class="brand-icon">✣</span><span>ARCADE<span class="brand-highlight">HUB</span><small>RETRO GAME STATION</small></span></a><div class="header-actions"><span class="online-indicator">● PLAYER ONE READY</span><button type="button" id="towerSound" class="sound-btn" aria-pressed="true" title="Música lo-fi">♫ LO-FI ON</button></div></header>
-<main>
+<main><button type="button" id="exitMobileGame" aria-label="Salir de pantalla completa">⤡ SALIR</button><div class="rotate-notice" aria-live="polite"><div><b>↻</b>GIRA EL TELÉFONO<br>PARA JUGAR EN HORIZONTAL</div></div>
   <div class="tower-heading"><div><div class="tower-kicker">◈ MACHINE 04 / PLATFORM CHALLENGE</div><h1>🦇 TORRE ARCADE</h1><p>Una torre embrujada bajo la luna roja. Sube las escaleras, esquiva los barriles y desafía al demonio.</p></div><a class="tower-back" href="index.html">← VOLVER AL ARCADE</a></div>
   <div class="tower-layout"><div class="tower-main">
     <div class="tower-stats"><div class="tower-stat">PUNTOS <b id="score">0</b></div><div class="tower-stat">VIDAS <b id="lives">3</b></div><div class="tower-stat">RÉCORD <b id="best">0</b></div><div class="tower-stat">NIVEL <b id="level">1/3</b></div></div>
@@ -862,14 +903,32 @@ body.intro-open{overflow:hidden}
     document.getElementById('characterBack').focus();
   }
   function showStart(){characterPanel.hidden=true;startPanel.hidden=false;document.getElementById('introPlay').focus()}
+  function enterMobileGameMode(){
+    if(!isMobile)return;
+    document.body.classList.add('game-fullscreen');
+    const lockLandscape=()=>{try{Promise.resolve(screen.orientation?.lock?.('landscape')).catch(()=>{})}catch{}};
+    try{
+      const fullscreen=document.documentElement.requestFullscreen?.({navigationUI:'hide'});
+      if(fullscreen?.then)fullscreen.then(lockLandscape).catch(()=>{});
+      else lockLandscape();
+    }catch{}
+  }
+  function leaveMobileGameMode(){
+    document.body.classList.remove('game-fullscreen');
+    try{screen.orientation?.unlock?.()}catch{}
+    if(document.fullscreenElement)document.exitFullscreen?.().catch?.(()=>{});
+  }
   function startTower(){
     try{localStorage.setItem('torreSelectedHero',selectedHero)}catch{}
     towerSfx.unlock();
+    enterMobileGameMode();
     intro.classList.add('is-hidden');
     document.body.classList.remove('intro-open');
     reset();
     canvas.focus?.();
   }
+  document.getElementById('exitMobileGame').addEventListener('click',leaveMobileGameMode);
+  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('game-fullscreen')});
   document.getElementById('introPlay').addEventListener('click',startTower);
   document.getElementById('characterPlay').addEventListener('click',startTower);
   document.getElementById('introCharacters').addEventListener('click',showCharacters);
