@@ -166,6 +166,27 @@ body.tower-page{background:#060a1b var(--tower-sky) center/cover fixed no-repeat
   body.game-fullscreen .tower-controls button{box-shadow:0 4px 0 rgba(0,0,0,.62),0 0 0 2px rgba(12,21,48,.35)}
 }
 
+
+/* Consola táctil: cruceta limpia a la izquierda y acciones agrupadas a la derecha. */
+@media(max-width:800px), (hover:none) and (pointer:coarse){
+  .tower-controls{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(78px,1.25fr)}
+  .tower-controls .action-b{
+    display:block;grid-column:4;grid-row:1;min-height:55px;
+    background:#243a63;border-color:#75a2df;color:#eaf4ff;
+    font:10px/1.5 'Press Start 2P',monospace
+  }
+  .tower-controls .action-a{
+    grid-column:4;grid-row:2;min-height:55px;
+    font:10px/1.5 'Press Start 2P',monospace
+  }
+  #pause,#restart{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:calc(50% - 4px);min-height:45px;margin:9px 4px 0 0;padding:8px 4px;
+    font-size:8px;vertical-align:top
+  }
+  #restart{margin-right:0}
+}
+
 </style>
 </head>
 <body class="tower-page">
